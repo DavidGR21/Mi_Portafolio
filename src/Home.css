@@ -7,8 +7,9 @@
 
 body {
   font-family: 'Arial', sans-serif;
-  background-color: #000;
+  background-color: rgb(13,13,13);
   color: #fff;
+  cursor: url('src/assets/registro.png'), auto;
 }
 
 /* Contenedor principal */
@@ -20,7 +21,7 @@ body {
 
 /* Menú */
 .menu {
-  background-color: #000;
+  background-color: rgb(13,13,13);
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -48,16 +49,38 @@ body {
 
 .menu-list {
   list-style: none;
-  margin: 20px 0;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
 }
 
 .menu-item {
-  font-size: 14px;
-  margin: 10px 0;
   display: flex;
-  align-items: center;
+  align-items: center; /* Alinear verticalmente el guion con el texto */
+  padding: 10px 0; /* Separación entre elementos */
+  color: #fff; /* Color del texto */
+  text-transform: uppercase; /* Texto en mayúsculas */
+  font-size: 16px; /* Tamaño del texto */
   cursor: pointer;
-  transition: color 0.3s;
+  transition: color 0.4s ease; /* Transición suave para hover */
+  text-align: left;
+  width: 10px;
+  cursor: none;
+}
+
+.menu-item::before {
+  content: "—"; /* El guion encima del texto */
+  position: absolute; /* Posicionarlo en relación al item */
+  top: -10px; /* Posicionarlo encima del texto */
+  left: 0; /* Alinear a la izquierda */
+  color: #fff; /* Color del guion */
+  font-size: 16px; /* Tamaño del guion */
+  line-height: 1; /* Ajustar el espacio vertical */
+  transition: color 0.3s ease; /* Transición suave para hover */
+}
+
+.menu-item.active::before {
+  color: #e74c3c; /* Cambiar el color del guion cuando está activo */
 }
 
 .menu-item span {
@@ -67,6 +90,8 @@ body {
 
 .menu-item:hover {
   color: #e74c3c; /* Rojo al pasar */
+  cursor: url('src/assets/flecha.png'), auto;
+  transition: 0.3s;
 }
 
 .menu-item.active {

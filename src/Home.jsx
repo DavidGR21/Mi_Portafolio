@@ -36,10 +36,10 @@ function Home() {
                 </div>
                 <ul className="menu-list">
                     <li onClick={() => { setPage("home"); setActivePage("home") }} className={`menu-item ${activePage === "home" ? "active" : ""}`}>
-                        <span>—</span> HOME
+                        <span>—</span>  HOME
                     </li>
                     <li onClick={() => { setPage("works"); setActivePage("works") }} className={`menu-item ${activePage === "works" ? "active" : ""}`}>
-                        <span>—</span> WORKS
+                        <span>—</span>WORKS
                     </li>
                     <li onClick={() => { setPage("contact"); setActivePage("contact") }} className={`menu-item ${activePage === "contact" ? "active" : ""}`}>
                         <span>—</span> CONTACT
