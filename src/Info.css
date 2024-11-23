@@ -1,0 +1,101 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #111; /* Fondo oscuro */
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+.container_Info {
+  padding: 5px 10px;
+  text-align: center;
+  color: #ffffffcb;
+  margin-left: 45vh;
+  border-left: 1px solid #ffffff1a;
+  height: 100vh;
+}
+
+.container_Info {
+  overflow-y: scroll;
+}
+
+.titulo_Info:first-of-type {
+  text-align: left;
+  font-size: 25px;
+  position: sticky;
+  top: 0;
+  background-color: transparent;
+  z-index: 10;
+}
+
+.titulo_Profile {
+  text-align: left;
+  font-size: 25px;
+  background-color: transparent;
+  margin-top: 20vh;
+  margin-bottom: 7vh;
+}
+
+.container_Info::-webkit-scrollbar {
+  width: 0px;
+}
+
+.container_Profile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.profile-image {
+  width: 150px;
+  height: 150px;
+  margin-right: 20px;
+}
+
+.profile-text {
+  max-width: 700px;
+  text-align: justify;
+  margin-right: 20vh;
+}
+
+.social-buttons {
+  display: flex;
+  justify-content: start;
+  gap: 10px;
+}
+
+.social-buttons a {
+  color: white;
+  cursor: none;
+  background-color: #333;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.social-buttons a:hover {
+  background-color: #9e1a0b;
+  color: white;
+  cursor: url("/assets/flechaArriba.png"), auto;
+}
+
+.credits {
+  margin-top: 20px;
+  text-align: start;
+  margin-bottom: 20vh;
+}
+
+.credits a {
+  color: #ccc;
+  text-decoration: underline;
+  cursor: url("/assets/registro.png"), auto;
+}
+
+.credits a:hover {
+  color: white;
+}

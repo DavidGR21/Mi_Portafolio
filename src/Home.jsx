@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./Home.css";
 import icono from './assets/icono.png';
+import Info from './Info.jsx'
 
 function Home() {
     const [page, setPage] = useState("home");
@@ -15,7 +16,7 @@ function Home() {
             case "contact":
                 return <h2>Contacto</h2>;
             case "info":
-                return <h2>Info</h2>;
+                return <Info />
             default:
                 return <h2>Página Principal</h2>;
         }

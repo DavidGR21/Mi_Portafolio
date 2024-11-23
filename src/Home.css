@@ -6,15 +6,16 @@
 }
 
 body {
-  font-family: 'Arial', sans-serif;
-  background-color: rgb(13,13,13);
+  font-family: "Arial", sans-serif;
+  background-color: rgb(13, 13, 13);
+  overflow: hidden;
   color: #fff;
-  cursor: url('/assets/registro.png'), auto;
+  cursor: url("/assets/registro.png"), auto;
 }
 
 ::selection {
-  color: #e74c3c;  /* Cambia este valor al color que desees para el texto seleccionado */
-  background-color: transparent;  /* Elimina el fondo de selección */
+  color: #e74c3c; /* Cambia este valor al color que desees para el texto seleccionado */
+  background-color: transparent; /* Elimina el fondo de selección */
 }
 
 /* Contenedor principal */
@@ -26,7 +27,7 @@ body {
 
 /* Menú */
 .menu {
-  background-color: rgb(13,13,13);
+  background-color: rgb(13, 13, 13);
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -95,7 +96,7 @@ body {
 
 .menu-item:hover {
   color: #e74c3c; /* Rojo al pasar */
-  cursor: url('/assets/flecha.png'), auto;
+  cursor: url("/assets/flecha.png"), auto;
   transition: 0.2s;
 }
 
@@ -106,7 +107,9 @@ body {
 /* Footer del menú */
 .menu-footer {
   display: flex;
-  justify-content: center;
+  justify-content: left;
+  margin-left: -5vh;
+  margin-bottom: -10vh;
 }
 
 .menu-footer .logo {
@@ -116,7 +119,5 @@ body {
 
 /* Contenido principal */
 .content {
-  padding: 40px;
-  background-color: #111;
+  background-color: rgb(13, 13, 13);
 }
-
