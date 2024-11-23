@@ -1,0 +1,112 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: rgb(13, 13, 13); /* Fondo oscuro */
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+.container_G_Works {
+  display: flex;
+  justify-content: space-between;
+  padding: 0;
+}
+
+.container_List_Works {
+  width: 70%;
+  max-height: 100vh;
+  border-right: 1px solid rgba(255, 255, 255, 0.13);
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.container_List_Works::-webkit-scrollbar {
+  width: 0px;
+}
+
+ol {
+  list-style-type: none;
+  padding: 0;
+}
+
+.work-item {
+  margin-bottom: 10vh;
+}
+
+.cont_Project {
+  position: relative;
+  display: flex;
+  width: 100%;
+  max-width: 300px;
+  color: #ffffff4d;
+  overflow: hidden;
+}
+
+.etiqueta {
+  top: 10px;
+  left: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.img_Project {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: grayscale(100%); /* Imagen en blanco y negro */
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.img_Project:hover {
+  transform: scale(1.05); /* Efecto de zoom */
+  filter: grayscale(0); /* Vuelve a color al pasar el cursor */
+  cursor: url("/assets/flecha.png"), auto;
+}
+
+.name_Project {
+  text-align: right;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.container_Works {
+  width: 25%;
+  text-align: center;
+}
+
+.titulo_Works {
+  font-size: 24px;
+  color: #ffffff4f;
+}
+
+.cant_Items {
+  font-size: 13px;
+  color: #aca8a8;
+  font-style: oblique;
+  margin-left: -10vh;
+}
+#tituloW {
+  margin-left: -8px;
+  margin-top: 5px;
+}
+
+.container_Img_Big img {
+  position: absolute;
+  width: 350px;
+  height: 350px;
+  margin-top: 10vh;
+  margin-left: 25vh;
+}
+
+.name_Big {
+  position: absolute;
+  margin-top: 30vh;
+  margin-left: 10vh;
+  font-size: 50px;
+  z-index: 20;
+}

@@ -3,6 +3,7 @@ import "./Home.css";
 import icono from './assets/icono.png';
 import Info from './Info.jsx';
 import Contact from './Contact.jsx';
+import Works from './Works.jsx';
 
 function Home() {
     const [page, setPage] = useState("home");
@@ -23,7 +24,7 @@ function Home() {
             case "home":
                 return <h2>Página Principal</h2>;
             case "works":
-                return <h2>Trabajos</h2>;
+                return <Works />;
             case "contact":
                 return <Contact />;
             case "info":
