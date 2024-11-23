@@ -9,34 +9,31 @@ body {
   font-family: Arial, sans-serif;
 }
 
-.container_Info {
+.container_Contact {
   padding: 5px 10px;
   text-align: center;
   color: #ffffffcb;
   margin-left: 45vh;
   border-left: 1px solid #ffffff1a;
   height: 100vh;
+  width: 100vh;
 }
 
 .container_Info {
   overflow-y: scroll;
 }
 
-/* From Uiverse.io by pablofernz */
 .formContainer {
   height: 100%;
-  /* change the width here if you want */
   width: 300px;
+  margin-left: 40%;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-direction: column-reverse;
-  /* explanation: Reverse make the label appear visually above the input, when in the HTML it is below so that the "+" selector can work  */
-  gap: 10px;
+  flex-direction: column;
   position: relative;
 }
 
-/* This selects the label inside "formContainer*/
 .formContainer > label {
   font-family: Basier Square;
   font-weight: 900;
@@ -47,10 +44,9 @@ body {
   transition: all 0.3s ease;
 }
 
-/* This selects the input inside "formContainer*/
-.formContainer > input {
+.formContainer > input,
+.formContainer > textarea {
   width: 100%;
-  height: 40px;
   border-radius: 10px;
   font-weight: 900px;
   background-color: transparent;
@@ -63,9 +59,21 @@ body {
   z-index: 5;
 }
 
-/* If you give the input a class, this would be equal to: 
-  .input:focus */
-.formContainer > input:focus {
+/* Ajustar la altura específica del textarea */
+.formContainer > textarea {
+  height: 120px; /* Cambia este valor según sea necesario */
+  padding: 10px; /* Agregar un padding adicional para multilineas */
+  resize: none; /* Opcional: deshabilita el redimensionado */
+}
+
+.formContainer > input {
+    height: 40px; /* Cambia este valor según sea necesario */
+    padding: 10px; /* Agregar un padding adicional para multilineas */
+    resize: none; /* Opcional: deshabilita el redimensionado */
+  }
+
+.formContainer > input:focus,
+.formContainer > textarea:focus {
   color: rgb(197, 197, 197);
   outline: none;
   border: 2px solid rgb(255, 255, 255);
@@ -73,21 +81,20 @@ body {
     0px 0px 5px rgba(255, 255, 255, 0.145) inset;
 }
 
-/* This would be equal to: .input:focus+.label */
-.formContainer > input:focus + label {
+.formContainer > input:focus + label,
+.formContainer > textarea:focus + label {
   color: rgb(197, 197, 197);
   text-shadow: 0px 0px 10px rgba(255, 255, 255, 0.145);
 }
 
-/* This would be equal to: .input::placeholder */
-.formContainer > input::placeholder {
+/* Placeholder */
+.formContainer > input::placeholder,
+.formContainer > textarea::placeholder {
   color: rgb(85, 85, 85);
   transition: all 0.5s ease;
 }
 
-/* This would be equal to: .input:focus::placeholder */
-.formContainer > input:focus::placeholder {
+.formContainer > input:focus::placeholder,
+.formContainer > textarea:focus::placeholder {
   color: rgb(150, 150, 150);
 }
-
-/* <thx/> */

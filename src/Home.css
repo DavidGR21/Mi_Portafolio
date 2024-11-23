@@ -119,7 +119,7 @@ body {
 
 /* Contenido principal */
 .content {
-  background-color: rgb(13, 13, 13);
+  background-color: #0d0d0d;
   flex-grow: 1;
   transition: opacity 0.3s ease-in-out; /* Animación suave */
   opacity: 1;
@@ -130,5 +130,5 @@ body {
 }
 
 .content.fade-in {
-  opacity: 1; /* Aparece */
+  opacity: 1; 
 }
