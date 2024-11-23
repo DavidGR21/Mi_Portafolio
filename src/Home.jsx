@@ -1,11 +1,22 @@
 import React, { useState } from "react";
 import "./Home.css";
 import icono from './assets/icono.png';
-import Info from './Info.jsx'
+import Info from './Info.jsx';
+import Contact from './Contact.jsx';
 
 function Home() {
     const [page, setPage] = useState("home");
     const [activePage, setActivePage] = useState("home");
+    const [isFading, setIsFading] = useState(false); // Nuevo estado para manejar la animación
+
+    const changePage = (newPage) => {
+        setIsFading(true); // Comienza la animación de desvanecimiento
+        setTimeout(() => {
+            setPage(newPage); // Cambia la página después de la animación de salida
+            setActivePage(newPage); // Cambia el estado de la página activa
+            setIsFading(false); // Reinicia la animación para la nueva página
+        }, 500); // Duración del desvanecimiento
+    };
 
     const renderContent = () => {
         switch (page) {
@@ -14,9 +25,9 @@ function Home() {
             case "works":
                 return <h2>Trabajos</h2>;
             case "contact":
-                return <h2>Contacto</h2>;
+                return <Contact />;
             case "info":
-                return <Info />
+                return <Info />;
             default:
                 return <h2>Página Principal</h2>;
         }
@@ -37,16 +48,28 @@ function Home() {
                     </p>
                 </div>
                 <ul className="menu-list">
-                    <li onClick={() => { setPage("home"); setActivePage("home") }} className={`menu-item ${activePage === "home" ? "active" : ""}`}>
-                        <span>—</span>  HOME
+                    <li
+                        onClick={() => changePage("home")}
+                        className={`menu-item ${activePage === "home" ? "active" : ""}`}
+                    >
+                        <span>—</span> HOME
                     </li>
-                    <li onClick={() => { setPage("works"); setActivePage("works") }} className={`menu-item ${activePage === "works" ? "active" : ""}`}>
-                        <span>—</span>WORKS
+                    <li
+                        onClick={() => changePage("works")}
+                        className={`menu-item ${activePage === "works" ? "active" : ""}`}
+                    >
+                        <span>—</span> WORKS
                     </li>
-                    <li onClick={() => { setPage("contact"); setActivePage("contact") }} className={`menu-item ${activePage === "contact" ? "active" : ""}`}>
+                    <li
+                        onClick={() => changePage("contact")}
+                        className={`menu-item ${activePage === "contact" ? "active" : ""}`}
+                    >
                         <span>—</span> CONTACT
                     </li>
-                    <li onClick={() => { setPage("info"); setActivePage("info") }} className={`menu-item ${activePage === "info" ? "active" : ""}`}>
+                    <li
+                        onClick={() => changePage("info")}
+                        className={`menu-item ${activePage === "info" ? "active" : ""}`}
+                    >
                         <span>—</span> INFO
                     </li>
                 </ul>
@@ -55,8 +78,8 @@ function Home() {
                 </div>
             </div>
 
-            {/* Contenido principal */}
-            <div className="content">
+            {/* Contenido principal con animación */}
+            <div className={`content ${isFading ? "fade-out" : "fade-in"}`}>
                 {renderContent()}
             </div>
         </div>

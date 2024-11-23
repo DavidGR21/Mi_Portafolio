@@ -40,7 +40,7 @@ function Info() {
             </div>
             <h2 className="titulo_Profile">CREDITS</h2>
             <div className="credits">
-                <h3>Web Site</h3>
+                <h3>Web</h3>
                 <a href="https://production-hasu.work/info/">Production Hasu</a>
             </div>
         </div>
