@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./Home.css";
+import icono from './assets/icono.png';
 
 function Home() {
     const [page, setPage] = useState("home");
@@ -49,7 +50,7 @@ function Home() {
                     </li>
                 </ul>
                 <div className="menu-footer">
-                    <img src="src\assets\logoPerfilBlanco.png"></img>
+                    <img src={icono} alt="Icono" />
                 </div>
             </div>
 

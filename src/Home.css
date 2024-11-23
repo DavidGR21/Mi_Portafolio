@@ -9,7 +9,12 @@ body {
   font-family: 'Arial', sans-serif;
   background-color: rgb(13,13,13);
   color: #fff;
-  cursor: url('src/assets/registro.png'), auto;
+  cursor: url('/assets/registro.png'), auto;
+}
+
+::selection {
+  color: #e74c3c;  /* Cambia este valor al color que desees para el texto seleccionado */
+  background-color: transparent;  /* Elimina el fondo de selección */
 }
 
 /* Contenedor principal */
@@ -62,7 +67,7 @@ body {
   text-transform: uppercase; /* Texto en mayúsculas */
   font-size: 16px; /* Tamaño del texto */
   cursor: pointer;
-  transition: color 0.4s ease; /* Transición suave para hover */
+  transition: color 0.3s ease; /* Transición suave para hover */
   text-align: left;
   width: 10px;
   cursor: none;
@@ -90,8 +95,8 @@ body {
 
 .menu-item:hover {
   color: #e74c3c; /* Rojo al pasar */
-  cursor: url('src/assets/flecha.png'), auto;
-  transition: 0.3s;
+  cursor: url('/assets/flecha.png'), auto;
+  transition: 0.2s;
 }
 
 .menu-item.active {
