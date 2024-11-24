@@ -1,23 +1,35 @@
 import "./Works.css";
 import { useState } from 'react';
+import img1 from './assets/ProjectMascota.png';
+import img2 from './assets/iBlog.jpg';
+import img3 from './assets/gestorNotas.png';
+import img4 from './assets/Ventas.png';
+
 
 function Works() {
     const listworks = [
-        { id: '01', nombre: "Proyecto Mascota Virtual", url: "https://cdn.sanity.io/images/7b0p5ml9/production/28c54dc21c037d45d1aaf3cae45db267d1167e23-3830x2144.png?auto=format&q=80&w=1920", descripcion: "descripcion de la imagen 1", url_go: '' },
-        { id: '02', nombre: "WORK2", url: "https://cdn.sanity.io/images/7b0p5ml9/production/6b5fe1f056531e95e933afe8e06555ad6f18e953-2000x2000.png?auto=format&q=80&w=1920", descripcion: "descripcion de la imagen 2", url_go: '' },
-        { id: '03', nombre: "WORK3", url: "https://cdn.sanity.io/images/7b0p5ml9/production/28c54dc21c037d45d1aaf3cae45db267d1167e23-3830x2144.png?auto=format&q=80&w=1920", descripcion: "descripcion de la imagen 3", url_go: '' },
-        { id: '04', nombre: "WORK4", url: "https://cdn.sanity.io/images/7b0p5ml9/production/28c54dc21c037d45d1aaf3cae45db267d1167e23-3830x2144.png?auto=format&q=80&w=1920", descripcion: "descripcion de la imagen 4", url_go: '' },
+        { id: '01', nombre: "Mascota Virtual", url: img1, descripcion: "descripcion de la imagen 1", url_go: '' },
+        { id: '02', nombre: "iBlog", url: img2, descripcion: "descripcion de la imagen 2", url_go: '' },
+        { id: '03', nombre: "Gestor Notas", url: img3, descripcion: "descripcion de la imagen 3", url_go: '' },
+        { id: '04', nombre: "App Venta", url: img4, descripcion: "descripcion de la imagen 4", url_go: '' },
         // Agrega más elementos si es necesario
     ];
 
     const [selectedImage, setSelectedImage] = useState('https://cdn.sanity.io/images/7b0p5ml9/production/28c54dc21c037d45d1aaf3cae45db267d1167e23-3830x2144.png?auto=format&q=80&w=1920');
     const [selectedName, setSelectedName] = useState('WORK1');
-    const [selectedURL, setSelectedURL] = useState('WORK1');
+    const [selectedURL, setSelectedURL] = useState('');
+    const [outgoingImage, setOutgoingImage] = useState(null);
 
-    const handleMouseEnter = (url, name, url_go) => {
-        setSelectedImage(url);
-        setSelectedName(name);
-        setSelectedURL(url_go);
+    const handleMouseEnter = (url, nombre, url_go) => {
+        if (selectedImage) {
+            setOutgoingImage(selectedImage);
+        }
+        setTimeout(() => {
+            setSelectedImage(url);
+            setOutgoingImage(null);
+            setSelectedName(nombre);
+            setSelectedURL(url_go);
+        }, 300);
     };
 
     return (
@@ -32,7 +44,10 @@ function Works() {
                         >
                             <div className="cont_Project">
                                 <p className="etiqueta">#{work.id}</p>
-                                <img className="img_Project" src={work.url} alt="Project Image"
+                                <img
+                                    className="img_Project"
+                                    src={work.url}
+                                    alt="Project Image"
                                 />
                             </div>
                             <p className="name_Project">{work.nombre}</p>
@@ -43,10 +58,27 @@ function Works() {
             <div className="container_Works">
                 <h2 id="tituloW" className="titulo_Info">WORKS</h2>
                 <p className="cant_Items">{listworks.length} ITEMS</p>
+                <p className="name_Big">{selectedName}</p>
                 <div className="container_Img_Big">
-                    <p className="name_Big">{selectedName}</p>
-                    <img src={selectedImage}></img>
-                    <a className="urlGO" href={selectedURL}>GITHUB</a>
+                    {outgoingImage && (
+                        <img
+                            src={outgoingImage}
+                            alt="Outgoing Project"
+                            className="outgoing"
+                        />
+                    )}
+                    {selectedImage && (
+                        <img
+                            src={selectedImage}
+                            alt="Selected Project"
+                            className="incoming"
+                        />
+                    )}
+                    <a href={selectedURL} className="button">
+                        <span className="bracket left">❴</span>
+                        <span className="text">Code</span>
+                        <span className="bracket right">❵</span>
+                    </a>
                 </div>
             </div>
         </div>

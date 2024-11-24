@@ -96,10 +96,10 @@ ol {
 }
 
 .container_Img_Big {
-  position: absolute; /* Para que no afecte a otros componentes */
-  top: 10vh; /* Ajusta según tu diseño */
-  left: 120vh; /* Ajusta según tu diseño */
-  width: 80vh; /* Ajusta el tamaño necesario */
+  position: absolute;
+  top: 10vh;
+  left: 120vh;
+  width: 80vh;
   height: 80vh;
   background: repeating-linear-gradient(
     -45deg,
@@ -109,14 +109,11 @@ ol {
     rgb(13, 13, 13) 1px
   );
   border: 1px solid rgba(0, 0, 0, 0.685);
-  overflow: hidden;
+  overflow: visible;
   z-index: 10;
-  clip-path: polygon(
-    0% 10%,     /* Esquina superior izquierda */
-    100% 0%,   /* Esquina superior derecha */
-    100% 100%, /* Esquina inferior derecha más alta */
-    0% 90%    /* Esquina inferior izquierda */
-  );
+  clip-path: polygon(0% 10%, 100% 0%, 100% 100%, 0% 90%);
+  opacity: 1; /* Visible por defecto */
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .container_Img_Big::before {
@@ -131,12 +128,22 @@ ol {
 
 .name_Big {
   position: absolute;
-  margin-top: 50vh;
-  font-size: 5vh;
+  margin-top: 8vh;
+  width: 50vh;
+  height: 65vh;
+  font-size: 8vh;
   text-align: start;
   padding-left: 2vh;
-  width: 80%;
   z-index: 20;
+  font-family: Roboto, sans-serif;
+  font-weight: bold;
+  color: #ffffffb9;
+  text-shadow: 1px 1px 0 #44444471, -1px -1px 0 #0000006b, -2px -2px 0 #000000a4;
+  text-transform: uppercase;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .container_Img_Big img {
@@ -147,12 +154,13 @@ ol {
   margin-top: 5vh;
   margin-left: 4vh;
   clip-path: polygon(
-    0% 10%,     /* Esquina superior izquierda */
-    100% 0%,   /* Esquina superior derecha */
-    100% 100%, /* Esquina inferior derecha más alta */
-    0% 90%    /* Esquina inferior izquierda */
+    0% 10%,
+    100% 0%,
+    100% 100%,
+    0% 90%
   );
   box-shadow: 100px 10px 20px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .urlGO {
@@ -162,3 +170,61 @@ ol {
   z-index: 1000;
   cursor: url("/assets/flecha.png"), auto;
 }
+
+/* From Uiverse.io by vinodjangid07 */
+.button {
+  display: flex;
+  position: absolute;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 45px;
+  width: 45px;
+  margin-top: 70vh;
+  margin-left: 60vh;
+  border: none;
+  border-radius: 10px;
+  background-color: rgba(13, 13, 13);
+  cursor: pointer;
+  transition: all 0.3s;
+  overflow: hidden;
+}
+.bracket {
+  font-size: 18px;
+  transition: all 0.3s;
+  color: rgba(138, 131, 131, 0.678);
+}
+.text {
+  font-size: 15px;
+  width: 0;
+  transform: scale(0);
+  transition: all 0.3s;
+  color: white;
+}
+.button:hover {
+  width: 100px;
+  cursor: url("/assets/flecha.png"), auto;
+}
+.button:hover .text {
+  transform: scale(1);
+  width: 40px;
+}
+
+@keyframes disintegrate {
+  0% {
+    transform: scale(1);
+    filter: grayscale(0);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    filter: grayscale(100%);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.5);
+    filter: grayscale(100%);
+    opacity: 0;
+  }
+}
+
