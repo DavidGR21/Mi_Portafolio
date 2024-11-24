@@ -31,7 +31,7 @@ function Home() {
             case "info":
                 return <Info />;
             default:
-                return <h2>Página Principal</h2>;
+                return <Principal />;
         }
     };
 

@@ -3,6 +3,17 @@ body {
   font-weight: 700;
   overscroll-behavior: none;
 }
+.container_Inf {
+  position: absolute;
+  display: flex;
+  margin-top: 70vh;
+  margin-left: 120vh;
+  margin-right: 10vh;
+}
+.container_Inf p {
+  text-align: justify;
+  margin-right: 20px;
+}
 
 .top {
   position: absolute;

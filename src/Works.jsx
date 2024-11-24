@@ -8,18 +8,18 @@ import img5 from "./assets/NFC.png";
 
 function Works() {
     const listworks = [
-        { id: "01", nombre: "Virtual Pets", url: img1, descripcion: "descripcion de la imagen 1", url_go: "" },
+        { id: "01", nombre: "Virtual Pets", url: img1, descripcion: "descripcion de la imagen 1", url_go: "https://github.com/DavidGR21/MascotaVirtualJAVA" },
         { id: "02", nombre: "iBlog", url: img2, descripcion: "descripcion de la imagen 2", url_go: "https://github.com/xxxMichael/iBlog" },
         { id: "03", nombre: "Notes Manager", url: img3, descripcion: "descripcion de la imagen 3", url_go: "https://github.com/DavidGR21/Proyecto_Agiles" },
-        { id: "04", nombre: "Sales App", url: img4, descripcion: "descripcion de la imagen 4", url_go: "" },
-        { id: "05", nombre: "NFC detector", url: img5, descripcion: "descripcion de la imagen 5", url_go: "" },
+        { id: "04", nombre: "Sales App", url: img4, descripcion: "descripcion de la imagen 4", url_go: "https://github.com/DavidGR21/App-de-Ventas" },
+        { id: "05", nombre: "NFC detector", url: img5, descripcion: "descripcion de la imagen 5", url_go: "https://github.com/xxxMichael/Nfc-detector" },
     ];
 
     const [selectedImage, setSelectedImage] = useState(img1);
     const [animationClass, setAnimationClass] = useState("");
     const [selectedName, setSelectedName] = useState("Virtual Pets");
     const [animatedName, setAnimatedName] = useState("Virtual Pets");
-    const [selectedURL, setSelectedURL] = useState("");
+    const [selectedURL, setSelectedURL] = useState("https://github.com/DavidGR21/MascotaVirtualJAVA");
     const [isAnimating, setIsAnimating] = useState(false); // Nuevo estado para manejar la animación
     const [isAnimatingButton, setIsAnimatingButton] = useState(false); // Estado para animar el botón
 
@@ -40,7 +40,7 @@ function Works() {
 
             // Animación de entrada del botón
             setIsAnimatingButton(false);
-        }, 300); // Duración de la animación de salida
+        }, 200); // Duración de la animación de salida
     };
 
     const animateTitle = (newName) => {
