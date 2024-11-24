@@ -17,8 +17,8 @@ function Works() {
 
     const [selectedImage, setSelectedImage] = useState(img1);
     const [animationClass, setAnimationClass] = useState("");
-    const [selectedName, setSelectedName] = useState("Mascota Virtual");
-    const [animatedName, setAnimatedName] = useState("Mascota Virtual");
+    const [selectedName, setSelectedName] = useState("Virtual Pets");
+    const [animatedName, setAnimatedName] = useState("Virtual Pets");
     const [selectedURL, setSelectedURL] = useState("");
     const [isAnimating, setIsAnimating] = useState(false); // Nuevo estado para manejar la animación
     const [isAnimatingButton, setIsAnimatingButton] = useState(false); // Estado para animar el botón
