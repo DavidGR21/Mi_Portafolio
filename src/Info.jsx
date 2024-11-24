@@ -10,10 +10,10 @@ function Info() {
                 <img src={foto} alt="Perfil" className="profile-image" />
                 <div className="profile-text">
                     <p>
-                        Soy un desarrollador web en formación, actualmente estudiando Ingeniería de Software,
-                        cursando el 4to semestre.<br />
-                        Busco oportunidades para trabajar y aprender
-                        de profesionales experimentados en el campo del desarrollo web y la tecnología.
+                        I am a web developer in training, currently studying Software Engineering,
+                        in the 4th semester.<br />
+                        I am looking for opportunities to work and learn
+                        from experienced professionals in the field of web development and technology.
                     </p>
                 </div>
             </div>

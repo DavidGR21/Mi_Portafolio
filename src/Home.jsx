@@ -42,10 +42,10 @@ function Home() {
                 <div className="menu-header">
                     <h1>NERIS DAVID<br />GILER</h1>
                     <p>
-                        DESARROLLADOR <br />
+                        DEVELOPER <br />
                         FRONTEND <br />
                         BACKEND <br />
-                        WEB Y ESCRITORIO<br />
+                        WEB & DESKTOP<br />
                         © DAVID GILER
                     </p>
                 </div>

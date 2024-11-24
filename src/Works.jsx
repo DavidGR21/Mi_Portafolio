@@ -8,11 +8,11 @@ import img5 from "./assets/NFC.png";
 
 function Works() {
     const listworks = [
-        { id: "01", nombre: "Mascota Virtual", url: img1, descripcion: "descripcion de la imagen 1", url_go: "" },
+        { id: "01", nombre: "Virtual Pets", url: img1, descripcion: "descripcion de la imagen 1", url_go: "" },
         { id: "02", nombre: "iBlog", url: img2, descripcion: "descripcion de la imagen 2", url_go: "https://github.com/xxxMichael/iBlog" },
-        { id: "03", nombre: "Gestor Notas", url: img3, descripcion: "descripcion de la imagen 3", url_go: "https://github.com/DavidGR21/Proyecto_Agiles" },
-        { id: "04", nombre: "App Venta", url: img4, descripcion: "descripcion de la imagen 4", url_go: "" },
-        { id: "05", nombre: "REGISTRO NFC", url: img5, descripcion: "descripcion de la imagen 5", url_go: "" },
+        { id: "03", nombre: "Notes Manager", url: img3, descripcion: "descripcion de la imagen 3", url_go: "https://github.com/DavidGR21/Proyecto_Agiles" },
+        { id: "04", nombre: "Sales App", url: img4, descripcion: "descripcion de la imagen 4", url_go: "" },
+        { id: "05", nombre: "NFC detector", url: img5, descripcion: "descripcion de la imagen 5", url_go: "" },
     ];
 
     const [selectedImage, setSelectedImage] = useState(img1);
