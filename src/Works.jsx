@@ -12,7 +12,7 @@ function Works() {
         { id: "02", nombre: "iBlog", url: img2, descripcion: "descripcion de la imagen 2", url_go: "https://github.com/xxxMichael/iBlog" },
         { id: "03", nombre: "Gestor Notas", url: img3, descripcion: "descripcion de la imagen 3", url_go: "https://github.com/DavidGR21/Proyecto_Agiles" },
         { id: "04", nombre: "App Venta", url: img4, descripcion: "descripcion de la imagen 4", url_go: "" },
-        { id: "05", nombre: "lector NFC", url: img5, descripcion: "descripcion de la imagen 5", url_go: "" },
+        { id: "05", nombre: "REGISTRO NFC", url: img5, descripcion: "descripcion de la imagen 5", url_go: "" },
     ];
 
     const [selectedImage, setSelectedImage] = useState(img1);

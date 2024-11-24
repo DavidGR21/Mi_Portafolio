@@ -4,6 +4,7 @@ import icono from './assets/icono.png';
 import Info from './Info.jsx';
 import Contact from './Contact.jsx';
 import Works from './Works.jsx';
+import Principal from './Principal.jsx';
 
 function Home() {
     const [page, setPage] = useState("home");
@@ -22,7 +23,7 @@ function Home() {
     const renderContent = () => {
         switch (page) {
             case "home":
-                return <h2>Página Principal</h2>;
+                return <Principal />;
             case "works":
                 return <Works />;
             case "contact":
