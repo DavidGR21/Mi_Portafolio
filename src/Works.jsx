@@ -5,6 +5,7 @@ import img2 from "./assets/iBlog.jpg";
 import img3 from "./assets/gestorNotas.png";
 import img4 from "./assets/Ventas.png";
 import img5 from "./assets/NFC.png";
+import img6 from "./assets/campaña.png";
 
 function Works() {
     const listworks = [
@@ -13,6 +14,7 @@ function Works() {
         { id: "03", nombre: "Notes Manager", url: img3, descripcion: "descripcion de la imagen 3", url_go: "https://github.com/DavidGR21/Proyecto_Agiles" },
         { id: "04", nombre: "Sales App", url: img4, descripcion: "descripcion de la imagen 4", url_go: "https://github.com/DavidGR21/App-de-Ventas" },
         { id: "05", nombre: "NFC detector", url: img5, descripcion: "descripcion de la imagen 5", url_go: "https://github.com/xxxMichael/Nfc-detector" },
+        { id: "06", nombre: "Political Campaign", url: img6, descripcion: "descripcion de la imagen 6", url_go: "https://github.com/IsmaelSailema20/PaginaWebCandidata" },
     ];
 
     const [selectedImage, setSelectedImage] = useState(img1);
