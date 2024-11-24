@@ -112,8 +112,7 @@ ol {
   overflow: visible;
   z-index: 10;
   clip-path: polygon(0% 10%, 100% 0%, 100% 100%, 0% 90%);
-  opacity: 1; /* Visible por defecto */
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  opacity: 1;
 }
 
 .container_Img_Big::before {
@@ -153,14 +152,8 @@ ol {
   display: block;
   margin-top: 5vh;
   margin-left: 4vh;
-  clip-path: polygon(
-    0% 10%,
-    100% 0%,
-    100% 100%,
-    0% 90%
-  );
+  clip-path: polygon(0% 10%, 100% 0%, 100% 100%, 0% 90%);
   box-shadow: 100px 10px 20px rgba(0, 0, 0, 0.5);
-  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .urlGO {
@@ -171,7 +164,6 @@ ol {
   cursor: url("/assets/flecha.png"), auto;
 }
 
-/* From Uiverse.io by vinodjangid07 */
 .button {
   display: flex;
   position: absolute;
@@ -188,6 +180,7 @@ ol {
   cursor: pointer;
   transition: all 0.3s;
   overflow: hidden;
+  opacity: 1;
 }
 .bracket {
   font-size: 18px;
@@ -210,21 +203,86 @@ ol {
   width: 40px;
 }
 
-@keyframes disintegrate {
+/* Título animado */
+.name_Big {
+  text-align: center;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+
+.big-image {
+  position: relative;
+  width: 100%;
+  height: auto;
+  opacity: 1;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  overflow: hidden;
+}
+
+/* Animación de destrucción */
+.big-image.fade-out {
+  animation: destroy 1s forwards;
+}
+
+/* Animación de reconstrucción */
+.big-image.fade-in {
+  animation: rebuild 1s forwards;
+}
+
+/* Animación de destrucción: La imagen se desintegra */
+@keyframes destroy {
   0% {
-    transform: scale(1);
-    filter: grayscale(0);
     opacity: 1;
+    transform: scale(1);
+  }
+  30% {
+    opacity: 0.5;
+    transform: scale(1.1);
   }
   50% {
-    transform: scale(1.1);
-    filter: grayscale(100%);
-    opacity: 0.6;
+    opacity: 0;
+    transform: scale(0.7) rotate(10deg);
+  }
+  70% {
+    opacity: 0;
+    transform: scale(0.5) rotate(-10deg);
   }
   100% {
-    transform: scale(1.5);
-    filter: grayscale(100%);
     opacity: 0;
+    transform: scale(0) rotate(360deg);
   }
 }
 
+/* Animación de reconstrucción: La imagen se reconstruye */
+@keyframes rebuild {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(360deg);
+  }
+  30% {
+    opacity: 0.5;
+    transform: scale(0.5) rotate(-10deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(0.7) rotate(10deg);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.button.fade-out {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.button.fade-in {
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+}

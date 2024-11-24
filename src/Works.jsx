@@ -1,35 +1,69 @@
 import "./Works.css";
-import { useState } from 'react';
-import img1 from './assets/ProjectMascota.png';
-import img2 from './assets/iBlog.jpg';
-import img3 from './assets/gestorNotas.png';
-import img4 from './assets/Ventas.png';
-
+import { useState } from "react";
+import img1 from "./assets/ProjectMascota.png";
+import img2 from "./assets/iBlog.jpg";
+import img3 from "./assets/gestorNotas.png";
+import img4 from "./assets/Ventas.png";
+import img5 from "./assets/NFC.png";
 
 function Works() {
     const listworks = [
-        { id: '01', nombre: "Mascota Virtual", url: img1, descripcion: "descripcion de la imagen 1", url_go: '' },
-        { id: '02', nombre: "iBlog", url: img2, descripcion: "descripcion de la imagen 2", url_go: '' },
-        { id: '03', nombre: "Gestor Notas", url: img3, descripcion: "descripcion de la imagen 3", url_go: '' },
-        { id: '04', nombre: "App Venta", url: img4, descripcion: "descripcion de la imagen 4", url_go: '' },
-        // Agrega más elementos si es necesario
+        { id: "01", nombre: "Mascota Virtual", url: img1, descripcion: "descripcion de la imagen 1", url_go: "" },
+        { id: "02", nombre: "iBlog", url: img2, descripcion: "descripcion de la imagen 2", url_go: "https://github.com/xxxMichael/iBlog" },
+        { id: "03", nombre: "Gestor Notas", url: img3, descripcion: "descripcion de la imagen 3", url_go: "https://github.com/DavidGR21/Proyecto_Agiles" },
+        { id: "04", nombre: "App Venta", url: img4, descripcion: "descripcion de la imagen 4", url_go: "" },
+        { id: "05", nombre: "lector NFC", url: img5, descripcion: "descripcion de la imagen 5", url_go: "" },
     ];
 
-    const [selectedImage, setSelectedImage] = useState('https://cdn.sanity.io/images/7b0p5ml9/production/28c54dc21c037d45d1aaf3cae45db267d1167e23-3830x2144.png?auto=format&q=80&w=1920');
-    const [selectedName, setSelectedName] = useState('WORK1');
-    const [selectedURL, setSelectedURL] = useState('');
-    const [outgoingImage, setOutgoingImage] = useState(null);
+    const [selectedImage, setSelectedImage] = useState(img1);
+    const [animationClass, setAnimationClass] = useState("");
+    const [selectedName, setSelectedName] = useState("Mascota Virtual");
+    const [animatedName, setAnimatedName] = useState("Mascota Virtual");
+    const [selectedURL, setSelectedURL] = useState("");
+    const [isAnimating, setIsAnimating] = useState(false); // Nuevo estado para manejar la animación
+    const [isAnimatingButton, setIsAnimatingButton] = useState(false); // Estado para animar el botón
 
     const handleMouseEnter = (url, nombre, url_go) => {
-        if (selectedImage) {
-            setOutgoingImage(selectedImage);
-        }
+        if (nombre === selectedName || isAnimating) return;
+
+        // Animación de la imagen y el botón
+        setAnimationClass("fade-out"); // Salida de la imagen actual
+        setIsAnimatingButton(true); // Animación de salida del botón
+
+        animateTitle(nombre);
+
         setTimeout(() => {
-            setSelectedImage(url);
-            setOutgoingImage(null);
-            setSelectedName(nombre);
-            setSelectedURL(url_go);
-        }, 300);
+            setSelectedImage(url); // Cambiar la imagen después de la salida
+            setSelectedName(nombre); // Cambiar el nombre
+            setSelectedURL(url_go); // Cambiar el enlace
+            setAnimationClass("fade-in"); // Entrada de la nueva imagen
+
+            // Animación de entrada del botón
+            setIsAnimatingButton(false);
+        }, 300); // Duración de la animación de salida
+    };
+
+    const animateTitle = (newName) => {
+        const originalName = [...newName]; // Dividir el nuevo nombre en caracteres
+        let iterations = 0;
+        const interval = setInterval(() => {
+            // Actualizar cada letra con un número aleatorio, mantener los espacios
+            const updatedName = originalName.map((char) => {
+                if (char === " ") return " "; // Mantener los espacios
+                if (Math.random() > 0.5 || iterations < originalName.length) {
+                    return Math.floor(Math.random() * 10).toString(); // Reemplazar con un número
+                }
+                return char; // Devolver la letra original
+            });
+            setAnimatedName(updatedName.join("")); // Actualizar el título con números aleatorios
+
+            iterations++;
+            if (iterations > 4) {
+                clearInterval(interval); // Detener la animación
+                setAnimatedName(newName); // Establecer el nuevo nombre
+                setSelectedName(newName); // Actualizar el estado final del título
+            }
+        }, 100); // Tiempo entre cambios
     };
 
     return (
@@ -44,11 +78,7 @@ function Works() {
                         >
                             <div className="cont_Project">
                                 <p className="etiqueta">#{work.id}</p>
-                                <img
-                                    className="img_Project"
-                                    src={work.url}
-                                    alt="Project Image"
-                                />
+                                <img className="img_Project" src={work.url} alt="Project Image" />
                             </div>
                             <p className="name_Project">{work.nombre}</p>
                         </li>
@@ -58,23 +88,15 @@ function Works() {
             <div className="container_Works">
                 <h2 id="tituloW" className="titulo_Info">WORKS</h2>
                 <p className="cant_Items">{listworks.length} ITEMS</p>
-                <p className="name_Big">{selectedName}</p>
+                <p className="name_Big">{animatedName}</p>
                 <div className="container_Img_Big">
-                    {outgoingImage && (
-                        <img
-                            src={outgoingImage}
-                            alt="Outgoing Project"
-                            className="outgoing"
-                        />
-                    )}
-                    {selectedImage && (
-                        <img
-                            src={selectedImage}
-                            alt="Selected Project"
-                            className="incoming"
-                        />
-                    )}
-                    <a href={selectedURL} className="button">
+                    <img src={selectedImage} alt="Selected Project" className={`big-image ${animationClass}`} />
+                    <a
+                        href={selectedURL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`button ${isAnimatingButton ? 'fade-out' : 'fade-in'}`}
+                    >
                         <span className="bracket left">❴</span>
                         <span className="text">Code</span>
                         <span className="bracket right">❵</span>
