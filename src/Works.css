@@ -95,18 +95,70 @@ ol {
   margin-top: 5px;
 }
 
-.container_Img_Big img {
+.container_Img_Big {
+  position: absolute; /* Para que no afecte a otros componentes */
+  top: 10vh; /* Ajusta según tu diseño */
+  left: 120vh; /* Ajusta según tu diseño */
+  width: 80vh; /* Ajusta el tamaño necesario */
+  height: 80vh;
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.178),
+    rgb(13, 13, 13) 1px,
+    rgb(13, 13, 13) 1px,
+    rgb(13, 13, 13) 1px
+  );
+  border: 1px solid rgba(0, 0, 0, 0.685);
+  overflow: hidden;
+  z-index: 10;
+  clip-path: polygon(
+    0% 10%,     /* Esquina superior izquierda */
+    100% 0%,   /* Esquina superior derecha */
+    100% 100%, /* Esquina inferior derecha más alta */
+    0% 90%    /* Esquina inferior izquierda */
+  );
+}
+
+.container_Img_Big::before {
+  content: "";
   position: absolute;
-  width: 350px;
-  height: 350px;
-  margin-top: 10vh;
-  margin-left: 25vh;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
 .name_Big {
   position: absolute;
-  margin-top: 30vh;
-  margin-left: 10vh;
-  font-size: 50px;
+  margin-top: 50vh;
+  font-size: 5vh;
+  text-align: start;
+  padding-left: 2vh;
+  width: 80%;
   z-index: 20;
+}
+
+.container_Img_Big img {
+  position: absolute;
+  width: 90%;
+  height: 70vh;
+  display: block;
+  margin-top: 5vh;
+  margin-left: 4vh;
+  clip-path: polygon(
+    0% 10%,     /* Esquina superior izquierda */
+    100% 0%,   /* Esquina superior derecha */
+    100% 100%, /* Esquina inferior derecha más alta */
+    0% 90%    /* Esquina inferior izquierda */
+  );
+  box-shadow: 100px 10px 20px rgba(0, 0, 0, 0.5);
+}
+
+.urlGO {
+  position: absolute;
+  margin-top: 55vh;
+  margin-left: 25vh;
+  z-index: 1000;
+  cursor: url("/assets/flecha.png"), auto;
 }
