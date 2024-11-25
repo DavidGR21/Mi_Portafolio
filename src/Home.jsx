@@ -10,15 +10,22 @@ import Principal from './Principal.jsx';
 function Home() {
     const [page, setPage] = useState("home");
     const [activePage, setActivePage] = useState("home");
-    const [isAnimating, setIsAnimating] = useState(true); // Controla la visibilidad inicial del contenido principal
+    const [isAnimating, setIsAnimating] = useState(true); // Para controlar el video inicial
+    const [isFading, setIsFading] = useState(false); // Para manejar fade-in y fade-out
 
     const handleVideoEnd = () => {
         setIsAnimating(false); // Muestra el contenido principal al terminar el video
     };
 
     const changePage = (newPage) => {
-        setPage(newPage);
-        setActivePage(newPage);
+        if (page === newPage) return; // Si la página es la misma, no hace nada
+
+        setIsFading(true); // Activa el efecto de fade-out
+        setTimeout(() => {
+            setPage(newPage); // Cambia el contenido después de la animación
+            setActivePage(newPage);
+            setIsFading(false); // Activa el efecto de fade-in
+        }, 500); // Duración de la animación
     };
 
     const renderContent = () => {
@@ -91,8 +98,8 @@ function Home() {
                 ></video>
             </div>
 
-            {/* Contenido principal */}
-            <div className={`content ${isAnimating ? "hidden" : "visible"}`}>
+            {/* Contenido principal con animaciones de fade-in y fade-out */}
+            <div className={`content ${isFading ? "fade-out" : "fade-in"}`}>
                 {renderContent()}
             </div>
         </div>
