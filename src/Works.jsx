@@ -6,6 +6,8 @@ import img3 from "./assets/gestorNotas.png";
 import img4 from "./assets/Ventas.png";
 import img5 from "./assets/NFC.png";
 import img6 from "./assets/campaña.png";
+import img7 from "./assets/Educativa.png";
+
 
 function Works() {
     const listworks = [
@@ -15,6 +17,7 @@ function Works() {
         { id: "04", nombre: "Sales App", url: img4, descripcion: "descripcion de la imagen 4", url_go: "https://github.com/DavidGR21/App-de-Ventas" },
         { id: "05", nombre: "NFC detector", url: img5, descripcion: "descripcion de la imagen 5", url_go: "https://github.com/xxxMichael/Nfc-detector" },
         { id: "06", nombre: "Political Campaign", url: img6, descripcion: "descripcion de la imagen 6", url_go: "https://github.com/IsmaelSailema20/PaginaWebCandidata" },
+        { id: "07", nombre: "Education platform", url: img7, descripcion: "descripcion de la imagen 7", url_go: "https://github.com/xxxMichael/Plataforma-Educativa?tab=readme-ov-file" },
     ];
 
     const [selectedImage, setSelectedImage] = useState(img1);
