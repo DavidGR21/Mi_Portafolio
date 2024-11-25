@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./Home.css";
+import video from './assets/Presentacion.mp4';
 import icono from './assets/icono.png';
 import Info from './Info.jsx';
 import Contact from './Contact.jsx';
@@ -9,15 +10,15 @@ import Principal from './Principal.jsx';
 function Home() {
     const [page, setPage] = useState("home");
     const [activePage, setActivePage] = useState("home");
-    const [isFading, setIsFading] = useState(false); // Nuevo estado para manejar la animación
+    const [isAnimating, setIsAnimating] = useState(true); // Controla la visibilidad inicial del contenido principal
+
+    const handleVideoEnd = () => {
+        setIsAnimating(false); // Muestra el contenido principal al terminar el video
+    };
 
     const changePage = (newPage) => {
-        setIsFading(true); // Comienza la animación de desvanecimiento
-        setTimeout(() => {
-            setPage(newPage); // Cambia la página después de la animación de salida
-            setActivePage(newPage); // Cambia el estado de la página activa
-            setIsFading(false); // Reinicia la animación para la nueva página
-        }, 500); // Duración del desvanecimiento
+        setPage(newPage);
+        setActivePage(newPage);
     };
 
     const renderContent = () => {
@@ -37,7 +38,6 @@ function Home() {
 
     return (
         <div className="container">
-            {/* Menú fijo a la izquierda */}
             <div className="menu">
                 <div className="menu-header">
                     <h1>NERIS DAVID<br />GILER</h1>
@@ -80,8 +80,19 @@ function Home() {
                 </div>
             </div>
 
-            {/* Contenido principal con animación */}
-            <div className={`content ${isFading ? "fade-out" : "fade-in"}`}>
+            {/* Pantalla de bienvenida con animación */}
+            <div className={`welcome-message ${isAnimating ? "visible" : "hidden"}`}>
+                <video
+                    src={video}
+                    autoPlay
+                    muted
+                    className="welcome-video"
+                    onEnded={handleVideoEnd}
+                ></video>
+            </div>
+
+            {/* Contenido principal */}
+            <div className={`content ${isAnimating ? "hidden" : "visible"}`}>
                 {renderContent()}
             </div>
         </div>
