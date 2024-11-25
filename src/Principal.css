@@ -53,3 +53,20 @@ body {
     transform: translate(-50%);
   }
 }
+
+@media (max-width: 768px) {
+  .top {
+    text-align: center;
+  }
+
+  .top_title {
+    margin-bottom: 20px; /* Añadir un poco de espacio después del título */
+  }
+
+  .container_Inf {
+    font-size: 1.1rem;
+    margin-left: 12vh;
+    width: 70%;
+    margin-top: 60vh;
+  }
+}

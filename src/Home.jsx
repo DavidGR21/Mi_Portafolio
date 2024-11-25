@@ -6,12 +6,15 @@ import Info from './Info.jsx';
 import Contact from './Contact.jsx';
 import Works from './Works.jsx';
 import Principal from './Principal.jsx';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
 function Home() {
     const [page, setPage] = useState("home");
     const [activePage, setActivePage] = useState("home");
     const [isAnimating, setIsAnimating] = useState(true); // Para controlar el video inicial
     const [isFading, setIsFading] = useState(false); // Para manejar fade-in y fade-out
+    const [menuOpen, setMenuOpen] = useState(false);
 
     const handleVideoEnd = () => {
         setIsAnimating(false); // Muestra el contenido principal al terminar el video
@@ -45,7 +48,14 @@ function Home() {
 
     return (
         <div className="container">
-            <div className="menu">
+            <button
+                className={`menu-toggle ${menuOpen ? "show" : ""}`}
+                onClick={() => setMenuOpen(!menuOpen)}
+            >
+                <FontAwesomeIcon icon={menuOpen ? faArrowLeft : faArrowRight} />
+            </button>
+
+            <div className={`menu ${menuOpen ? "show" : ""}`}>
                 <div className="menu-header">
                     <h1>NERIS DAVID<br />GILER</h1>
                     <p>

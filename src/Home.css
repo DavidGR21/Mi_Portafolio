@@ -176,3 +176,51 @@ body {
 .welcome-message.hidden {
   display: none;
 }
+
+.menu-toggle {
+  display: none; /* Oculto por defecto */
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 10px;
+  font-size: 20px;
+  z-index: 100;
+}
+
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block; /* Visible solo en móviles */
+    position: fixed; /* Necesario para posicionarlo relativo a la ventana */
+    top: 50%; /* Posición vertical a la mitad de la pantalla */
+    left: 10px; /* Puedes ajustar esto para alinearlo horizontalmente */
+    transform: translateY(-50%); /* Centra el botón verticalmente */
+    transition: left 0.3s ease-in-out;
+    z-index: 20;
+    background-color: transparent;
+    border: 1px solid #554e4e81;
+  }
+  .menu {
+    left: -30vh; /* Escondido fuera de la pantalla */
+    transition: left 0.3s ease-in-out; /* Animación suave para móvil */
+    z-index: 10;
+    position: fixed;
+    top: 0;
+    width: 30vh;
+    height: 100%;
+    background-color: rgb(13, 13, 13);
+    overflow-y: none;
+    color: white;
+  }
+
+  .menu.show {
+    left: 0;
+  }
+
+  .menu-toggle.show {
+    left: 30vh; /* Visible solo en móviles */
+    background-color: rgb(13, 13, 13);
+  }
+}
