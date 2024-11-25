@@ -194,13 +194,13 @@ body {
   .menu-toggle {
     display: block; /* Visible solo en móviles */
     position: fixed; /* Necesario para posicionarlo relativo a la ventana */
-    top: 50%; /* Posición vertical a la mitad de la pantalla */
-    left: 10px; /* Puedes ajustar esto para alinearlo horizontalmente */
-    transform: translateY(-50%); /* Centra el botón verticalmente */
+    top: 5vh; /* Posición vertical a la mitad de la pantalla */
+    left: 1vh;
     transition: left 0.3s ease-in-out;
     z-index: 20;
+    transition: left 0.3s ease;
     background-color: transparent;
-    border: 1px solid #554e4e81;
+    border: 1px solid #5a5555c0;
   }
   .menu {
     left: -30vh; /* Escondido fuera de la pantalla */
@@ -213,6 +213,14 @@ body {
     background-color: rgb(13, 13, 13);
     overflow-y: none;
     color: white;
+  }
+
+  .content {
+    background-color: #0d0d0d;
+    width: 45vh;
+    flex-grow: 1;
+    transition: opacity 0.3s ease-in-out; /* Animación suave */
+    opacity: 1;
   }
 
   .menu.show {

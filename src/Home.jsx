@@ -24,6 +24,7 @@ function Home() {
         if (page === newPage) return; // Si la página es la misma, no hace nada
 
         setIsFading(true); // Activa el efecto de fade-out
+        setMenuOpen(false);
         setTimeout(() => {
             setPage(newPage); // Cambia el contenido después de la animación
             setActivePage(newPage);
