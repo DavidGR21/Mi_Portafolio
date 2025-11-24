@@ -1,0 +1,7 @@
+.projects-container {
+    width: 100vw;                     /* Ocupa todo el ancho horizontal */
+    min-height: auto;                 /* Altura depende del contenido */
+    padding: 40px;                    /* Espaciado interno */
+    box-sizing: border-box;
+    background-color: blue;  /* Color de fondo claro */
+}
