@@ -1,0 +1,63 @@
+/* Overlay para bloquear toda interacción durante el video */
+.intro-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: transparent;
+  z-index: 9999;
+  pointer-events: all;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.intro-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  width: 100dvw;  /* Mejor soporte para móviles */
+  height: 100dvh; /* Mejor soporte para móviles */
+  object-fit: cover;
+  object-position: center;
+  margin: 0;
+  padding: 0;
+  z-index: 9998;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.intro-video.visible {
+  opacity: 1;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Estilos específicos para móviles */
+@media (max-width: 768px) {
+  .intro-video {
+    height: 100svh; /* Safe viewport height para móviles */
+  }
+}
+
+/* Prevenir zoom en dispositivos táctiles */
+@media (hover: none) and (pointer: coarse) {
+  .intro-overlay,
+  .intro-video {
+    touch-action: none;
+    -webkit-touch-callout: none;
+  }
+}
