@@ -37,9 +37,9 @@ export default function ParticleLogo({ activeImageId = null }) {
       : null;
 
     return {
-      defaultPath: `src/${defaultImg.path}`,
-      hoverPath: `src/${hoverImg.path}`,
-      activePath: activeImg ? `src/${activeImg.path}` : `src/${hoverImg.path}`,
+      defaultPath: `${defaultImg.path}`,
+      hoverPath: `${hoverImg.path}`,
+      activePath: activeImg ? `${activeImg.path}` : `${hoverImg.path}`,
       defaultId: defaultImg.id,
       hoverId: hoverImg.id,
       activeId: activeImg?.id || hoverImg.id,

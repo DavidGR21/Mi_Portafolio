@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { Menu, X, User, Briefcase, Mail } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import { useTheme } from '../context/ThemeContext';
-import logoBlanco from '../assets/images/logo/logoHorizontalBlanco.png';
-import logoNegro from '../assets/images/logo/logoHorizontalNegro.png';
+import logoBlanco from '/assets/images/logo/logoHorizontalBlanco.png';
+import logoNegro from '/assets/images/logo/logoHorizontalNegro.png';
 import '../styles/Navbar.css';
 
 const Navbar = ({ onNavigate }) => {

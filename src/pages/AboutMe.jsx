@@ -33,7 +33,7 @@ function AboutMe() {
         <div className="about-right">
           <div ref={contentRef} className="about-content">
             <h2 className="about-title title-teko">ABOUT ME</h2>
-            <img className='img-profile' src="src\assets\perfilPortafolio.jpg" alt="Perfil" />
+            <img className='img-profile' src="assets/perfilPortafolio.jpg" alt="Perfil" />
             <h3 className="about-name text-rocksalt">{aboutMeData.name}</h3>
             <p className="about-role title-teko">{aboutMeData.role}</p>
             <p className="about-description text-chivo">{aboutMeData.description}</p>

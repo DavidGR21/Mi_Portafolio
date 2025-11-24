@@ -24,7 +24,7 @@ export const particleImages = [
   // Agrega más imágenes aquí según necesites
   {
     id: "logo-javascript",
-    path: "assets/images/logo/Javascript.png",
+    path: "assets/images/logo/javascript.png",
     name: "JavaScript"
   },
   {

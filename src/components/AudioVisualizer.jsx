@@ -12,42 +12,29 @@ const AudioVisualizer = () => {
 
     const audioContextRef = useRef(null);
     const analyserRef = useRef(null);
-    const sourceNodeRef = useRef(null); // Ref para el source node
+    const sourceNodeRef = useRef(null);
     const configRef = useRef(null);
-    const themeRef = useRef(theme); // Ref para mantener el tema actualizado
+    const themeRef = useRef(theme);
 
     const [screenWidth, setScreenWidth] = useState(window.innerWidth);
     const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
-    const wasPlayingRef = useRef(false); // Ref para rastrear si estaba reproduciendo
+    const [isLoading, setIsLoading] = useState(false);
+    const wasPlayingRef = useRef(false);
 
     const currentTrack = playlist[currentTrackIndex];
-    
-    // Determinar si el título es largo (más de 30 caracteres)
+
     const isTitleLong = currentTrack.title.length > 30;
 
-    // Configuración base constante con color según el tema
     const baseConfig = useMemo(() => ({
         barWidth: 2,
         gap: 1,
         height: 50,
         fftSize: 2048,
         densityFactor: 1,
-        colorBar: theme === 'light' ? 0 : 170  // Rojo en modo claro, Turquesa en modo oscuro
-        /*
-            Rojo:          0
-            Naranja:       30
-            Amarillo:      60
-            Verde:         120
-            Turquesa:      170
-            Cyan:          180
-            Azul:          220
-            Morado:        270
-            Rosa:          320
-        */
+        colorBar: theme === 'light' ? 0 : 170
     }), [theme]);
 
-    // Configuración derivada del tamaño de pantalla
     const config = useMemo(() => {
         const { barWidth, gap, densityFactor } = baseConfig;
 
@@ -59,14 +46,11 @@ const AudioVisualizer = () => {
         };
     }, [screenWidth, baseConfig]);
 
-    // Mantener siempre la config actualizada
     useEffect(() => {
         configRef.current = config;
-        themeRef.current = theme; // Actualizar themeRef cuando cambie el tema
-        console.log('Config actualizada:', config.colorBar, 'Tema:', theme);
+        themeRef.current = theme;
     }, [config, theme]);
 
-    // Ajuste del canvas al tamaño de la pantalla
     useEffect(() => {
         const handleResize = () => {
             const canvas = canvasRef.current;
@@ -84,6 +68,39 @@ const AudioVisualizer = () => {
 
         return () => window.removeEventListener('resize', handleResize);
     }, [config.height]);
+
+    // Función para cargar archivos de audio
+    const loadAudioFile = async (filePath) => {
+        try {
+            // Para desarrollo local y GitHub Pages
+            let finalPath = filePath;
+
+            // Si estamos en GitHub Pages y la ruta no es relativa, hacerla relativa
+            if (window.location.hostname.includes('github.io') && !filePath.startsWith('.')) {
+                finalPath = `.${filePath}`;
+            }
+
+            const response = await fetch(finalPath);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const blob = await response.blob();
+            return URL.createObjectURL(blob);
+        } catch (error) {
+            console.error('Error loading audio file:', error);
+            // Fallback: intentar con ruta absoluta desde root
+            try {
+                const absolutePath = filePath.startsWith('/') ? filePath : `/${filePath}`;
+                const response = await fetch(absolutePath);
+                const blob = await response.blob();
+                return URL.createObjectURL(blob);
+            } catch (fallbackError) {
+                console.error('Fallback also failed:', fallbackError);
+                throw fallbackError;
+            }
+        }
+    };
 
     // Funciones de control del reproductor
     const playAudio = async () => {
@@ -118,66 +135,81 @@ const AudioVisualizer = () => {
     };
 
     const playNextTrack = () => {
-        wasPlayingRef.current = true; // Marcar que debe seguir reproduciendo
+        wasPlayingRef.current = isPlaying;
         const nextIndex = (currentTrackIndex + 1) % playlist.length;
         setCurrentTrackIndex(nextIndex);
     };
 
     const playPreviousTrack = () => {
-        wasPlayingRef.current = isPlaying; // Mantener el estado actual de reproducción
+        wasPlayingRef.current = isPlaying;
         const prevIndex = currentTrackIndex === 0 ? playlist.length - 1 : currentTrackIndex - 1;
         setCurrentTrackIndex(prevIndex);
     };
 
-    // Cargar y cambiar de canción
+    // Cargar y cambiar de canción - CORREGIDO
     useEffect(() => {
         const loadTrack = async () => {
             const audio = audioRef.current;
             if (!audio) return;
 
             try {
-                // Importar el archivo de audio dinámicamente
-                const audioModule = await import(/* @vite-ignore */ currentTrack.file);
-                audio.src = audioModule.default;
+                setIsLoading(true);
 
-                // Si estaba reproduciendo o fue cambio automático, seguir reproduciendo
-                if (isPlaying || wasPlayingRef.current) {
+                // Pausar audio actual antes de cambiar
+                if (isPlaying) {
+                    audio.pause();
+                }
+
+                // Limpiar URL anterior si existe
+                if (audio.src && audio.src.startsWith('blob:')) {
+                    URL.revokeObjectURL(audio.src);
+                }
+
+                // Cargar el nuevo archivo de audio
+                const audioUrl = await loadAudioFile(currentTrack.file);
+                audio.src = audioUrl;
+
+                // NO crear un nuevo source node - reutilizar el existente
+                // El source node ya está conectado desde la inicialización
+
+                // Si estaba reproduciendo, seguir reproduciendo
+                if (wasPlayingRef.current) {
                     await playAudio();
-                    wasPlayingRef.current = false; // Resetear el flag
+                    wasPlayingRef.current = false;
                 }
             } catch (error) {
                 console.error('Error al cargar la canción:', error);
+            } finally {
+                setIsLoading(false);
             }
         };
 
         loadTrack();
-    }, [currentTrackIndex]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [currentTrackIndex]);
 
-    // Inicialización de audio y visualizador
+    // Inicialización de audio y visualizador - CORREGIDO
     useEffect(() => {
         const audio = audioRef.current;
-        
+
         const initAudio = async () => {
             try {
                 // Cargar archivo de audio inicial
-                const mod = await import(/* @vite-ignore */ currentTrack.file);
-                audio.src = mod.default;
+                const audioUrl = await loadAudioFile(currentTrack.file);
+                audio.src = audioUrl;
 
-                // Solo crear el contexto de audio si no existe
+                // Crear contexto de audio si no existe
                 if (!audioContextRef.current) {
                     const AudioContext = window.AudioContext || window.webkitAudioContext;
                     const audioContext = new AudioContext();
 
                     const analyser = audioContext.createAnalyser();
-                    
-                    // Solo crear el source node si no existe
-                    if (!sourceNodeRef.current) {
-                        const source = audioContext.createMediaElementSource(audio);
-                        sourceNodeRef.current = source;
-                        
-                        source.connect(analyser);
-                        analyser.connect(audioContext.destination);
-                    }
+
+                    // Crear source node SOLO UNA VEZ
+                    const source = audioContext.createMediaElementSource(audio);
+                    sourceNodeRef.current = source;
+
+                    source.connect(analyser);
+                    analyser.connect(audioContext.destination);
 
                     analyser.fftSize = config.fftSize;
                     analyser.smoothingTimeConstant = 0.8;
@@ -196,7 +228,6 @@ const AudioVisualizer = () => {
                 // Listener para actualizar el estado de reproducción
                 const handlePlay = () => setIsPlaying(true);
                 const handlePause = () => {
-                    // Solo actualizar si no estamos haciendo una transición automática
                     if (!wasPlayingRef.current) {
                         setIsPlaying(false);
                     }
@@ -241,8 +272,7 @@ const AudioVisualizer = () => {
                 const x = startX + i * (barWidth + gap);
                 const y = height - barHeight;
 
-                const brightness = 20 + (value / 255) * 30; // 20% a 50%
-                // Calcular el color según el tema actual usando themeRef
+                const brightness = 20 + (value / 255) * 30;
                 const currentColor = themeRef.current === 'light' ? 0 : 170;
                 ctx.fillStyle = `hsl(${currentColor}, 100%, ${brightness}%)`;
 
@@ -261,33 +291,39 @@ const AudioVisualizer = () => {
                 audio.removeEventListener('ended', audio._handleEnded);
                 audio.removeEventListener('play', audio._handlePlay);
                 audio.removeEventListener('pause', audio._handlePause);
+
+                // Limpiar URLs de objeto
+                if (audio.src && audio.src.startsWith('blob:')) {
+                    URL.revokeObjectURL(audio.src);
+                }
             }
 
             // Limpiar el contexto de audio solo cuando el componente se desmonte
             if (audioContextRef.current) {
+                // Desconectar el source node antes de cerrar
+                if (sourceNodeRef.current) {
+                    sourceNodeRef.current.disconnect();
+                    sourceNodeRef.current = null;
+                }
                 audioContextRef.current.close();
                 audioContextRef.current = null;
-            }
-            
-            // Limpiar el source node
-            if (sourceNodeRef.current) {
-                sourceNodeRef.current.disconnect();
-                sourceNodeRef.current = null;
+                analyserRef.current = null;
             }
         };
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <div className="audio-visualizer-fixed">
             <canvas ref={canvasRef} className="visualizer-canvas" />
             <audio ref={audioRef} />
-            
+
             {/* Controles integrados dentro del visualizador */}
             <div className="audio-controls">
                 <div className="song-info">
                     <div className="song-title">
                         <span className={`song-title-text ${isTitleLong ? 'long' : ''}`}>
                             {currentTrack.title}
+                            {isLoading && <span className="loading-dots">...</span>}
                         </span>
                     </div>
                     <p className="song-artist">{currentTrack.artist}</p>
@@ -296,6 +332,7 @@ const AudioVisualizer = () => {
                 <button
                     className="control-button btn-previous"
                     onClick={playPreviousTrack}
+                    disabled={isLoading}
                     aria-label="Anterior"
                     title="Anterior"
                 >
@@ -305,6 +342,7 @@ const AudioVisualizer = () => {
                 <button
                     className={`control-button play-pause ${isPlaying ? 'btn-pause' : 'btn-play'}`}
                     onClick={togglePlayPause}
+                    disabled={isLoading}
                     aria-label={isPlaying ? 'Pausar' : 'Reproducir'}
                     title={isPlaying ? 'Pausar' : 'Reproducir'}
                 >
@@ -314,6 +352,7 @@ const AudioVisualizer = () => {
                 <button
                     className="control-button btn-next"
                     onClick={playNextTrack}
+                    disabled={isLoading}
                     aria-label="Siguiente"
                     title="Siguiente"
                 >

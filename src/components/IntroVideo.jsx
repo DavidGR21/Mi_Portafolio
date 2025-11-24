@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import mobileVideo from "../assets/videos/intro-mobile.mp4";
-import desktopVideo from "../assets/videos/intro-desktop.mp4";
+import mobileVideo from "/assets/videos/intro-mobile.mp4";
+import desktopVideo from "/assets/videos/intro-desktop.mp4";
 import "../styles/IntroVideo.css";
 
 export default function IntroVideo({ onVideoEnd }) {
