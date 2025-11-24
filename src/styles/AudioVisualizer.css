@@ -1,0 +1,240 @@
+/* Contenedor fijo del visualizador en la parte inferior */
+.audio-visualizer-fixed {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+
+  width: 100%;
+  height: 50px;
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--visualizer-bg);
+  background-color: transparent;
+
+  pointer-events: none;
+  transition: background 0.3s ease;
+}
+
+/* El canvas ocupa todo el espacio */
+.visualizer-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  box-sizing: border-box;
+  z-index: 2;
+}
+
+/* Controles integrados dentro del visualizador - MÁS GRANDE */
+.audio-controls {
+  position: relative;
+  bottom: 25px;
+  z-index: 3;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 10px 20px;
+  border-radius: 30px;
+
+  /* background-color: rgb(20, 20, 20, 0.8 ); */
+  background: var(--controls-bg);
+  border: 1px solid var(--controls-border);
+
+  pointer-events: all;
+
+  transition: all 0.3s ease;
+}
+
+.audio-controls:hover {
+  background: var(--controls-bg-hover);
+  border-color: var(--controls-border-hover);
+}
+
+/* Información de la canción - ANCHO FIJO con overflow para marquesina */
+.song-info {
+  display: flex;
+  flex-direction: column;
+  color: var(--text-color);
+  width: 220px; /* Ancho fijo */
+  user-select: none;
+  margin-right: 8px;
+  overflow: hidden;
+  transition: color 0.3s ease;
+}
+
+/* Contenedor para el efecto marquesina en el título */
+.song-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+/* Texto interno que se anima - SOLO para títulos largos */
+.song-title-text {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+/* Clase para títulos largos - velocidad constante de entrada y salida */
+.song-title-text.long {
+  animation: marquee-smooth 16s linear infinite;
+}
+
+/*
+  Animación con velocidad constante:
+  - 50% del tiempo: salida (izquierda)
+  - 50% del tiempo: entrada (derecha)
+  - Velocidad uniforme en ambas direcciones
+*/
+@keyframes marquee-smooth {
+  0% {
+    transform: translateX(0%);
+  }
+  /* 50% del tiempo: movimiento de derecha a izquierda */
+  50% {
+    transform: translateX(-100%);
+  }
+  /* Salto instantáneo de regreso (invisible al usuario) */
+  50.01% {
+    transform: translateX(100%);
+  }
+  /* 50% del tiempo: vuelve desde la derecha a la misma velocidad */
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.song-artist {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin: 0;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+  transition: color 0.3s ease;
+}
+
+/* Botones más grandes */
+.control-button {
+  background: transparent;
+  border: none;
+  color: var(--button-color);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.control-button svg {
+  display: block;
+}
+
+.control-button:hover {
+  color: var(--button-color-hover);
+  background: var(--button-bg-hover);
+  transform: scale(1.1);
+}
+
+.control-button:active {
+  transform: scale(0.95);
+}
+
+/* Botón de play/pause más grande y destacado */
+.control-button.play-pause {
+  width: 42px;
+  height: 42px;
+  background: var(--button-play-bg);
+  margin: 0 4px;
+}
+
+.control-button.play-pause:hover {
+  background: var(--button-play-bg-hover);
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+  .audio-controls {
+    gap: 10px;
+    padding: 8px 16px;
+  }
+
+  .song-info {
+    width: 160px;
+    margin-right: 6px;
+  }
+
+  .song-title {
+    font-size: 12px;
+  }
+
+  .song-artist {
+    font-size: 10px;
+  }
+
+  .control-button {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .control-button.play-pause {
+    width: 38px;
+    height: 38px;
+    font-size: 16px;
+  }
+}
+
+/* Para pantallas muy pequeñas */
+@media (max-width: 480px) {
+  .audio-controls {
+    gap: 8px;
+    padding: 6px 12px;
+  }
+
+  .song-info {
+    width: 120px;
+    margin-right: 4px;
+  }
+
+  .song-title {
+    font-size: 11px;
+  }
+
+  .song-artist {
+    font-size: 9px;
+  }
+
+  .control-button {
+    width: 30px;
+    height: 30px;
+    font-size: 13px;
+  }
+
+  .control-button.play-pause {
+    width: 36px;
+    height: 36px;
+    font-size: 15px;
+  }
+}
+
