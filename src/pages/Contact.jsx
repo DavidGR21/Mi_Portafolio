@@ -1,11 +1,10 @@
+import EnvelopeScene from '../components/Contact3D/EnvelopeScene';
 import '../styles/Contact.css';
 
 function Contact() {
     return (
-        <section id="contact">
-            <div className="contact-container">
-                CONTACT
-            </div>
+        <section id="contact" style={{ padding: 0, margin: 0 }}>
+            <EnvelopeScene />
         </section>
     );
 }

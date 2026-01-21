@@ -1,0 +1,102 @@
+.envelope-scene-container {
+    width: 100%;
+    height: 88vh;
+    position: relative;
+    overflow: hidden;
+}
+
+.envelope-canvas {
+    width: 100%;
+    height: 100%;
+}
+
+.instruction-text {
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.2rem;
+    font-weight: 500;
+    text-align: center;
+    padding: 1rem 2rem;
+    backdrop-filter: blur(10px);
+    border-radius: 50px;
+    animation: pulse 2s ease-in-out infinite;
+    z-index: 10;
+    white-space: nowrap;
+}
+
+/* Tema oscuro - texto de instrucción */
+[data-theme="dark"] .instruction-text {
+    color: #ffffff;
+    background: rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Tema claro - texto de instrucción */
+[data-theme="light"] .instruction-text {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.contact-title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+  margin-left: 20px;
+  /* Color por defecto, se sobreescribe en .dark y .light */
+  background: linear-gradient(135deg, #e40707 0%, #3f0707 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transition: background 0.3s, color 0.3s;
+}
+
+[data-theme="dark"] .contact-title {
+    background: linear-gradient(135deg, #44b4b8 0%, #021633 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+[data-theme="light"] .contact-title {
+    background: linear-gradient(135deg, #ff3c00 0%, #5c0f0f 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 0.8;
+        transform: translateX(-50%) scale(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1.05);
+    }
+}
+
+
+
+/* Responsive */
+@media (max-width: 768px) {
+    .instruction-text {
+        font-size: 1rem;
+        padding: 0.75rem 1.5rem;
+        bottom: 2rem;
+        max-width: 90%;
+        white-space: normal;
+    }
+}
+
+@media (max-width: 480px) {
+    .instruction-text {
+        font-size: 0.9rem;
+        padding: 0.6rem 1.2rem;
+        bottom: 1.5rem;
+    }
+}
