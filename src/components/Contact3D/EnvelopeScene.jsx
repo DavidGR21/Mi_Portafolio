@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { PerspectiveCamera } from '@react-three/drei';
 import Envelope from './Envelope';
@@ -8,7 +8,18 @@ import '../../styles/EnvelopeScene.css';
 function EnvelopeScene() {
     const [envelopeState, setEnvelopeState] = useState('closed');
     const [showForm, setShowForm] = useState(false);
+    const [submitStatus, setSubmitStatus] = useState(''); // 'success' | 'error' | ''
     const closeEnvelopeRef = useRef();
+
+    // Auto-ocultar toasts después de 4 segundos
+    useEffect(() => {
+        if (submitStatus) {
+            const timer = setTimeout(() => {
+                setSubmitStatus('');
+            }, 4000);
+            return () => clearTimeout(timer);
+        }
+    }, [submitStatus]);
 
     const handleEnvelopeStateChange = (newState) => {
         setEnvelopeState(newState);
@@ -22,16 +33,24 @@ function EnvelopeScene() {
     const handleCancelForm = () => {
         setShowForm(false);
         if (closeEnvelopeRef.current) {
-            closeEnvelopeRef.current();
+            closeEnvelopeRef.current.closeEnvelope();
         }
     };
 
-    const handleSubmitForm = (formData) => {
+    const handleSubmitForm = (formData, status) => {
         console.log('Form submitted:', formData);
-        // Cerrar el formulario y el sobre después de enviar exitosamente
+        // Mostrar el toast correspondiente
+        setSubmitStatus(status);
+        // Cerrar el formulario primero
         setShowForm(false);
+        // Ejecutar animación de cierre y luego vuelo del sobre
         if (closeEnvelopeRef.current) {
-            closeEnvelopeRef.current();
+            closeEnvelopeRef.current.closeEnvelope(() => {
+                // Ejecutar flyAway cuando termine la animación de cierre
+                if (closeEnvelopeRef.current) {
+                    closeEnvelopeRef.current.flyAway();
+                }
+            });
         }
     };
 
@@ -72,6 +91,27 @@ function EnvelopeScene() {
                     onCancel={handleCancelForm}
                     onSubmit={handleSubmitForm}
                 />
+            )}
+
+            {/* Toasts de notificación */}
+            {submitStatus === 'error' && (
+                <div className="form-error-toast">
+                    <span className="error-icon">⚠️</span>
+                    <div className="error-content">
+                        <strong>Error al enviar</strong>
+                        <p>Por favor, intenta de nuevo.</p>
+                    </div>
+                </div>
+            )}
+
+            {submitStatus === 'success' && (
+                <div className="form-success-toast">
+                    <span className="success-icon">✓</span>
+                    <div className="success-content">
+                        <strong>¡Mensaje enviado!</strong>
+                        <p>Gracias por contactarme.</p>
+                    </div>
+                </div>
             )}
         </div>
     );

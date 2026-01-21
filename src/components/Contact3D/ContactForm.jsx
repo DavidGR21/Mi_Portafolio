@@ -21,6 +21,8 @@ function ContactForm({ onCancel, onSubmit }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        // Continuar con el proceso de envío en segundo plano
         setIsSubmitting(true);
         setSubmitStatus('');
 
@@ -51,6 +53,9 @@ function ContactForm({ onCancel, onSubmit }) {
 
             setSubmitStatus('success');
             
+            // Iniciar animación y pasar status de éxito
+            onSubmit(formData, 'success');
+            
             // Limpiar formulario
             setFormData({
                 name: '',
@@ -58,21 +63,20 @@ function ContactForm({ onCancel, onSubmit }) {
                 message: '',
             });
 
-            // Llamar al callback de éxito y cerrar después de 2 segundos
-            setTimeout(() => {
-                onSubmit(formData);
-            }, 2000);
-
         } catch (error) {
             console.error('Error al enviar el mensaje:', error);
             setSubmitStatus('error');
+            
+            // Iniciar animación y pasar status de error
+            onSubmit(formData, 'error');
+            
         } finally {
             setIsSubmitting(false);
         }
     };
 
     return (
-        <div className="contact-form-overlay" onClick={onCancel}>
+        <div className="contact-form-overlay" onClick={isSubmitting ? undefined : onCancel}>
             <div className="contact-form-container" onClick={(e) => e.stopPropagation()}>
                 <h2 className="form-title">ENVIAME UN MENSAJE</h2>
                 
@@ -133,12 +137,6 @@ function ContactForm({ onCancel, onSubmit }) {
                             {isSubmitting ? 'Enviando...' : submitStatus === 'success' ? '✓ Enviado' : 'Enviar'}
                         </button>
                     </div>
-                    
-                    {submitStatus === 'error' && (
-                        <div className="form-error">
-                            Error al enviar el mensaje. Por favor, intenta de nuevo.
-                        </div>
-                    )}
                 </form>
             </div>
         </div>

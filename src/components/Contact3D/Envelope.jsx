@@ -10,15 +10,18 @@ function Envelope({ onStateChange, onClose }) {
     const sealRef = useRef()
     const currentTimeRef = useRef(0) // Tiempo actual continuo para la animación
 
-    const [envelopeState, setEnvelopeState] = useState('closed') // 'closed', 'opening', 'open', 'closing'
+    const [envelopeState, setEnvelopeState] = useState('closed') // 'closed', 'opening', 'open', 'closing', 'flyingAway'
     const [sealOpacity, setSealOpacity] = useState(1)
     const [flapOpacity, setFlapOpacity] = useState(1)
     const [paperPosition, setPaperPosition] = useState(1.5) // Posición Y de la carta (posición final)
     const [paperScale, setPaperScale] = useState(0.1) // Escala de la carta (inicia pequeña)
     const [paperVisible, setPaperVisible] = useState(false) // Visibilidad del papel
+    const [envelopeOpacity, setEnvelopeOpacity] = useState(1) // Opacidad del sobre completo
+    const [flyingXPosition, setFlyingXPosition] = useState(0) // Posición X durante el vuelo
+    const [envelopeScale, setEnvelopeScale] = useState(1) // Escala del sobre durante animaciones
 
     // Función para cerrar el sobre (animación inversa)
-    const closeEnvelope = () => {
+    const closeEnvelope = (onCloseComplete) => {
         if (envelopeState === 'open') {
             setEnvelopeState('closing')
             onStateChange?.('closing')
@@ -52,6 +55,10 @@ function Envelope({ onStateChange, onClose }) {
                             clearInterval(appearInterval)
                             setEnvelopeState('closed')
                             onStateChange?.('closed')
+                            // Ejecutar callback cuando termine la animación
+                            if (onCloseComplete) {
+                                setTimeout(() => onCloseComplete(), 50)
+                            }
                             return 1
                         }
                         return newOpacity
@@ -61,9 +68,51 @@ function Envelope({ onStateChange, onClose }) {
         }
     }
 
-    // Exponer la función closeEnvelope al componente padre
+    // Función para hacer volar el sobre (después de enviar)
+    const flyAway = () => {
+        if (envelopeState === 'closed') {
+            setEnvelopeState('flyingAway')
+            onStateChange?.('flyingAway')
+
+            // Animación de vuelo hacia la derecha a velocidad tremenda
+            const flyInterval = setInterval(() => {
+                setFlyingXPosition(prev => {
+                    const newX = prev + 1.5 // Velocidad tremenda
+                    if (newX >= 25) {
+                        clearInterval(flyInterval)
+                        // Hacer invisible el sobre instantáneamente
+                        setEnvelopeOpacity(0)
+                        // Resetear posición mientras es invisible
+                        setFlyingXPosition(0)
+                        setEnvelopeScale(0.1) // Empezar pequeño
+                        
+                        // Reaparecer el sobre con animación de crecimiento
+                        setTimeout(() => {
+                            setEnvelopeOpacity(1) // Hacer visible de inmediato
+                            const reappearInterval = setInterval(() => {
+                                setEnvelopeScale(prev => {
+                                    const newScale = prev + 0.05
+                                    if (newScale >= 1) {
+                                        clearInterval(reappearInterval)
+                                        setEnvelopeState('closed')
+                                        onStateChange?.('closed')
+                                        return 1
+                                    }
+                                    return newScale
+                                })
+                            }, 16)
+                        }, 100)
+                        return 25
+                    }
+                    return newX
+                })
+            }, 16)
+        }
+    }
+
+    // Exponer las funciones al componente padre
     if (onClose) {
-        onClose.current = closeEnvelope
+        onClose.current = { closeEnvelope, flyAway }
     }
 
     useFrame((state) => {
@@ -75,6 +124,10 @@ function Envelope({ onStateChange, onClose }) {
                 currentTimeRef.current += 0.016 // Aproximadamente 60fps
                 envelopeRef.current.position.y = Math.sin(currentTimeRef.current * 0.9) * 0.2
                 envelopeRef.current.rotation.z = Math.sin(currentTimeRef.current * 0.2) * 0.02
+            } else if (envelopeState === 'flyingAway') {
+                // Durante el vuelo, aplicar la posición X de vuelo
+                envelopeRef.current.position.x = flyingXPosition
+                envelopeRef.current.rotation.z = 0 // Mantener recto durante el vuelo
             }
             // Para otros estados, mantener la posición actual (no actualizar)
         }
@@ -127,7 +180,7 @@ function Envelope({ onStateChange, onClose }) {
     }
 
     return (
-        <group ref={envelopeRef} onClick={handleClick} style={{ cursor: 'pointer' }}>
+        <group ref={envelopeRef} onClick={handleClick} style={{ cursor: 'pointer' }} scale={[envelopeScale, envelopeScale, envelopeScale]}>
 
             {/* Cuerpo principal del sobre */}
             <mesh position={[0, 2, 0]}
@@ -137,6 +190,8 @@ function Envelope({ onStateChange, onClose }) {
                     color="#ecddbb"
                     roughness={0.7}
                     metalness={0.1}
+                    transparent
+                    opacity={envelopeOpacity}
                 />
             </mesh>
 
@@ -150,7 +205,7 @@ function Envelope({ onStateChange, onClose }) {
                     roughness={0.7} 
                     metalness={0.1}
                     transparent
-                    opacity={flapOpacity}
+                    opacity={flapOpacity * envelopeOpacity}
                 />
             </mesh>
 
@@ -194,7 +249,7 @@ function Envelope({ onStateChange, onClose }) {
                     metalness={0.15}
                     depthTest={false}
                     transparent
-                    opacity={sealOpacity}
+                    opacity={sealOpacity * envelopeOpacity}
                 />
             </mesh>
 
@@ -210,7 +265,7 @@ function Envelope({ onStateChange, onClose }) {
                         <planeGeometry args={[line.w, 0.05]} />
                         <meshStandardMaterial
                             color="#000000"
-                            opacity={0.55}
+                            opacity={0.55 * envelopeOpacity}
                             transparent
                             roughness={1}
                         />
