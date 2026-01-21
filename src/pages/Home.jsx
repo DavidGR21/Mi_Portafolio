@@ -40,7 +40,7 @@ export default function Home() {
 
             {/* El contenido solo aparece cuando el video terminó */}
             {/* {videoFinished && ( */}
-            <main style={{ minHeight: "100vh" }}>
+            <main>
                 {renderSection()}
             </main>
             {/* )} */}

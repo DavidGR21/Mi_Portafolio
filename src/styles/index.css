@@ -7,12 +7,12 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  
+
   /* Variables de color por defecto (modo oscuro) */
   --bg-color: #0a0a0a;
   --text-color: rgba(255, 255, 255, 0.87);
   --text-secondary: rgba(255, 255, 255, 0.65);
-  
+
   /* Variables para el AudioVisualizer - ajustadas para combinar con el fondo oscuro */
   --visualizer-bg: rgba(10, 10, 10, 0.95);
   --controls-bg: rgba(20, 20, 20, 0.8);
@@ -24,7 +24,7 @@
   --button-bg-hover: rgba(255, 255, 255, 0.12);
   --button-play-bg: rgba(255, 255, 255, 0.15);
   --button-play-bg-hover: rgba(255, 255, 255, 0.25);
-  
+
   color: var(--text-color);
   background-color: var(--bg-color);
   overflow-x: hidden;
@@ -46,7 +46,7 @@ body {
   --bg-color: #f5f5f5;
   --text-color: #1a1a1a;
   --text-secondary: rgba(0, 0, 0, 0.65);
-  
+
   /* Variables para el AudioVisualizer en modo claro */
   --visualizer-bg: #f5f5f5;
   --controls-bg: rgba(255, 255, 255, 0.7);
@@ -71,10 +71,8 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
+  /* display: flex; */
   min-width: 320px;
-  min-height: 100vh;
   background-color: var(--bg-color);
   color: var(--text-color);
   transition: background-color 0.3s ease, color 0.3s ease;
