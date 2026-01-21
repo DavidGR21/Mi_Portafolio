@@ -1,27 +1,138 @@
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
+import * as THREE from 'three'
 
-function Envelope() {
+
+
+function Envelope({ onStateChange, onClose }) {
     const envelopeRef = useRef()
     const flapRef = useRef()
+    const sealRef = useRef()
+    const currentTimeRef = useRef(0) // Tiempo actual continuo para la animación
+
+    const [envelopeState, setEnvelopeState] = useState('closed') // 'closed', 'opening', 'open', 'closing'
+    const [sealOpacity, setSealOpacity] = useState(1)
+    const [flapOpacity, setFlapOpacity] = useState(1)
+    const [paperPosition, setPaperPosition] = useState(1.5) // Posición Y de la carta (posición final)
+    const [paperScale, setPaperScale] = useState(0.1) // Escala de la carta (inicia pequeña)
+    const [paperVisible, setPaperVisible] = useState(false) // Visibilidad del papel
+
+    // Función para cerrar el sobre (animación inversa)
+    const closeEnvelope = () => {
+        if (envelopeState === 'open') {
+            setEnvelopeState('closing')
+            onStateChange?.('closing')
+
+            // Fase 1: Encoger la carta
+            const paperShrinkInterval = setInterval(() => {
+                setPaperScale(prev => {
+                    const newScale = prev - 0.04
+                    if (newScale <= 0.1) {
+                        clearInterval(paperShrinkInterval)
+                        setPaperVisible(false)
+                        return 0.1
+                    }
+                    return newScale
+                })
+            }, 16)
+
+            // Fase 2: Aparecer el sello y la solapa después de que se encoja la carta
+            setTimeout(() => {
+                const appearInterval = setInterval(() => {
+                    setSealOpacity(prev => {
+                        const newOpacity = prev + 0.05
+                        if (newOpacity >= 1) {
+                            return 1
+                        }
+                        return newOpacity
+                    })
+                    setFlapOpacity(prev => {
+                        const newOpacity = prev + 0.05
+                        if (newOpacity >= 1) {
+                            clearInterval(appearInterval)
+                            setEnvelopeState('closed')
+                            onStateChange?.('closed')
+                            return 1
+                        }
+                        return newOpacity
+                    })
+                }, 25)
+            }, 400)
+        }
+    }
+
+    // Exponer la función closeEnvelope al componente padre
+    if (onClose) {
+        onClose.current = closeEnvelope
+    }
 
     useFrame((state) => {
         const t = state.clock.elapsedTime
 
-        // Animación suave del sobre completo
         if (envelopeRef.current) {
-            envelopeRef.current.position.y = Math.sin(t * 0.9) * 0.2
-            envelopeRef.current.rotation.z = Math.sin(t * 0.2) * 0.02
+            if (envelopeState === 'closed') {
+                // Continuar con el tiempo desde donde se detuvo
+                currentTimeRef.current += 0.016 // Aproximadamente 60fps
+                envelopeRef.current.position.y = Math.sin(currentTimeRef.current * 0.9) * 0.2
+                envelopeRef.current.rotation.z = Math.sin(currentTimeRef.current * 0.2) * 0.02
+            }
+            // Para otros estados, mantener la posición actual (no actualizar)
         }
     })
 
+    const handleClick = () => {
+        if (envelopeState === 'closed') {
+            setEnvelopeState('opening')
+            onStateChange?.('opening')
+
+            // Fase 1: Desaparecer el sello y la solapa (500ms)
+            const fadeInterval = setInterval(() => {
+                setSealOpacity(prev => {
+                    const newOpacity = prev - 0.05
+                    if (newOpacity <= 0) {
+                        return 0
+                    }
+                    return newOpacity
+                })
+                setFlapOpacity(prev => {
+                    const newOpacity = prev - 0.05
+                    if (newOpacity <= 0) {
+                        clearInterval(fadeInterval)
+                        return 0
+                    }
+                    return newOpacity
+                })
+            }, 25)
+
+            // Fase 2: Sacar la carta después de que desaparezca la solapa
+            setTimeout(() => {
+                // Hacer visible el papel justo antes de que empiece a salir
+                setPaperVisible(true)
+                
+                // Animación: agrandar la carta desde pequeña hasta su tamaño final
+                const paperAnimationInterval = setInterval(() => {
+                    setPaperScale(prev => {
+                        const newScale = prev + 0.04
+                        if (newScale >= 1) {
+                            clearInterval(paperAnimationInterval)
+                            setEnvelopeState('open')
+                            onStateChange?.('open')
+                            return 1
+                        }
+                        return newScale
+                    })
+                }, 16)
+            }, 500)
+        }
+    }
+
     return (
-        <group ref={envelopeRef}>
+        <group ref={envelopeRef} onClick={handleClick} style={{ cursor: 'pointer' }}>
 
             {/* Cuerpo principal del sobre */}
             <mesh position={[0, 2, 0]}
                 scale={[1.5, 1.3, 1]}>
-                <boxGeometry args={[3.5, 2.4, 0.1]} />
+                <boxGeometry args={[3, 2.2, 0.1]} />
                 <meshStandardMaterial
                     color="#ecddbb"
                     roughness={0.7}
@@ -29,34 +140,66 @@ function Envelope() {
                 />
             </mesh>
 
-            {/* Solapa superior (triángulo invertido) */}
-            <mesh
-                position={[0, 2.52, 0]}
+            {/* Solapa superior (triángulo invertido) - ahora con opacidad controlada */}
+            <mesh position={[0, 2.6, 0]}
                 rotation={[Math.PI / 2, 0, Math.PI]}
-                scale={[1.96, 1, 1]}
-            >
+                scale={[1.68, 1, 0.7]} >
                 <coneGeometry args={[1.4, 2, 3]} />
-                <meshStandardMaterial
-                    color="#e2d4b2"
-                    roughness={0.7}
+                <meshStandardMaterial 
+                    color="#e2d4b2" 
+                    roughness={0.7} 
                     metalness={0.1}
+                    transparent
+                    opacity={flapOpacity}
                 />
             </mesh>
 
+            {/* Carta/Papel que aparece y se agranda */}
+            {paperVisible && (
+                <group position={[0, paperPosition, 1.5]} scale={[paperScale, paperScale, 1]}>
+                    <mesh>
+                        <planeGeometry args={[4, 3]} />
+                        <meshStandardMaterial
+                            color="#FFFFFF"
+                            roughness={0.6}
+                            metalness={0.0}
+                            side={THREE.DoubleSide}
+                        />
+                    </mesh>
 
-            {/* Sello o adhesivo */}
-            <mesh position={[0, 1.5, 1]}>
-                <circleGeometry args={[0.5, 32]} />
+                    {/* Borde superior de la carta */}
+                    <mesh position={[0, 1.5, 0.01]}>
+                        <planeGeometry args={[4, 0.4]} />
+                        <meshStandardMaterial color="#0c2e55" />
+                    </mesh>
+
+                    {/* Líneas decorativas en la carta (simulando texto) */}
+                    <group position={[0, 0, 0.01]}>
+                        {[0.6, 0.3, 0, -0.3, -0.6].map((yPos, index) => (
+                            <mesh key={index} position={[0, yPos, 0]}>
+                                <planeGeometry args={[3, 0.04]} />
+                                <meshStandardMaterial color="#CCCCCC" />
+                            </mesh>
+                        ))}
+                    </group>
+                </group>
+            )}
+
+            {/* Sello o adhesivo - ahora con opacidad controlada */}
+            <mesh ref={sealRef} position={[0, 1.7, 1]}>
+                <circleGeometry args={[0.3, 32]} />
                 <meshStandardMaterial
                     color="#e72914"
                     roughness={0.5}
                     metalness={0.15}
                     depthTest={false}
+                    transparent
+                    opacity={sealOpacity}
                 />
             </mesh>
 
             {/* Dirección escrita en el sobre */}
-            <group position={[-1.5, 1, 1]}>
+            <group position={[-1.2, 1.2, 1]}>
                 {[
                     { y: 0.25, w: 1.4 },
                     { y: 0.05, w: 1.2 },
