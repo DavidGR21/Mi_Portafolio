@@ -44,7 +44,7 @@ function Projects() {
 
     const handleMouseDown = (e) => {
         setIsDragging(true);
-        lastX.current = e.clientX;
+        lastX.current = e.clientX || e.touches?.[0]?.clientX;
         lastTime.current = Date.now();
         velocity.current = 0;
         if (animationFrame.current) {
@@ -55,7 +55,7 @@ function Projects() {
     const handleMouseMove = (e) => {
         if (!isDragging) return;
 
-        const currentX = e.clientX;
+        const currentX = e.clientX || e.touches?.[0]?.clientX;
         const currentTime = Date.now();
         const deltaX = currentX - lastX.current;
         const deltaTime = currentTime - lastTime.current;
@@ -69,6 +69,18 @@ function Projects() {
 
         lastX.current = currentX;
         lastTime.current = currentTime;
+    };
+
+    const handleTouchStart = (e) => {
+        handleMouseDown(e);
+    };
+
+    const handleTouchMove = (e) => {
+        handleMouseMove(e);
+    };
+
+    const handleTouchEnd = () => {
+        handleMouseUp();
     };
 
     const handleMouseUp = () => {
@@ -130,6 +142,9 @@ function Projects() {
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseUp}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
             >
                 <div
                     className="slider"
