@@ -28,8 +28,11 @@ function EnvelopeScene() {
 
     const handleSubmitForm = (formData) => {
         console.log('Form submitted:', formData);
-        // Aquí puedes agregar la lógica para enviar el email
-        // Por ejemplo, usando EmailJS
+        // Cerrar el formulario y el sobre después de enviar exitosamente
+        setShowForm(false);
+        if (closeEnvelopeRef.current) {
+            closeEnvelopeRef.current();
+        }
     };
 
     return (

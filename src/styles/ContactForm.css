@@ -122,6 +122,25 @@
     box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3);
 }
 
+.btn-cancel:disabled,
+.btn-send:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.form-error {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: rgba(231, 76, 60, 0.1);
+    border: 1px solid rgba(231, 76, 60, 0.3);
+    border-radius: 8px;
+    color: #e74c3c;
+    font-size: 0.9rem;
+    text-align: center;
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;

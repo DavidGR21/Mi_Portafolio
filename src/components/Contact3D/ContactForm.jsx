@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import emailjs from '@emailjs/browser';
 import '../../styles/ContactForm.css';
 
 function ContactForm({ onCancel, onSubmit }) {
@@ -7,6 +8,8 @@ function ContactForm({ onCancel, onSubmit }) {
         email: '',
         message: '',
     });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitStatus, setSubmitStatus] = useState(''); // 'success' | 'error' | ''
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -16,9 +19,56 @@ function ContactForm({ onCancel, onSubmit }) {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        onSubmit(formData);
+        setIsSubmitting(true);
+        setSubmitStatus('');
+
+        try {
+            // Configuración de EmailJS desde variables de entorno
+            const serviceID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+            const templateID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+            const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+            // Validar que las credenciales estén configuradas
+            if (!serviceID || !templateID || !publicKey) {
+                throw new Error('EmailJS no está configurado. Por favor, configura las variables de entorno.');
+            }
+
+            const templateParams = {
+                from_name: formData.name,
+                from_email: formData.email,
+                message: formData.message,
+                to_name: 'Tu Nombre', // Tu nombre o el destinatario
+            };
+
+            await emailjs.send(
+                serviceID,
+                templateID,
+                templateParams,
+                publicKey
+            );
+
+            setSubmitStatus('success');
+            
+            // Limpiar formulario
+            setFormData({
+                name: '',
+                email: '',
+                message: '',
+            });
+
+            // Llamar al callback de éxito y cerrar después de 2 segundos
+            setTimeout(() => {
+                onSubmit(formData);
+            }, 2000);
+
+        } catch (error) {
+            console.error('Error al enviar el mensaje:', error);
+            setSubmitStatus('error');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -71,16 +121,24 @@ function ContactForm({ onCancel, onSubmit }) {
                             type="button" 
                             onClick={onCancel}
                             className="btn-cancel"
+                            disabled={isSubmitting}
                         >
                             Cancelar
                         </button>
                         <button 
                             type="submit" 
                             className="btn-send"
+                            disabled={isSubmitting}
                         >
-                            Enviar
+                            {isSubmitting ? 'Enviando...' : submitStatus === 'success' ? '✓ Enviado' : 'Enviar'}
                         </button>
                     </div>
+                    
+                    {submitStatus === 'error' && (
+                        <div className="form-error">
+                            Error al enviar el mensaje. Por favor, intenta de nuevo.
+                        </div>
+                    )}
                 </form>
             </div>
         </div>
