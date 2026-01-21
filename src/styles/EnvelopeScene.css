@@ -39,16 +39,16 @@
 }
 
 .contact-title {
-  font-size: 3rem;
-  font-weight: 700;
-  margin-bottom: 2px;
-  margin-left: 20px;
-  /* Color por defecto, se sobreescribe en .dark y .light */
-  background: linear-gradient(135deg, #e40707 0%, #3f0707 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  transition: background 0.3s, color 0.3s;
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 2px;
+    margin-left: 20px;
+    /* Color por defecto, se sobreescribe en .dark y .light */
+    background: linear-gradient(135deg, #e40707 0%, #3f0707 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    transition: background 0.3s, color 0.3s;
 }
 
 [data-theme="dark"] .contact-title {
@@ -83,20 +83,99 @@
 
 
 /* Responsive */
+/* Tablets y pantallas medianas */
+@media (max-width: 1024px) {
+    .envelope-scene-container {
+        height: 85vh;
+    }
+
+    .contact-title {
+        font-size: 2.5rem;
+        margin-left: 15px;
+    }
+
+    .instruction-text {
+        font-size: 1.1rem;
+        padding: 0.85rem 1.75rem;
+        bottom: 18%;
+    }
+}
+
+/* Móviles y pantallas pequeñas */
 @media (max-width: 768px) {
+    .envelope-scene-container {
+        height: 80vh;
+    }
+
+    .contact-title {
+        font-size: 2rem;
+        margin-left: 10px;
+        margin-bottom: 5px;
+    }
+
     .instruction-text {
         font-size: 1rem;
-        padding: 0.75rem 1.5rem;
-        bottom: 2rem;
+        padding: 0.5rem 1rem;
+        bottom: 15%;
         max-width: 90%;
         white-space: normal;
     }
 }
 
+/* Móviles pequeños */
 @media (max-width: 480px) {
+    .envelope-scene-container {
+        height: 75vh;
+    }
+
+    .contact-title {
+        font-size: 1.75rem;
+        margin-left: 10px;
+        margin-bottom: 3px;
+    }
+
     .instruction-text {
         font-size: 0.9rem;
-        padding: 0.6rem 1.2rem;
-        bottom: 1.5rem;
+        width: 350px;
+        padding: 0.65rem 1.25rem;
+        bottom: 12%;
+        max-width: 85%;
+        border-radius: 30px;
+    }
+}
+
+/* Pantallas muy pequeñas */
+@media (max-width: 360px) {
+    .envelope-scene-container {
+        height: 70vh;
+    }
+
+    .contact-title {
+        font-size: 1.5rem;
+        margin-left: 8px;
+    }
+
+    .instruction-text {
+        font-size: 0.85rem;
+        padding: 0.6rem 1rem;
+        bottom: 10%;
+    }
+}
+
+/* Landscape en móviles */
+@media (max-height: 500px) and (orientation: landscape) {
+    .envelope-scene-container {
+        height: 90vh;
+    }
+
+    .contact-title {
+        font-size: 1.5rem;
+        margin-bottom: 2px;
+    }
+
+    .instruction-text {
+        font-size: 0.85rem;
+        padding: 0.5rem 1rem;
+        bottom: 8%;
     }
 }
