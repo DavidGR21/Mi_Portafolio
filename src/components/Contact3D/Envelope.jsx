@@ -1,14 +1,31 @@
 import { useRef, useState, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+import { useTheme } from '../../context/ThemeContext'
 
 
 
 function Envelope({ onStateChange, onClose }) {
+    const { theme } = useTheme()
     const envelopeRef = useRef()
     const flapRef = useRef()
     const sealRef = useRef()
     const currentTimeRef = useRef(0) // Tiempo actual continuo para la animación
+
+    // Colores según el tema
+    const envelopeColors = theme === 'dark' 
+        ? { 
+            body: '#ffffff',      // Turquesa vibrante
+            flap: '#ddd6d6',      // Turquesa más oscuro
+            seal: '#e72914',      // Rojo del sello
+            paper: '#f5f5f5'      // Papel blanco
+          }
+        : { 
+            body: '#e8c39e',      // Naranja vibrante
+            flap: '#e2b07f',      // Naranja más oscuro
+            seal: '#c41e0a',      // Rojo más oscuro
+            paper: '#ffffff'      // Papel blanco puro
+          }
 
     const [envelopeState, setEnvelopeState] = useState('closed') // 'closed', 'opening', 'open', 'closing', 'flyingAway'
     const [sealOpacity, setSealOpacity] = useState(1)
@@ -187,11 +204,13 @@ function Envelope({ onStateChange, onClose }) {
                 scale={[1.5, 1.3, 1]}>
                 <boxGeometry args={[3, 2.2, 0.1]} />
                 <meshStandardMaterial
-                    color="#ecddbb"
-                    roughness={0.7}
-                    metalness={0.1}
+                    color={envelopeColors.body}
+                    roughness={0.4}
+                    metalness={0.2}
                     transparent
                     opacity={envelopeOpacity}
+                    emissive={envelopeColors.body}
+                    emissiveIntensity={0.15}
                 />
             </mesh>
 
@@ -201,11 +220,13 @@ function Envelope({ onStateChange, onClose }) {
                 scale={[1.68, 1, 0.7]} >
                 <coneGeometry args={[1.4, 2, 3]} />
                 <meshStandardMaterial 
-                    color="#e2d4b2" 
-                    roughness={0.7} 
-                    metalness={0.1}
+                    color={envelopeColors.flap}
+                    roughness={0.4}
+                    metalness={0.2}
                     transparent
                     opacity={flapOpacity * envelopeOpacity}
+                    emissive={envelopeColors.flap}
+                    emissiveIntensity={0.15}
                 />
             </mesh>
 
@@ -215,8 +236,8 @@ function Envelope({ onStateChange, onClose }) {
                     <mesh>
                         <planeGeometry args={[4, 3]} />
                         <meshStandardMaterial
-                            color="#FFFFFF"
-                            roughness={0.6}
+                            color={envelopeColors.paper}
+                            roughness={0.5}
                             metalness={0.0}
                             side={THREE.DoubleSide}
                         />
@@ -225,7 +246,9 @@ function Envelope({ onStateChange, onClose }) {
                     {/* Borde superior de la carta */}
                     <mesh position={[0, 1.5, 0.01]}>
                         <planeGeometry args={[4, 0.4]} />
-                        <meshStandardMaterial color="#0c2e55" />
+                        <meshStandardMaterial 
+                            color={theme === 'dark' ? '#8cecf3' : '#da3009'} 
+                        />
                     </mesh>
 
                     {/* Líneas decorativas en la carta (simulando texto) */}
@@ -244,12 +267,14 @@ function Envelope({ onStateChange, onClose }) {
             <mesh ref={sealRef} position={[0, 1.7, 1]}>
                 <circleGeometry args={[0.3, 32]} />
                 <meshStandardMaterial
-                    color="#e72914"
-                    roughness={0.5}
-                    metalness={0.15}
+                    color={envelopeColors.seal}
+                    roughness={0.3}
+                    metalness={0.3}
                     depthTest={false}
                     transparent
                     opacity={sealOpacity * envelopeOpacity}
+                    emissive={envelopeColors.seal}
+                    emissiveIntensity={0.2}
                 />
             </mesh>
 
@@ -264,7 +289,7 @@ function Envelope({ onStateChange, onClose }) {
                     <mesh key={i} position={[0, line.y, 0]}>
                         <planeGeometry args={[line.w, 0.05]} />
                         <meshStandardMaterial
-                            color="#000000"
+                            color={theme === 'dark' ? '#887777' : '#000000'} 
                             opacity={0.55 * envelopeOpacity}
                             transparent
                             roughness={1}
