@@ -1,0 +1,136 @@
+.drag-hint {
+    position: absolute;
+    top: 45%;
+    left: 20%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    z-index: 100;
+    pointer-events: none;
+    animation: fadeInHint 0.5s ease-in-out, fadeOutHint 0.5s ease-in-out 4.5s forwards;
+}
+
+@keyframes fadeInHint {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+@keyframes fadeOutHint {
+    from {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+}
+
+.drag-hint-hand {
+    animation: dragHandMove 2s ease-in-out infinite;
+}
+
+@keyframes dragHandMove {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-15px);
+    }
+    75% {
+        transform: translateX(15px);
+    }
+}
+
+.dark .drag-hint-hand {
+    color: #44b4b8;
+    filter: drop-shadow(0 0 8px #44b4b8);
+}
+
+.light .drag-hint-hand {
+    color: #ff3c00;
+    filter: drop-shadow(0 0 8px #ff3c00);
+}
+
+.drag-hint-arrows {
+    display: flex;
+    gap: 30px;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.arrow-left,
+.arrow-right {
+    animation: arrowPulse 2s ease-in-out infinite;
+}
+
+.arrow-left {
+    animation-delay: 0s;
+}
+
+.arrow-right {
+    animation-delay: 1s;
+}
+
+@keyframes arrowPulse {
+    0%, 50%, 100% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+    25% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+}
+
+.dark .drag-hint-arrows {
+    color: #44b4b8;
+}
+
+.light .drag-hint-arrows {
+    color: #ff3c00;
+}
+
+.drag-hint-text {
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 0;
+    font-family: 'Impact', 'Arial Black', sans-serif;
+}
+
+.dark .drag-hint-text {
+    color: #44b4b8;
+    text-shadow: 0 0 10px rgba(68, 180, 184, 0.5);
+}
+
+.light .drag-hint-text {
+    color: #ff3c00;
+    text-shadow: 0 0 10px rgba(255, 60, 0, 0.5);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .drag-hint {
+        top: 40%;
+        left: 50%;
+    }
+
+    .drag-hint-arrows {
+        font-size: 1.5rem;
+        gap: 20px;
+    }
+
+    .drag-hint-text {
+        font-size: 0.9rem;
+    }
+}

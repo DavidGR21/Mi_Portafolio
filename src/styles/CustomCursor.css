@@ -1,0 +1,169 @@
+/* Ocultar cursor predeterminado */
+* {
+    cursor: none !important;
+}
+
+/* Cursor principal */
+.custom-cursor {
+    position: fixed;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10000;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s ease, height 0.3s ease, opacity 0.2s ease;
+}
+
+/* Estado draggable - cursor con flechas */
+.custom-cursor.draggable {
+    width: 50px;
+    height: 50px;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.drag-arrows {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    gap: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.drag-arrow-left,
+.drag-arrow-right {
+    animation: arrowSlide 1s ease-in-out infinite;
+}
+
+.drag-arrow-left {
+    animation-delay: 0s;
+}
+
+.drag-arrow-right {
+    animation-delay: 0.5s;
+}
+
+@keyframes arrowSlide {
+    0%, 100% {
+        opacity: 0.4;
+        transform: translateX(0);
+    }
+    50% {
+        opacity: 1;
+        transform: translateX(-3px);
+    }
+}
+
+.drag-arrow-right {
+    animation-name: arrowSlideRight;
+}
+
+@keyframes arrowSlideRight {
+    0%, 100% {
+        opacity: 0.4;
+        transform: translateX(0);
+    }
+    50% {
+        opacity: 1;
+        transform: translateX(3px);
+    }
+}
+
+/* Colores de las flechas según tema */
+[data-theme="dark"] .drag-arrows {
+    color: #ff3c00;
+    text-shadow: 0 0 10px rgba(255, 60, 0, 0.8);
+}
+
+[data-theme="light"] .drag-arrows {
+    color: #44b4b8;
+    text-shadow: 0 0 10px rgba(68, 180, 184, 0.8);
+}
+
+/* Estado hover - cursor crece */
+.custom-cursor.hovering {
+    width: 20px;
+    height: 20px;
+    opacity: 0.8;
+}
+
+/* Colores según tema */
+[data-theme="dark"] .custom-cursor {
+    background: #ff3c00;
+    box-shadow: 0 0 10px #ff3c00, 0 0 20px #ff3c00;
+}
+
+[data-theme="light"] .custom-cursor {
+    background: #3ea2c0;
+    box-shadow: 0 0 10px #37bfc4, 0 0 20px #44b4b8;
+}
+
+/* Anillo exterior pulsante */
+.cursor-ring {
+    position: fixed;
+    width: 40px;
+    height: 40px;
+    border: 2px solid;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    animation: ringAppear 0.3s ease-out, ringPulse 1.5s ease-in-out 0.3s infinite;
+}
+
+@keyframes ringAppear {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.8;
+    }
+}
+
+@keyframes ringPulse {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.8;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.3);
+        opacity: 0.3;
+    }
+}
+
+[data-theme="dark"] .cursor-ring {
+    border-color: #ff3c00;
+    box-shadow: 0 0 15px #ff3c00;
+}
+
+[data-theme="light"] .cursor-ring {
+    border-color: #44b4b8;
+    box-shadow: 0 0 15px #44b4b8;
+}
+
+/* Partículas del trail */
+.cursor-particle {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+}
+
+[data-theme="dark"] .cursor-particle {
+    background: radial-gradient(circle, #ff3c00 0%, transparent 70%);
+    box-shadow: 0 0 8px #ff3c00;
+
+}
+
+[data-theme="light"] .cursor-particle {
+    background: radial-gradient(circle, #44b4b8 0%, transparent 70%);
+    box-shadow: 0 0 8px #44b4b8;
+}

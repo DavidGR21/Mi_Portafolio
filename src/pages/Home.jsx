@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import IntroVideo from "../components/IntroVideo.jsx";
 import AudioVisualizer from "../components/AudioVisualizer.jsx";
 import Navbar from "../components/Navbar.jsx";
+import CustomCursor from "../components/CustomCursor.jsx";
 import AboutMe from "./AboutMe.jsx";
 // Importa los demás componentes
 import Projects from "./Projects.jsx";
@@ -51,6 +52,7 @@ export default function Home() {
 
     return (
         <>
+            <CustomCursor />
             <Navbar onNavigate={handleNavigation} />
 
             {/* IntroVideo antes de mostrar contenido */}

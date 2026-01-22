@@ -172,7 +172,7 @@ function Envelope({ onStateChange, onClose }) {
                     }
                     return newOpacity
                 })
-            }, 25)
+            }, 15)
 
             // Fase 2: Sacar la carta después de que desaparezca la solapa
             setTimeout(() => {
@@ -182,7 +182,7 @@ function Envelope({ onStateChange, onClose }) {
                 // Animación: agrandar la carta desde pequeña hasta su tamaño final
                 const paperAnimationInterval = setInterval(() => {
                     setPaperScale(prev => {
-                        const newScale = prev + 0.04
+                        const newScale = prev + 0.06
                         if (newScale >= 1) {
                             clearInterval(paperAnimationInterval)
                             setEnvelopeState('open')
@@ -192,12 +192,27 @@ function Envelope({ onStateChange, onClose }) {
                         return newScale
                     })
                 }, 16)
-            }, 500)
+            }, 300)
         }
     }
 
+    const handlePointerOver = () => {
+        document.body.classList.add('hovering-envelope');
+    };
+
+    const handlePointerOut = () => {
+        document.body.classList.remove('hovering-envelope');
+    };
+
     return (
-        <group ref={envelopeRef} onClick={handleClick} style={{ cursor: 'pointer' }} scale={[envelopeScale, envelopeScale, envelopeScale]}>
+        <group 
+            ref={envelopeRef} 
+            onClick={handleClick} 
+            onPointerOver={handlePointerOver}
+            onPointerOut={handlePointerOut}
+            style={{ cursor: 'pointer' }} 
+            scale={[envelopeScale, envelopeScale, envelopeScale]}
+        >
 
             {/* Cuerpo principal del sobre */}
             <mesh position={[0, 2, 0]}
