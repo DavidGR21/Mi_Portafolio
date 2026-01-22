@@ -331,21 +331,21 @@
 }
 
 .dark .project-links a {
-    color: #0a0a0a;
-    background: #44b4b8;
+    color: #000000;
+    background: #25a2a7;
 }
 
 .dark .project-links a:hover {
-    background: rgba(68, 180, 184, 0.7);
+    background: rgba(18, 133, 139, 0.7);
 }
 
 .light .project-links a {
     color: #ffffff;
-    background: #ff3c00;
+    background: #a10606;
 }
 
 .light .project-links a:hover {
-    background: rgba(255, 60, 0, 0.7);
+    background: rgba(209, 13, 13, 0.788);
 }
 
 /* Controles de paginación */
