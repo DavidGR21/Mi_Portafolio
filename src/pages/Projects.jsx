@@ -3,6 +3,7 @@ import '../styles/Projects.css';
 import { useTheme } from '../context/ThemeContext';
 import { projectsData } from '../data/projectsData';
 import { SkipBack, SkipForward } from 'lucide-react';
+import AnimatedTitle from '../components/AnimatedTitle';
 
 function Projects() {
     const { theme } = useTheme();
@@ -185,9 +186,9 @@ function Projects() {
             )}
 
             {/* Info del proyecto activo */}
-            <div className="container-info" key={activeProjectIndex}>
+            <div className="container-info" key={`${currentPage}-${activeProjectIndex}`}>
                 <div className="project-card">
-                    <h2 className="title-teko">{activeProject.title}</h2>
+                    <AnimatedTitle text={activeProject.title} className="title-teko" />
                     <p className="text-chivo">{activeProject.description}</p>
                     <div className="tech-tags">
                         {activeProject.tech.map((tech, index) => (

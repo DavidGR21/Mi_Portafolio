@@ -21,7 +21,7 @@ export const projectsData = [
     },
     {
         id: 3,
-        title: "NFC Access Control",
+        title: "Control NFC",
         description:
             "A task management app that helps users organize their to-do lists with deadlines and priorities. A task management app that helps users organize their to-do lists with deadlines and priorities.",
         image: "assets/images/projects/NFC.png",
