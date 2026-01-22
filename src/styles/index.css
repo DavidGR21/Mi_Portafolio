@@ -41,6 +41,40 @@ body {
   box-sizing: border-box;
 }
 
+/* Animaciones de transición entre secciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+main {
+  overflow: hidden;
+  position: relative;
+}
+
+.section-container {
+  animation: fadeIn 0.4s ease-in-out forwards;
+  will-change: opacity;
+}
+
+.section-container.fade-out {
+  animation: fadeOut 0.3s ease-in-out forwards;
+  will-change: opacity;
+}
+
 /* Modo claro */
 [data-theme="light"] {
   --bg-color: #f5f5f5;

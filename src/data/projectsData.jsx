@@ -3,6 +3,7 @@ export const projectsData = [
         id: 1,
         title: "iBlog",
         description:
+            "A blogging platform built with React and Node.js, allowing users to create, edit, and share blog posts." +
             "A blogging platform built with React and Node.js, allowing users to create, edit, and share blog posts.",
         image: "assets/images/projects/iBlog.jpg",
         tech: ["React", "Node.js", "MySQL", "AWS"],
