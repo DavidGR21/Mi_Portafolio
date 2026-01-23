@@ -1,18 +1,48 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import '../styles/CustomCursor.css';
 
 function CustomCursor() {
     const [particles, setParticles] = useState([]);
-    const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
     const [isHovering, setIsHovering] = useState(false);
     const [isDraggable, setIsDraggable] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+    
+    const cursorRef = useRef(null);
+    const ringRef = useRef(null);
+    const particlesRef = useRef([]);
+    const lastParticleTime = useRef(0);
+    const MAX_PARTICLES = 30; // Limitar partículas activas
+    const PARTICLE_INTERVAL = 10; // ms entre partículas
 
     useEffect(() => {
+        // Detectar si es un dispositivo móvil o táctil
+        const checkIfMobile = () => {
+            return (
+                'ontouchstart' in window ||
+                navigator.maxTouchPoints > 0 ||
+                /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+            );
+        };
+
+        const mobile = checkIfMobile();
+        setIsMobile(mobile);
+
+        // Si es móvil, no iniciar los eventos del cursor
+        if (mobile) return;
+
         let particleId = 0;
         let animationFrameId;
 
         const handleMouseMove = (e) => {
-            setCursorPosition({ x: e.clientX, y: e.clientY });
+            // Actualizar posición del cursor directamente en el DOM (más eficiente)
+            if (cursorRef.current) {
+                cursorRef.current.style.left = `${e.clientX}px`;
+                cursorRef.current.style.top = `${e.clientY}px`;
+            }
+            if (ringRef.current) {
+                ringRef.current.style.left = `${e.clientX}px`;
+                ringRef.current.style.top = `${e.clientY}px`;
+            }
 
             // Detectar si está sobre un elemento clickeable o si el body tiene la clase hovering-envelope
             const target = e.target;
@@ -37,31 +67,38 @@ function CustomCursor() {
             setIsHovering(!!isClickable || isHoveringEnvelope);
             setIsDraggable(isDraggableArea && !isClickable);
 
-            // Crear nueva partícula
-            const newParticle = {
-                id: particleId++,
-                x: e.clientX,
-                y: e.clientY,
-                size: Math.random() * 6 + 3,
-                vx: (Math.random() - 0.5) * 2,
-                vy: (Math.random() - 0.5) * 2,
-                life: 1,
-            };
+            // Crear nueva partícula con throttling
+            const now = Date.now();
+            if (now - lastParticleTime.current > PARTICLE_INTERVAL && particlesRef.current.length < MAX_PARTICLES) {
+                lastParticleTime.current = now;
+                
+                const newParticle = {
+                    id: particleId++,
+                    x: e.clientX,
+                    y: e.clientY,
+                    size: Math.random() * 6 + 4,
+                    vx: (Math.random() - 0.5) * 1.5,
+                    vy: (Math.random() - 0.5) * 1.5,
+                    life: 1,
+                };
 
-            setParticles(prev => [...prev, newParticle]);
+                particlesRef.current.push(newParticle);
+            }
         };
 
         const animate = () => {
-            setParticles(prev => {
-                return prev
-                    .map(particle => ({
-                        ...particle,
-                        x: particle.x + particle.vx,
-                        y: particle.y + particle.vy,
-                        life: particle.life - 0.02,
-                    }))
-                    .filter(particle => particle.life > 0);
-            });
+            // Actualizar partículas
+            particlesRef.current = particlesRef.current
+                .map(particle => ({
+                    ...particle,
+                    x: particle.x + particle.vx,
+                    y: particle.y + particle.vy,
+                    life: particle.life - 0.04,
+                }))
+                .filter(particle => particle.life > 0);
+
+            // Solo actualizar state si hay cambios significativos
+            setParticles([...particlesRef.current]);
 
             animationFrameId = requestAnimationFrame(animate);
         };
@@ -75,15 +112,15 @@ function CustomCursor() {
         };
     }, []);
 
+    // No renderizar el cursor en dispositivos móviles
+    if (isMobile) return null;
+
     return (
         <>
             {/* Cursor principal */}
             <div
+                ref={cursorRef}
                 className={`custom-cursor ${isHovering ? 'hovering' : ''} ${isDraggable ? 'draggable' : ''}`}
-                style={{
-                    left: `${cursorPosition.x}px`,
-                    top: `${cursorPosition.y}px`,
-                }}
             >
                 {isDraggable && (
                     <div className="drag-arrows">
@@ -96,11 +133,8 @@ function CustomCursor() {
             {/* Anillo exterior al hacer hover */}
             {isHovering && (
                 <div
+                    ref={ringRef}
                     className="cursor-ring"
-                    style={{
-                        left: `${cursorPosition.x}px`,
-                        top: `${cursorPosition.y}px`,
-                    }}
                 />
             )}
 
