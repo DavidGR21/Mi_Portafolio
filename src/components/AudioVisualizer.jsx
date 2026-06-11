@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useMemo } from 'react';
+import { useRef, useEffect, useState, useMemo, useCallback } from 'react';
 import { SkipBack, Play, Pause, SkipForward } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import playlist from '../data/playlist';
@@ -15,6 +15,10 @@ const AudioVisualizer = () => {
     const sourceNodeRef = useRef(null);
     const configRef = useRef(null);
     const themeRef = useRef(theme);
+
+    // Caché de blob URLs para evitar re-fetch
+    const audioCacheRef = useRef({});   // { filePath: blobUrl }
+    const loadingPromisesRef = useRef({}); // { filePath: Promise } — evita descargas duplicadas
 
     const [screenWidth, setScreenWidth] = useState(window.innerWidth);
     const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
@@ -69,38 +73,69 @@ const AudioVisualizer = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, [config.height]);
 
-    // Función para cargar archivos de audio
-    const loadAudioFile = async (filePath) => {
-        try {
-            // Para desarrollo local y GitHub Pages
-            let finalPath = filePath;
+    // Resuelve la ruta correcta según el entorno
+    const resolvePath = useCallback((filePath) => {
+        if (window.location.hostname.includes('github.io') && !filePath.startsWith('.')) {
+            return `.${filePath}`;
+        }
+        return filePath;
+    }, []);
 
-            // Si estamos en GitHub Pages y la ruta no es relativa, hacerla relativa
-            if (window.location.hostname.includes('github.io') && !filePath.startsWith('.')) {
-                finalPath = `.${filePath}`;
-            }
+    // Carga UN archivo de audio con caché. Si ya se está descargando, reutiliza la misma promesa.
+    const loadAudioFile = useCallback(async (filePath) => {
+        // 1. Ya está en caché → devolver inmediatamente
+        if (audioCacheRef.current[filePath]) {
+            return audioCacheRef.current[filePath];
+        }
 
-            const response = await fetch(finalPath);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+        // 2. Ya se está descargando → esperar la misma promesa
+        if (loadingPromisesRef.current[filePath]) {
+            return loadingPromisesRef.current[filePath];
+        }
 
-            const blob = await response.blob();
-            return URL.createObjectURL(blob);
-        } catch (error) {
-            console.error('Error loading audio file:', error);
-            // Fallback: intentar con ruta absoluta desde root
+        // 3. Nueva descarga
+        const fetchAudio = async () => {
+            const finalPath = resolvePath(filePath);
             try {
+                const response = await fetch(finalPath);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const blob = await response.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                audioCacheRef.current[filePath] = blobUrl;
+                return blobUrl;
+            } catch (error) {
+                console.error('Error loading audio file:', error);
+                // Fallback con ruta absoluta
                 const absolutePath = filePath.startsWith('/') ? filePath : `/${filePath}`;
                 const response = await fetch(absolutePath);
                 const blob = await response.blob();
-                return URL.createObjectURL(blob);
-            } catch (fallbackError) {
-                console.error('Fallback also failed:', fallbackError);
-                throw fallbackError;
+                const blobUrl = URL.createObjectURL(blob);
+                audioCacheRef.current[filePath] = blobUrl;
+                return blobUrl;
+            } finally {
+                delete loadingPromisesRef.current[filePath];
             }
+        };
+
+        loadingPromisesRef.current[filePath] = fetchAudio();
+        return loadingPromisesRef.current[filePath];
+    }, [resolvePath]);
+
+    // Pre-carga todas las pistas en segundo plano
+    // Prioridad: pista actual primero, luego el resto en paralelo
+    const preloadAllTracks = useCallback(async () => {
+        // Cargar la pista actual primero (si no está en caché aún)
+        const currentFile = playlist[0].file;
+        if (!audioCacheRef.current[currentFile]) {
+            try { await loadAudioFile(currentFile); } catch { /* silencioso */ }
         }
-    };
+
+        // Resto de pistas en paralelo, sin bloquear nada
+        const others = playlist.slice(1).map(track =>
+            loadAudioFile(track.file).catch(() => { /* error silencioso */ })
+        );
+        await Promise.allSettled(others);
+    }, [loadAudioFile]);
 
     // Funciones de control del reproductor
     const playAudio = async () => {
@@ -146,7 +181,7 @@ const AudioVisualizer = () => {
         setCurrentTrackIndex(prevIndex);
     };
 
-    // Cargar y cambiar de canción - CORREGIDO
+    // Cargar y cambiar de canción
     useEffect(() => {
         const loadTrack = async () => {
             const audio = audioRef.current;
@@ -160,12 +195,7 @@ const AudioVisualizer = () => {
                     audio.pause();
                 }
 
-                // Limpiar URL anterior si existe
-                if (audio.src && audio.src.startsWith('blob:')) {
-                    URL.revokeObjectURL(audio.src);
-                }
-
-                // Cargar el nuevo archivo de audio
+                // Obtener la URL del caché (o descargar si aún no está lista)
                 const audioUrl = await loadAudioFile(currentTrack.file);
                 audio.src = audioUrl;
 
@@ -185,7 +215,7 @@ const AudioVisualizer = () => {
         };
 
         loadTrack();
-    }, [currentTrackIndex]);
+    }, [currentTrackIndex, loadAudioFile]);
 
     // Inicialización de audio y visualizador - CORREGIDO
     useEffect(() => {
@@ -243,6 +273,9 @@ const AudioVisualizer = () => {
                 audio._handlePause = handlePause;
 
                 draw();
+
+                // Pre-cargar el resto de pistas en segundo plano (sin bloquear)
+                preloadAllTracks();
             } catch (err) {
                 console.error('Error al inicializar audio:', err);
             }
@@ -309,8 +342,14 @@ const AudioVisualizer = () => {
                 audioContextRef.current = null;
                 analyserRef.current = null;
             }
+
+            // Liberar todos los blobs del caché
+            Object.values(audioCacheRef.current).forEach(url => {
+                if (url && url.startsWith('blob:')) URL.revokeObjectURL(url);
+            });
+            audioCacheRef.current = {};
         };
-    }, []);
+    }, [preloadAllTracks]);
 
     return (
         <div className="audio-visualizer-fixed">
