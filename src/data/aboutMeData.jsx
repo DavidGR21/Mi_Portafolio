@@ -1,10 +1,11 @@
 export const aboutMeData = {
   name: "David Giler",
   role: "Full Stack Developer",
-  description: `I love creating web designs that exude urban style and modernity. 
-                I have complete confidence in my vision to develop innovative interfaces that not 
-                only look fresh but also connect with the essence of each brand. 
-                I'm always looking for new trends and techniques to take my designs to the next level.`,
+  description: `I'm a Full Stack Developer with a strong interest in software 
+  architecture, distributed systems, and modern web technologies. I enjoy building 
+  reliable backend services, intuitive user interfaces, and scalable solutions using 
+  industry best practices. My goal is to create software that is maintainable, efficient, 
+  and capable of delivering meaningful value to users.`,
 
   skills: [
     {

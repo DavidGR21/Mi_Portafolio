@@ -196,7 +196,9 @@ function Projects() {
                         ))}
                     </div>
                     <div className="project-links">
-                        <a href={activeProject.demo} target="_blank" rel="noopener noreferrer" className="text-chivo">Live Demo</a>
+                        {activeProject.demo && (
+                            <a href={activeProject.demo} target="_blank" rel="noopener noreferrer" className="text-chivo">Live Demo</a>
+                        )}
                         <a href={activeProject.source} target="_blank" rel="noopener noreferrer" className="text-chivo">Source Code</a>
                     </div>
                 </div>
