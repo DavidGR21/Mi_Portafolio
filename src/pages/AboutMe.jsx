@@ -1,7 +1,8 @@
 // AboutMe.jsx
 import { useTheme } from '../context/ThemeContext';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ParticleLogo from '../components/ParticleLogo';
+import CustomScrollbar from '../components/CustomScrollbar';
 import { aboutMeData } from '../data/aboutMeData';
 import { GraduationCap, Briefcase } from 'lucide-react';
 import '../styles/AboutMe.css';
@@ -13,6 +14,24 @@ function AboutMe() {
   const contentRef = useRef(null);
   const [activeSkillImage, setActiveSkillImage] = useState(null);
 
+  // Barra de scroll personalizada para la página: se oculta la nativa mientras se ve esta sección
+  useEffect(() => {
+    document.documentElement.classList.add('has-custom-scrollbar');
+    return () => document.documentElement.classList.remove('has-custom-scrollbar');
+  }, []);
+
+  const getPageScrollMetrics = () => {
+    const root = document.documentElement;
+    return {
+      position: window.scrollY,
+      max: root.scrollHeight - window.innerHeight,
+      viewport: window.innerHeight,
+      content: root.scrollHeight,
+    };
+  };
+
+  const scrollPageTo = (value) => window.scrollTo(0, value);
+
   const handleSkillHover = (skill) => {
     setActiveSkillImage(skill.imageId);
   };
@@ -23,6 +42,11 @@ function AboutMe() {
 
   return (
     <section ref={sectionRef} className={`about-me ${theme}`} id="about">
+      <CustomScrollbar
+        className="page-scrollbar"
+        getMetrics={getPageScrollMetrics}
+        scrollTo={scrollPageTo}
+      />
       <div className="about-container">
         {/* Columna izquierda - Logo con Partículas */}
         <div ref={logoRef} className="about-left">

@@ -61,11 +61,19 @@ export const aboutMeData = {
   experience: [
     {
       id: 1,
-      title: "Desarrollador Full Stack",
+      title: "Full Stack Developer",
       company: "Freelance",
-      period: "2024 - Presente",
-      description: "Desarrollo de aplicaciones web personalizadas para diversos clientes.",
+      period: "2024 - 2026",
+      description: "Development of custom web applications for various clients.",
       imageId: "logo-freelance"
+    },
+    {
+      id: 2,
+      title: "Developer Intern",
+      company: "EEASA",
+      period: "2026 - Present",
+      description: "Web application developer for the company's finance department.",
+      imageId: "logo-eeasa"
     }
   ],
 
@@ -73,8 +81,8 @@ export const aboutMeData = {
     {
       id: 1,
       institution: "Universidad Técnica de Ambato",
-      degree: "Ingeniería en Software",
-      period: "2022 - Presente",
+      degree: "Software Engineering",
+      period: "2022 - 2027",
       imageId: "logo-uta"
     }
   ]
