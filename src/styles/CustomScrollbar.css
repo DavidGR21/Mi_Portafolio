@@ -1,0 +1,75 @@
+/* Barra de scroll minimalista (componente CustomScrollbar) */
+
+.custom-scrollbar {
+    --sb-rail: rgba(255, 255, 255, 0.12);
+    --sb-thumb: rgba(255, 255, 255, 0.45);
+    --sb-accent: #44b4b8;
+    --sb-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 6px;
+    z-index: 2;
+    width: 14px;
+    cursor: pointer;
+    touch-action: none;
+    transition: opacity 0.3s var(--sb-ease);
+}
+
+[data-theme="light"] .custom-scrollbar {
+    --sb-rail: rgba(0, 0, 0, 0.12);
+    --sb-thumb: rgba(0, 0, 0, 0.4);
+    --sb-accent: #ff3c00;
+}
+
+/* Riel: una línea fina */
+.custom-scrollbar::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 6px;
+    width: 1px;
+    background-color: var(--sb-rail);
+}
+
+.custom-scrollbar.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.custom-scrollbar-thumb {
+    position: absolute;
+    top: 0;
+    right: 5px;
+    width: 3px;
+    border-radius: 3px;
+    background-color: var(--sb-thumb);
+    will-change: transform;
+    transition: width 0.25s var(--sb-ease), right 0.25s var(--sb-ease), background-color 0.25s var(--sb-ease);
+}
+
+.custom-scrollbar:hover .custom-scrollbar-thumb,
+.custom-scrollbar.is-dragging .custom-scrollbar-thumb {
+    right: 4px;
+    width: 5px;
+    background-color: var(--sb-accent);
+}
+
+/* Barra de la página completa: entre el navbar y el visualizador de audio */
+.custom-scrollbar.page-scrollbar {
+    position: fixed;
+    top: 86px;
+    bottom: 66px;
+    z-index: 9997;
+}
+
+/* Mientras se usa la barra personalizada de página se oculta la nativa */
+html.has-custom-scrollbar {
+    scrollbar-width: none;
+}
+
+html.has-custom-scrollbar::-webkit-scrollbar {
+    display: none;
+}

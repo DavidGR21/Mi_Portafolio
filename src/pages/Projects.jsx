@@ -1,209 +1,259 @@
-import { useRef, useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { ArrowUpRight } from 'lucide-react';
 import '../styles/Projects.css';
 import { useTheme } from '../context/ThemeContext';
 import { projectsData } from '../data/projectsData';
-import { SkipBack, SkipForward } from 'lucide-react';
 import AnimatedTitle from '../components/AnimatedTitle';
+import ProjectPreview from '../components/ProjectPreview';
+import CustomScrollbar from '../components/CustomScrollbar';
+
+// Rutas de imágenes respetando el `base` de vite.config.js
+const projects = projectsData.map((project) => ({
+    ...project,
+    imageSrc: `${import.meta.env.BASE_URL}${project.image}`,
+}));
+const previewImages = projects.map((project) => project.imageSrc);
+
+const pad = (n) => String(n).padStart(2, '0');
+
+// Scroll suave con inercia solo en escritorio con mouse; en táctil se usa el scroll nativo
+const DESKTOP_QUERY = '(min-width: 960px)';
+const SMOOTH_SCROLL_QUERY = `${DESKTOP_QUERY} and (hover: hover)`;
+
+function ProjectInfo({ project }) {
+    return (
+        <>
+            <p className="detail-desc text-chivo">{project.description}</p>
+            <ul className="detail-tags">
+                {project.tech.map((tech, i) => (
+                    <li key={tech} className="detail-tag" style={{ '--i': i }}>{tech}</li>
+                ))}
+            </ul>
+            <div className="detail-links">
+                {project.demo && (
+                    <a href={project.demo} target="_blank" rel="noopener noreferrer">
+                        Live Demo <ArrowUpRight size={16} />
+                    </a>
+                )}
+                <a href={project.source} target="_blank" rel="noopener noreferrer">
+                    Source Code <ArrowUpRight size={16} />
+                </a>
+            </div>
+        </>
+    );
+}
 
 function Projects() {
     const { theme } = useTheme();
-    const [rotation, setRotation] = useState(0);
-    const [isDragging, setIsDragging] = useState(false);
-    const [activeProjectIndex, setActiveProjectIndex] = useState(0);
-    const [currentPage, setCurrentPage] = useState(0);
-    const lastX = useRef(0);
-    const velocity = useRef(0);
-    const lastTime = useRef(Date.now());
-    const animationFrame = useRef(null);
+    const [activeIndex, setActiveIndex] = useState(0);
+    const activeProject = projects[activeIndex];
 
-    const ITEMS_PER_PAGE = 5;
-    const totalPages = Math.ceil(projectsData.length / ITEMS_PER_PAGE);
-    const startIndex = currentPage * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
-    const currentProjects = projectsData.slice(startIndex, endIndex);
-
-    // Calcular qué proyecto está al frente basado en la rotación
+    // La vista previa WebGL solo se monta en pantallas anchas (en móvil está oculta)
+    const [isDesktop, setIsDesktop] = useState(() => window.matchMedia(DESKTOP_QUERY).matches);
     useEffect(() => {
-        const count = currentProjects.length;
-        const anglePerItem = 360 / count;
+        const query = window.matchMedia(DESKTOP_QUERY);
+        const handleChange = (e) => setIsDesktop(e.matches);
+        query.addEventListener('change', handleChange);
+        return () => query.removeEventListener('change', handleChange);
+    }, []);
 
-        const normalizedRotation = ((-rotation % 360) + 360) % 360;
+    const listWrapRef = useRef(null);
+    const listRef = useRef(null);
+    const previewTiltRef = useRef(null);
+    const scrollRef = useRef({ current: 0, target: 0, max: 0 });
+    const velocityRef = useRef(0); // Compartido con el shader de la vista previa
+    const mouseRef = useRef({ x: 0, y: 0, tiltX: 0, tiltY: 0 });
 
-        const index = Math.floor(
-            (normalizedRotation + anglePerItem / 2) / anglePerItem
-        ) % count;
+    const isSmoothScroll = () => window.matchMedia(SMOOTH_SCROLL_QUERY).matches;
 
-        setActiveProjectIndex(index);
-    }, [rotation, currentProjects.length]);
+    // Métricas para la barra de scroll: transform en escritorio, scroll nativo en táctil
+    const getScrollMetrics = () => {
+        const wrap = listWrapRef.current;
+        const scroll = scrollRef.current;
+        return {
+            position: isSmoothScroll() ? scroll.current : wrap.scrollTop,
+            max: scroll.max,
+            viewport: wrap.clientHeight,
+            content: listRef.current.scrollHeight,
+        };
+    };
 
-    // Resetear rotación y índice al cambiar de página
+    const scrollListTo = (value) => {
+        if (isSmoothScroll()) scrollRef.current.target = value;
+        else listWrapRef.current.scrollTop = value;
+    };
+
     useEffect(() => {
-        setRotation(0);
-        setActiveProjectIndex(0);
-    }, [currentPage]);
+        const wrap = listWrapRef.current;
+        const list = listRef.current;
+        const scroll = scrollRef.current;
+        const mouse = mouseRef.current;
+        const smoothQuery = window.matchMedia(SMOOTH_SCROLL_QUERY);
+        const clampTarget = (value) => Math.min(Math.max(value, 0), scroll.max);
 
-
-    const handleMouseDown = (e) => {
-        setIsDragging(true);
-        lastX.current = e.clientX || e.touches?.[0]?.clientX;
-        lastTime.current = Date.now();
-        velocity.current = 0;
-        if (animationFrame.current) {
-            cancelAnimationFrame(animationFrame.current);
-        }
-    };
-
-    const handleMouseMove = (e) => {
-        if (!isDragging) return;
-
-        const currentX = e.clientX || e.touches?.[0]?.clientX;
-        const currentTime = Date.now();
-        const deltaX = currentX - lastX.current;
-        const deltaTime = currentTime - lastTime.current;
-
-        // Calcular velocidad para inercia
-        if (deltaTime > 0) {
-            velocity.current = deltaX / deltaTime;
-        }
-
-        setRotation(prev => prev + deltaX * 0.5);
-
-        lastX.current = currentX;
-        lastTime.current = currentTime;
-    };
-
-    const handleTouchStart = (e) => {
-        handleMouseDown(e);
-    };
-
-    const handleTouchMove = (e) => {
-        handleMouseMove(e);
-    };
-
-    const handleTouchEnd = () => {
-        handleMouseUp();
-    };
-
-    const handleMouseUp = () => {
-        setIsDragging(false);
-
-        // Aplicar inercia
-        const animate = () => {
-            if (Math.abs(velocity.current) > 0.01) {
-                setRotation(prev => prev + velocity.current * 10);
-                velocity.current *= 0.95; // Fricción
-                animationFrame.current = requestAnimationFrame(animate);
-            }
+        const measure = () => {
+            scroll.max = Math.max(0, list.scrollHeight - wrap.clientHeight);
+            scroll.target = clampTarget(scroll.target);
         };
 
-        if (Math.abs(velocity.current) > 0.1) {
-            animate();
-        }
-    };
+        // La rueda del mouse mueve la lista desde cualquier parte de la pantalla
+        const handleWheel = (e) => {
+            if (!smoothQuery.matches || e.ctrlKey) return;
+            e.preventDefault();
+            scroll.target = clampTarget(scroll.target + e.deltaY);
+        };
 
-    useEffect(() => {
-        return () => {
-            if (animationFrame.current) {
-                cancelAnimationFrame(animationFrame.current);
+        const handlePointerMove = (e) => {
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = (e.clientY / window.innerHeight) * 2 - 1;
+        };
+
+        let frameId;
+        const tick = () => {
+            if (smoothQuery.matches) {
+                const previous = scroll.current;
+                scroll.current += (scroll.target - scroll.current) * 0.09;
+                const velocity = scroll.current - previous;
+                velocityRef.current = velocity;
+                // La lista se inclina según la velocidad del scroll
+                const skew = Math.min(Math.max(velocity * 0.08, -4), 4);
+                list.style.transform = `translate3d(0, ${-scroll.current}px, 0) skewY(${skew}deg)`;
+            } else {
+                velocityRef.current = 0;
+                list.style.transform = '';
             }
+
+            // La vista previa se inclina siguiendo al mouse
+            mouse.tiltX += (mouse.x - mouse.tiltX) * 0.06;
+            mouse.tiltY += (mouse.y - mouse.tiltY) * 0.06;
+            if (previewTiltRef.current) {
+                previewTiltRef.current.style.transform =
+                    `rotateY(${-8 + mouse.tiltX * 8}deg) rotateX(${mouse.tiltY * -5}deg)`;
+            }
+
+            frameId = requestAnimationFrame(tick);
+        };
+
+        const resizeObserver = new ResizeObserver(measure);
+        resizeObserver.observe(wrap);
+        resizeObserver.observe(list);
+        window.addEventListener('wheel', handleWheel, { passive: false });
+        window.addEventListener('pointermove', handlePointerMove);
+        frameId = requestAnimationFrame(tick);
+
+        return () => {
+            cancelAnimationFrame(frameId);
+            resizeObserver.disconnect();
+            window.removeEventListener('wheel', handleWheel);
+            window.removeEventListener('pointermove', handlePointerMove);
         };
     }, []);
 
-    // Asegurar que activeProject siempre exista
-    const activeProject = currentProjects[activeProjectIndex] || currentProjects[0];
+    // Con teclado: mantener visible el proyecto enfocado dentro del scroll suave
+    const handleFocus = (index, e) => {
+        setActiveIndex(index);
+        if (!window.matchMedia(SMOOTH_SCROLL_QUERY).matches) return;
 
-    const handlePrevPage = () => {
-        if (currentPage > 0) {
-            // Cancelar cualquier animación en curso
-            if (animationFrame.current) {
-                cancelAnimationFrame(animationFrame.current);
-            }
-            velocity.current = 0;
-            setCurrentPage(currentPage - 1);
-        }
-    };
-
-    const handleNextPage = () => {
-        if (currentPage < totalPages - 1) {
-            // Cancelar cualquier animación en curso
-            if (animationFrame.current) {
-                cancelAnimationFrame(animationFrame.current);
-            }
-            velocity.current = 0;
-            setCurrentPage(currentPage + 1);
+        const wrap = listWrapRef.current;
+        const scroll = scrollRef.current;
+        const item = e.currentTarget.closest('.project-item');
+        wrap.scrollTop = 0; // el foco puede desplazar el contenedor; el scroll lo controla el transform
+        const top = item.offsetTop;
+        const bottom = top + item.offsetHeight;
+        if (top < scroll.target || bottom > scroll.target + wrap.clientHeight) {
+            scroll.target = Math.min(Math.max(top - wrap.clientHeight / 3, 0), scroll.max);
         }
     };
 
     return (
         <section id="projects" className={`projects ${theme}`}>
-            <div className="projects-title title-teko">PROJECTS</div>
-            <div
-                className="banner"
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
-                onTouchStart={handleTouchStart}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
-            >
-                <div
-                    className="slider"
-                    style={{
-                        "--quantity": currentProjects.length,
-                        transform: `rotateY(${rotation}deg)`
-                    }}
-                >
-                    {currentProjects.map((project, index) => (
-                        <div className="item" key={project.id} style={{ "--position": index }}>
-                            <img src={project.image} alt={project.title} />
-                        </div>
-                    ))}
-                </div>
-            </div>
+            <aside className="projects-sidebar">
+                <header className="projects-header">
+                    <h1 className="projects-title title-teko">PROJECTS</h1>
+                    <span className="projects-count">{pad(projects.length)} Items</span>
+                </header>
 
-            {/* Controles de paginación */}
-            {totalPages > 1 && (
-                <div className="pagination-controls">
-                    <button
-                        className="pagination-btn"
-                        onClick={handlePrevPage}
-                        disabled={currentPage === 0}
-                    >
-                        <SkipBack />
-                    </button>
-                    <span className="pagination-info text-chivo">
-                        {currentPage + 1} / {totalPages}
+                <div className="projects-list-area">
+                    <div className="projects-list-wrap" ref={listWrapRef}>
+                        <ol className="projects-list" ref={listRef}>
+                            {projects.map((project, index) => {
+                                const isSelected = index === activeIndex;
+                                return (
+                                    <li
+                                        key={project.id}
+                                        className={`project-item ${isSelected ? 'is-selected' : ''}`}
+                                        style={{ '--i': index }}
+                                    >
+                                        <button
+                                            type="button"
+                                            className="project-item-trigger"
+                                            onMouseEnter={() => setActiveIndex(index)}
+                                            onFocus={(e) => handleFocus(index, e)}
+                                            onClick={() => setActiveIndex(index)}
+                                            aria-pressed={isSelected}
+                                        >
+                                            <div className="project-row">
+                                                <span className="project-index">#{pad(index + 1)}</span>
+                                                <div className="project-thumb">
+                                                    <img src={project.imageSrc} alt={project.title} loading="lazy" />
+                                                </div>
+                                            </div>
+                                            <h3 className="project-item-title title-teko">{project.title}</h3>
+                                        </button>
+
+                                        {/* En móvil la información se despliega dentro de la lista */}
+                                        {isSelected && (
+                                            <div className="project-item-details">
+                                                <ProjectInfo project={project} />
+                                            </div>
+                                        )}
+                                    </li>
+                                );
+                            })}
+                        </ol>
+                    </div>
+
+                    {/* Barra de scroll personalizada (sincronizada con el contenido) */}
+                    <CustomScrollbar
+                        className="projects-scrollbar"
+                        getMetrics={getScrollMetrics}
+                        scrollTo={scrollListTo}
+                    />
+                </div>
+            </aside>
+
+            <div className="projects-stage">
+                <div className="project-detail" key={activeProject.id}>
+                    <span className="detail-index">
+                        #{pad(activeIndex + 1)} <span>/ {pad(projects.length)}</span>
                     </span>
-                    <button
-                        className="pagination-btn"
-                        onClick={handleNextPage}
-                        disabled={currentPage === totalPages - 1}
-                    >
-                        <SkipForward />
-                    </button>
+                    <AnimatedTitle text={activeProject.title} className="detail-title title-teko" />
+                    <ProjectInfo project={activeProject} />
                 </div>
-            )}
 
-            {/* Info del proyecto activo */}
-            <div className="container-info" key={`${currentPage}-${activeProjectIndex}`}>
-                <div className="project-card">
-                    <AnimatedTitle text={activeProject.title} className="title-teko" />
-                    <p className="text-chivo">{activeProject.description}</p>
-                    <div className="tech-tags">
-                        {activeProject.tech.map((tech, index) => (
-                            <span key={index} className="tech-tag text-chivo">{tech}</span>
-                        ))}
-                    </div>
-                    <div className="project-links">
-                        {activeProject.demo && (
-                            <a href={activeProject.demo} target="_blank" rel="noopener noreferrer" className="text-chivo">Live Demo</a>
-                        )}
-                        <a href={activeProject.source} target="_blank" rel="noopener noreferrer" className="text-chivo">Source Code</a>
+                <div className="project-preview">
+                    <div className="preview-tilt" ref={previewTiltRef}>
+                        <div className="preview-frame">
+                            {isDesktop && (
+                                <ProjectPreview
+                                    images={previewImages}
+                                    activeIndex={activeIndex}
+                                    velocityRef={velocityRef}
+                                />
+                            )}
+                            <span className="preview-dot dot1" />
+                            <span className="preview-dot dot2" />
+                            <span className="preview-dot dot3" />
+                            <span className="preview-dot dot4" />
+                        </div>
+                        <div className="preview-caption">
+                            <span>FIG. {pad(activeIndex + 1)}</span>
+                            <span>{activeProject.tech.slice(0, 3).join(' · ')}</span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </section >
+        </section>
     );
 }
 
