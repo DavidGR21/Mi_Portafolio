@@ -78,11 +78,11 @@ function ContactForm({ onCancel, onSubmit }) {
     return (
         <div className="contact-form-overlay" onClick={isSubmitting ? undefined : onCancel}>
             <div className="contact-form-container" onClick={(e) => e.stopPropagation()}>
-                <h2 className="form-title">ENVIAME UN MENSAJE</h2>
+                <h2 className="form-title">SEND ME A MESSAGE</h2>
                 
                 <form onSubmit={handleSubmit} className="contact-form">
                     <div className="form-group">
-                        <label htmlFor="name">Nombre</label>
+                        <label htmlFor="name">Name</label>
                         <input
                             type="text"
                             id="name"
@@ -90,7 +90,7 @@ function ContactForm({ onCancel, onSubmit }) {
                             value={formData.name}
                             onChange={handleChange}
                             required
-                            placeholder="Tu nombre"
+                            placeholder="Your name"
                         />
                     </div>
 
@@ -103,19 +103,19 @@ function ContactForm({ onCancel, onSubmit }) {
                             value={formData.email}
                             onChange={handleChange}
                             required
-                            placeholder="tu@email.com"
+                            placeholder="your@email.com"
                         />
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="message">Mensaje</label>
+                        <label htmlFor="message">Message</label>
                         <textarea
                             id="message"
                             name="message"
                             value={formData.message}
                             onChange={handleChange}
                             required
-                            placeholder="Escribe tu mensaje aquí..."
+                            placeholder="Write your message here..."
                             rows={5}
                         />
                     </div>
@@ -127,14 +127,14 @@ function ContactForm({ onCancel, onSubmit }) {
                             className="btn-cancel"
                             disabled={isSubmitting}
                         >
-                            Cancelar
+                            Cancel
                         </button>
                         <button 
                             type="submit" 
                             className="btn-send"
                             disabled={isSubmitting}
                         >
-                            {isSubmitting ? 'Enviando...' : submitStatus === 'success' ? '✓ Enviado' : 'Enviar'}
+                            {isSubmitting ? 'Sending...' : submitStatus === 'success' ? '✓ Sent' : 'Send'}
                         </button>
                     </div>
                 </form>

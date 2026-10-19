@@ -91,6 +91,11 @@ export const particleImages = [
     id: "logo-freelance",
     path: "assets/images/logo/Freelance.png",
     name: "Freelance"
+  },
+  {
+    id: "logo-eeasa",
+    path: "assets/images/logo/EEASA.png",
+    name: "EEASA"
   }
 ];
 

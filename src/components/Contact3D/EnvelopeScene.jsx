@@ -57,20 +57,15 @@ function EnvelopeScene() {
     return (
         <div className="envelope-scene-container">
             <h1 className='contact-title'>CONTACT</h1>
-            <Canvas shadows className="envelope-canvas">
+            <Canvas className="envelope-canvas" dpr={[1, 2]}>
                 {/* Cámara */}
                 <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={50} />
 
-                {/* Luces */}
-                <ambientLight intensity={0.6} />
-                <spotLight
-                    position={[10, 10, 10]}
-                    angle={0.3}
-                    penumbra={1}
-                    intensity={1.2}
-                    castShadow
-                />
-                <pointLight position={[-10, -10, -5]} intensity={0.5} color="#4A90E2" />
+                {/* Luces: frontal + trasera para que ambas caras del sobre se vean bien al girar */}
+                <ambientLight intensity={1.1} />
+                <directionalLight position={[4, 6, 8]} intensity={1.6} />
+                <directionalLight position={[-4, 3, -8]} intensity={1.2} />
+                <pointLight position={[-8, -6, 4]} intensity={30} color="#4A90E2" />
 
                 {/* Sobre 3D */}
                 <Envelope 
@@ -80,8 +75,8 @@ function EnvelopeScene() {
             </Canvas>
             {/* Texto de instrucción */}
             {envelopeState === 'closed' && (
-                <div className="instruction-text">
-                    Haz clic en el sobre para enviar un mensaje
+                <div className="instruction-text">     
+                Click on the envelope to send a message
                 </div>
             )}
 
