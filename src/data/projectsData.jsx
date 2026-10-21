@@ -1,14 +1,18 @@
+// source: un enlace (string) o, si el proyecto tiene dos repositorios,
+// un objeto { frontend, backend } y se muestran por separado
 export const projectsData = [
     {
         id: 1,
-        title: "iBlog",
+        title: "iBlogTwo",
         description:
-            "A blogging platform built with React and Node.js, allowing users to create, edit, and share blog posts." +
             "A blogging platform built with React and Node.js, allowing users to create, edit, and share blog posts.",
-        image: "assets/images/projects/iBlog.jpg",
-        tech: ["React", "Node.js", "MySQL", "AWS"],
-        demo: "",
-        source: "https://github.com/xxxMichael/iBlog.git",
+        image: "assets/images/projects/iBlogTwo.png",
+        tech: ["React", "Node.js", "Neon(PostgreSQL)", "Vercel", "Render"],
+        demo: "https://iblogtwo.vercel.app/",
+        source: {
+            frontend: "https://github.com/DavidGR21/Frontend_iBlogTwo",
+            backend: "https://github.com/DavidGR21/Backend_iBlogTwo",
+        },
     },
     {
         id: 2,
@@ -66,7 +70,10 @@ export const projectsData = [
             "Docker Compose"
         ],
         demo: "",
-        source: "https://github.com/GrupoDistribuidas/Backend_ControlCombustible.git",
+        source: {
+            frontend: "https://github.com/GrupoDistribuidas/Frontend_ControlCombustible",
+            backend: "https://github.com/GrupoDistribuidas/Backend_ControlCombustible",
+        },
     },
     {
         id: 7,
@@ -78,7 +85,10 @@ export const projectsData = [
             ".NET", "C#", "MySQL", "gRPC", "JWT", "REST API", "Entity Framework Core", "Swagger", "Docker", "Docker Compose", "Microservices"
         ],
         demo: "",
-        source: "https://github.com/GrupoDistribuidas/GestionHospitalariaBackend.git",
+        source: {
+            frontend: "https://github.com/GrupoDistribuidas/GestionHospitalariaFrontend",
+            backend: "https://github.com/GrupoDistribuidas/GestionHospitalariaBackend",
+        },
     },
     {
         id: 8,

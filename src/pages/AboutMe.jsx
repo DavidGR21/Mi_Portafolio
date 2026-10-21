@@ -1,11 +1,14 @@
 // AboutMe.jsx
 import { useTheme } from '../context/ThemeContext';
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import ParticleLogo from '../components/ParticleLogo';
 import CustomScrollbar from '../components/CustomScrollbar';
 import { aboutMeData } from '../data/aboutMeData';
-import { GraduationCap, Briefcase } from 'lucide-react';
+import { GraduationCap, Briefcase, Award, FileText } from 'lucide-react';
 import '../styles/AboutMe.css';
+
+// Carga diferida: pdf.js solo se descarga al abrir un certificado
+const CertificateModal = lazy(() => import('../components/CertificateModal'));
 
 function AboutMe() {
   const { theme } = useTheme();
@@ -13,6 +16,8 @@ function AboutMe() {
   const logoRef = useRef(null);
   const contentRef = useRef(null);
   const [activeSkillImage, setActiveSkillImage] = useState(null);
+  const [activeCertificate, setActiveCertificate] = useState(null);
+  const closeCertificate = useCallback(() => setActiveCertificate(null), []);
 
   // Barra de scroll personalizada para la página: se oculta la nativa mientras se ve esta sección
   useEffect(() => {
@@ -70,6 +75,7 @@ function AboutMe() {
                   <span
                     key={index}
                     className="skill-tag graffiti-item"
+                    style={{ '--i': index }}
                     onMouseEnter={() => handleSkillHover(skill)}
                     onMouseLeave={handleSkillLeave}
                   >
@@ -105,6 +111,39 @@ function AboutMe() {
                 </div>
               </div>
 
+              {/* Columna Cursos */}
+              <div className="about-section urban-column">
+                <h4 className="section-title title-teko text-teal">COURSES</h4>
+                <div className="urban-cards-wrapper">
+                  {aboutMeData.courses.map((course) => (
+                    <div key={course.id} className="urban-card course-item"
+                      onClick={() => setActiveCertificate(course)}
+                      onMouseEnter={() => handleSkillHover(course)}
+                      onMouseLeave={handleSkillLeave}>
+                      {/* Caja para el icono */}
+                      <div className="card-icon-box">
+                        <Award size={28} strokeWidth={1.5} />
+                      </div>
+                      {/* Contenido de texto */}
+                      <div className="card-content">
+                        <h5 className="course-title card-title">{course.title}</h5>
+                        <p className="course-provider card-subtitle">{course.provider}</p>
+                        <span className="course-period card-period">{course.period}</span>
+                        <button
+                          className="certificate-link"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveCertificate(course);
+                          }}
+                        >
+                          <FileText size={16} /> View certificate
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               {/* Columna Experiencia */}
               <div className="about-section urban-column">
                 <h4 className="section-title title-teko text-teal">EXPERIENCE</h4>
@@ -132,6 +171,16 @@ function AboutMe() {
           </div>
         </div>
       </div>
+
+      {activeCertificate && (
+        <Suspense fallback={null}>
+          <CertificateModal
+            course={activeCertificate}
+            theme={theme}
+            onClose={closeCertificate}
+          />
+        </Suspense>
+      )}
     </section>
   );
 }

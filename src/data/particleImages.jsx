@@ -96,6 +96,11 @@ export const particleImages = [
     id: "logo-eeasa",
     path: "assets/images/logo/EEASA.png",
     name: "EEASA"
+  },
+  {
+    id: "logo-python",
+    path: "assets/images/logo/logoPython.png",
+    name: "Python"
   }
 ];
 

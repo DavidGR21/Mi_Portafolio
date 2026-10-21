@@ -16,6 +16,16 @@ const previewImages = projects.map((project) => project.imageSrc);
 
 const pad = (n) => String(n).padStart(2, '0');
 
+// Un solo repositorio -> "Source Code"; frontend y backend separados -> un enlace por cada uno
+const getSourceLinks = (source) => {
+    if (!source) return [];
+    if (typeof source === 'string') return [{ label: 'Source Code', url: source }];
+    return [
+        source.frontend && { label: 'Source Code Frontend', url: source.frontend },
+        source.backend && { label: 'Source Code Backend', url: source.backend },
+    ].filter(Boolean);
+};
+
 // Scroll suave con inercia solo en escritorio con mouse; en táctil se usa el scroll nativo
 const DESKTOP_QUERY = '(min-width: 960px)';
 const SMOOTH_SCROLL_QUERY = `${DESKTOP_QUERY} and (hover: hover)`;
@@ -35,9 +45,11 @@ function ProjectInfo({ project }) {
                         Live Demo <ArrowUpRight size={16} />
                     </a>
                 )}
-                <a href={project.source} target="_blank" rel="noopener noreferrer">
-                    Source Code <ArrowUpRight size={16} />
-                </a>
+                {getSourceLinks(project.source).map(({ label, url }) => (
+                    <a key={url} href={url} target="_blank" rel="noopener noreferrer">
+                        {label} <ArrowUpRight size={16} />
+                    </a>
+                ))}
             </div>
         </>
     );

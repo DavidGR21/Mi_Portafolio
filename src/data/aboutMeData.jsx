@@ -55,6 +55,10 @@ export const aboutMeData = {
     {
       name: "Docker",
       imageId: "logo-docker" // Referencia a particleImages
+    },
+    {
+      name: "Python",
+      imageId: "logo-python" // Referencia a particleImages
     }
   ],
 
@@ -84,6 +88,18 @@ export const aboutMeData = {
       degree: "Software Engineering",
       period: "2022 - 2027",
       imageId: "logo-uta"
+    }
+  ],
+
+  // Los PDF van en public/assets/certificates/ (certificate: ruta relativa desde public/)
+  courses: [
+    {
+      id: 1,
+      title: "Fundamentos de Python 1",
+      provider: "Networking Academy",
+      period: "2026",
+      certificate: "assets/certificates/certificadoCursoPython.pdf",
+      imageId: "logo-python"
     }
   ]
 };

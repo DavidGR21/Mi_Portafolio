@@ -193,3 +193,68 @@
         bottom: 8%;
     }
 }
+/* ---------- Animaciones de entrada ---------- */
+/* translate/scale independientes para no pisar el transform de centrado.
+   El canvas solo anima opacity/filter: react-three-fiber mide su tamaño con
+   getBoundingClientRect al montar, y un scale/translate lo descentraría */
+
+.contact-title {
+    animation: contactTitleReveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+
+.envelope-canvas {
+    animation: contactSceneIn 1s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both;
+}
+
+.instruction-text {
+    animation:
+        contactHintIn 0.6s ease-out 0.9s both,
+        pulse 2s ease-in-out 1.5s infinite;
+}
+
+@keyframes contactTitleReveal {
+    from {
+        clip-path: inset(100% 0 0 0);
+        translate: 0 30px;
+    }
+
+    to {
+        clip-path: inset(0 0 0 0);
+        translate: 0 0;
+    }
+}
+
+@keyframes contactSceneIn {
+    from {
+        opacity: 0;
+        filter: blur(10px);
+    }
+
+    to {
+        opacity: 1;
+        filter: none;
+    }
+}
+
+@keyframes contactHintIn {
+    from {
+        opacity: 0;
+        translate: 0 15px;
+    }
+
+    to {
+        opacity: 0.8;
+        translate: 0 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .contact-title,
+    .envelope-canvas,
+    .instruction-text {
+        animation-duration: 0.01ms !important;
+        animation-delay: 0s !important;
+        animation-iteration-count: 1 !important;
+    }
+}
