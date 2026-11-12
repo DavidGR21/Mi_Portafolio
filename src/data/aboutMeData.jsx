@@ -100,6 +100,14 @@ export const aboutMeData = {
       period: "2026",
       certificate: "assets/certificates/certificadoCursoPython.pdf",
       imageId: "logo-python"
+    },
+    {
+      id: 2,
+      title: "Fundamentos de Python 2",
+      provider: "Networking Academy",
+      period: "2026",
+      certificate: "assets/certificates/certificadoCursoPython2.pdf",
+      imageId: "logo-python"
     }
   ]
 };
