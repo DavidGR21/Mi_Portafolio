@@ -1,112 +1,84 @@
 /* ParticleLogo.css */
+/* El contenedor ocupa todo el espacio que le da su padre; el motor adapta
+   resolución y número de partículas a ese tamaño */
 .particle-logo-container {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: 100%;
   height: 100%;
-  max-width: 500px;
-  max-height: 500px;
+  margin: 0 auto;
   user-select: none;
   -webkit-user-select: none;
-  margin: 0 auto;
-}
-
-/* Hover hint con efecto neón */
-.hover-hint {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  pointer-events: none;
-  opacity: 1;
-  transition: opacity 0.3s ease-out;
-}
-
-.hover-hint.hidden {
-  opacity: 0;
-}
-
-.hover-text {
-  font-family: "Poppins", "Inter", sans-serif;
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  color: #00ffff;
-  text-shadow: 
-    0 0 5px #00ffff,
-    0 0 10px #00ffff,
-    0 0 20px #00ffff,
-    0 0 40px #00ffff,
-    0 0 80px #00ffff;
-  animation: neonPulse 2s ease-in-out infinite;
-}
-
-@keyframes neonPulse {
-  0%, 100% {
-    text-shadow: 
-      0 0 5px #00ffff,
-      0 0 10px #00ffff,
-      0 0 20px #00ffff,
-      0 0 40px #00ffff,
-      0 0 80px #00ffff;
-  }
-  50% {
-    text-shadow: 
-      0 0 2px #00ffff,
-      0 0 5px #00ffff,
-      0 0 10px #00ffff,
-      0 0 20px #00ffff,
-      0 0 40px #00ffff;
-  }
+  -webkit-tap-highlight-color: transparent;
+  /* Permite seguir haciendo scroll vertical al tocar el logo en móviles */
+  touch-action: pan-y;
 }
 
 .particle-canvas {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: absolute;
+  inset: 0;
 }
 
 .particle-canvas canvas {
-  width: 100% !important;
-  height: 100% !important;
-  max-width: 500px;
-  max-height: 500px;
   display: block;
+  width: 100%;
+  height: 100%;
 }
 
-.logo-text-overlay {
+/* Pista de interacción: desaparece tras el primer uso */
+.particle-hint {
   position: absolute;
   left: 50%;
-  bottom: 0; /* separación debajo del logo */
+  bottom: 0;
+  margin: 0;
   transform: translateX(-50%);
   pointer-events: none;
-  text-align: center;
-  width: 100%;
-}
-
-.logo-name {
-  font-family: "Poppins", "Inter", sans-serif;
-  font-weight: 700;
-  margin-bottom: 75px;
-  letter-spacing: 2px;
-  font-size: 20px;
-  color: #ff6b6b; /* color coral por defecto */
-  text-transform: uppercase;
-}
-
-.logo-subtitle {
-  font-family: "Poppins", "Inter", sans-serif;
-  font-weight: 400;
+  white-space: nowrap;
+  font-family: 'Chivo', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
   letter-spacing: 3px;
-  font-size: 12px;
-  margin: 4px 0 0 0;
-  color: #888;
   text-transform: uppercase;
-  opacity: 0.9;
+  color: currentColor;
+  opacity: 0.45;
+  transition: opacity 0.6s ease;
+  animation: particleHintIn 0.8s ease-out 2s backwards;
+}
+
+.particle-hint.hidden {
+  opacity: 0;
+}
+
+.particle-hint-touch {
+  display: none;
+}
+
+@media (hover: none) {
+  .particle-hint-mouse {
+    display: none;
+  }
+
+  .particle-hint-touch {
+    display: inline;
+  }
+}
+
+@keyframes particleHintIn {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Imagen estática si WebGL no está disponible */
+.particle-fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 12%;
+  box-sizing: border-box;
+  object-fit: contain;
+}
+
+[data-theme='dark'] .particle-fallback {
+  filter: invert(1);
 }

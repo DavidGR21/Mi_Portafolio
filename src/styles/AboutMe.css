@@ -1,5 +1,7 @@
 /* AboutMe Section */
 .about-me {
+  /* Lado del logo de partículas: crece con la pantalla sin salirse de ella */
+  --logo-size: clamp(340px, min(36vw, calc(100vh - 150px)), 640px);
   min-height: 100vh;
   width: 100%;
   padding: 10px 20px 50px;
@@ -31,13 +33,14 @@
 
 /* Columna izquierda - Logo con Partículas */
 .about-left {
-  width: 525px;
-  height: 450px;
+  width: var(--logo-size);
+  height: var(--logo-size);
   display: flex;
   align-items: center;
   justify-content: center;
   position: fixed;
-  top: 85px;
+  /* Centrado vertical en pantallas altas, nunca por encima del navbar */
+  top: max(85px, calc((100vh + 60px - var(--logo-size)) / 2));
   align-self: flex-start;
   will-change: transform;
   transition: transform 0.3s ease-out;
@@ -47,7 +50,7 @@
 .about-right {
   width: 100%;
   padding: 10px;
-  margin-left: 600px;
+  margin-left: calc(var(--logo-size) + 75px);
   min-height: calc(100vh - 200px);
 }
 
@@ -422,6 +425,13 @@
     grid-template-columns: 1fr;
   }
 
+}
+
+/* Pantallas bajas (móvil en horizontal): el logo no debe superar la altura visible */
+@media (max-width: 1200px) and (max-height: 520px) {
+  .about-left {
+    height: max(220px, 75vh);
+  }
 }
 
 @media (max-width: 768px) {
