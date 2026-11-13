@@ -95,6 +95,19 @@ main {
   --button-play-bg-hover: rgba(0, 0, 0, 0.18);
 }
 
+/* Selección de texto con el color principal de cada tema */
+::selection {
+  background: #44b4b8;
+  color: #0a0a0a;
+  -webkit-text-fill-color: #0a0a0a; /* también sobre los títulos con degradado */
+}
+
+[data-theme="light"] ::selection {
+  background: #ff3c00;
+  color: #ffffff;
+  -webkit-text-fill-color: #ffffff;
+}
+
 a {
   font-weight: 500;
   color: #646cff;

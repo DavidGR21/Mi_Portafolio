@@ -13,28 +13,65 @@ import "../styles/ParticleLogo.css";
 const defaultImage = particleImages[DEFAULT_IMAGE_INDEX];
 const hoverImage = particleImages[HOVER_IMAGE_INDEX];
 
-// Imagen a mostrar: la del elemento activo (skill, curso...) tiene prioridad;
-// si no hay, la de hover/toque o el logo por defecto
-function resolveImage(activeImageId, isHovering) {
-  if (activeImageId) {
-    return particleImages.find((img) => img.id === activeImageId) ?? hoverImage;
-  }
-  return isHovering ? hoverImage : defaultImage;
+const findImage = (id) => particleImages.find((img) => img.id === id);
+
+// Duración de la entrada (s). El resto de la página espera a que termine
+// (onEntered) y recién entonces aparece
+const ENTRY_DURATION_S = 1.4;
+// Si el navegador no logra completar la entrada, la página aparece igualmente
+const ENTRY_FALLBACK_MS = 5000;
+// Al salir de un elemento se espera un instante antes de volver al logo: si el
+// puntero pasa directo a otro elemento, no hay un viaje intermedio al logo
+const RELEASE_DELAY_MS = 70;
+
+// Imagen a mostrar, por prioridad: elemento bajo el puntero (skill, curso,
+// foto...), la imagen fijada con clic y, por último, el logo por defecto
+function resolveImage(activeImageId, pinnedImageId) {
+  if (activeImageId) return findImage(activeImageId) ?? hoverImage;
+  if (pinnedImageId) return findImage(pinnedImageId) ?? defaultImage;
+  return defaultImage;
 }
 
-export default function ParticleLogo({ activeImageId = null }) {
+export default function ParticleLogo({
+  activeImageId = null,
+  pinnedImageId = null,
+  onEntered,
+}) {
   const canvasHolderRef = useRef(null);
   const engineRef = useRef(null);
   const targetsCache = useRef(new Map());
   const requestRef = useRef(0);
+  const onEnteredRef = useRef(onEntered);
+  onEnteredRef.current = onEntered;
 
   const [engineReady, setEngineReady] = useState(false);
   const [failed, setFailed] = useState(false);
-  const [isHovering, setIsHovering] = useState(false);
-  const [hasInteracted, setHasInteracted] = useState(false);
 
   const { theme } = useTheme();
-  const image = resolveImage(activeImageId, isHovering);
+  const wanted = resolveImage(activeImageId, pinnedImageId);
+  const [image, setImage] = useState(wanted);
+
+  // Entrar a un elemento cambia la imagen al instante; salir de él espera un
+  // momento por si el puntero pasa directamente a otro elemento
+  useEffect(() => {
+    if (wanted.id === image.id) return;
+    if (activeImageId) {
+      setImage(wanted);
+      return;
+    }
+    const timer = setTimeout(() => setImage(wanted), RELEASE_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [wanted, image.id, activeImageId]);
+
+  // Avisar a la página cuando las partículas terminaron de formarse
+  useEffect(() => {
+    if (failed) {
+      onEnteredRef.current?.();
+      return;
+    }
+    const timer = setTimeout(() => onEnteredRef.current?.(), ENTRY_FALLBACK_MS);
+    return () => clearTimeout(timer);
+  }, [failed]);
 
   // Partículas de una imagen, calculadas una sola vez y reutilizadas
   const getTargets = useCallback((img, count) => {
@@ -67,6 +104,7 @@ export default function ParticleLogo({ activeImageId = null }) {
       setFailed(true);
       return;
     }
+    engine.onEntryComplete = () => onEnteredRef.current?.();
     engineRef.current = engine;
     setEngineReady(true);
 
@@ -102,7 +140,9 @@ export default function ParticleLogo({ activeImageId = null }) {
     const request = ++requestRef.current;
     getTargets(image, engine.count).then((targets) => {
       if (request !== requestRef.current || engineRef.current !== engine) return;
-      if (targets) engine.setTarget(targets);
+      if (!targets) return;
+      // Solo la 1.ª llamada usa la duración de entrada
+      engine.setTarget(targets, ENTRY_DURATION_S);
     });
   }, [image, engineReady, getTargets]);
 
@@ -138,10 +178,6 @@ export default function ParticleLogo({ activeImageId = null }) {
 
   // ---------- Interacción ----------
 
-  const handlePointerEnter = (e) => {
-    if (e.pointerType === "mouse") setIsHovering(true);
-  };
-
   const handlePointerMove = (e) => {
     engineRef.current?.movePointer(e.clientX, e.clientY);
   };
@@ -150,22 +186,13 @@ export default function ParticleLogo({ activeImageId = null }) {
     const engine = engineRef.current;
     engine?.movePointer(e.clientX, e.clientY);
     engine?.pulse(e.clientX, e.clientY);
-    // En táctil no existe hover: cada toque alterna entre logo y dragón
-    if (e.pointerType !== "mouse") setIsHovering((value) => !value);
-    setHasInteracted(true);
   };
 
   const handlePointerEnd = (e) => {
     if (e.pointerType !== "mouse") engineRef.current?.releasePointer();
   };
 
-  const handlePointerLeave = (e) => {
-    engineRef.current?.releasePointer();
-    if (e.pointerType === "mouse") {
-      setIsHovering(false);
-      setHasInteracted(true);
-    }
-  };
+  const handlePointerLeave = () => engineRef.current?.releasePointer();
 
   if (failed) {
     return (
@@ -182,9 +209,9 @@ export default function ParticleLogo({ activeImageId = null }) {
   return (
     <div
       className="particle-logo-container"
+      data-particle-trigger
       role="img"
       aria-label={`${image.name} — interactive particle logo`}
-      onPointerEnter={handlePointerEnter}
       onPointerMove={handlePointerMove}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerEnd}
@@ -192,7 +219,7 @@ export default function ParticleLogo({ activeImageId = null }) {
       onPointerLeave={handlePointerLeave}
     >
       <div ref={canvasHolderRef} className="particle-canvas" />
-      <p className={`particle-hint${hasInteracted ? " hidden" : ""}`} aria-hidden="true">
+      <p className="particle-hint" aria-hidden="true">
         <span className="particle-hint-mouse">Hover &amp; click</span>
         <span className="particle-hint-touch">Tap &amp; drag</span>
       </p>

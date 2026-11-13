@@ -16,8 +16,12 @@ function AboutMe() {
   const logoRef = useRef(null);
   const contentRef = useRef(null);
   const [activeSkillImage, setActiveSkillImage] = useState(null);
+  const [pinnedImage, setPinnedImage] = useState(null);
   const [activeCertificate, setActiveCertificate] = useState(null);
   const closeCertificate = useCallback(() => setActiveCertificate(null), []);
+  // El contenido espera a que las partículas terminen de formar el logo
+  const [entered, setEntered] = useState(false);
+  const handleEntered = useCallback(() => setEntered(true), []);
 
   // Barra de scroll personalizada para la página: se oculta la nativa mientras se ve esta sección
   useEffect(() => {
@@ -37,6 +41,25 @@ function AboutMe() {
 
   const scrollPageTo = (value) => window.scrollTo(0, value);
 
+  // Un clic en cualquier elemento con efecto hover (o en el propio logo) fija su
+  // imagen; un clic en cualquier otro sitio vuelve al logo inicial
+  useEffect(() => {
+    const unpinOnOutsideClick = (e) => {
+      if (e.target.closest('[data-particle-trigger], .certificate-modal')) return;
+      setPinnedImage(null);
+    };
+    document.addEventListener('click', unpinOnOutsideClick);
+    return () => document.removeEventListener('click', unpinOnOutsideClick);
+  }, []);
+
+  // Props comunes de los elementos que muestran su imagen al pasar el cursor
+  const particleTrigger = (item) => ({
+    'data-particle-trigger': true,
+    onMouseEnter: () => handleSkillHover(item),
+    onMouseLeave: handleSkillLeave,
+    onClick: () => setPinnedImage(item.imageId),
+  });
+
   const handleSkillHover = (skill) => {
     setActiveSkillImage(skill.imageId);
   };
@@ -46,7 +69,7 @@ function AboutMe() {
   };
 
   return (
-    <section ref={sectionRef} className={`about-me ${theme}`} id="about">
+    <section ref={sectionRef} className={`about-me ${theme}${entered ? ' entered' : ''}`} id="about">
       <CustomScrollbar
         className="page-scrollbar"
         getMetrics={getPageScrollMetrics}
@@ -55,14 +78,18 @@ function AboutMe() {
       <div className="about-container">
         {/* Columna izquierda - Logo con Partículas */}
         <div ref={logoRef} className="about-left">
-          <ParticleLogo activeImageId={activeSkillImage} />
+          <ParticleLogo
+            activeImageId={activeSkillImage}
+            pinnedImageId={pinnedImage}
+            onEntered={handleEntered}
+          />
         </div>
 
         {/* Columna derecha - Información */}
         <div className="about-right">
           <div ref={contentRef} className="about-content">
             <h2 className="about-title title-teko">ABOUT ME</h2>
-            <img className='img-profile' src="assets/perfilPortafolio.jpg" alt="Perfil" />
+            <img className='img-profile clickable' {...particleTrigger({ imageId: 'dragon' })} src="assets/perfilPortafolio.jpg" alt="Perfil" />
             <h3 className="about-name text-rocksalt">{aboutMeData.name}</h3>
             <p className="about-role title-teko">{aboutMeData.role}</p>
             <p className="about-description text-chivo">{aboutMeData.description}</p>
@@ -76,8 +103,7 @@ function AboutMe() {
                     key={index}
                     className="skill-tag graffiti-item"
                     style={{ '--i': index }}
-                    onMouseEnter={() => handleSkillHover(skill)}
-                    onMouseLeave={handleSkillLeave}
+                    {...particleTrigger(skill)}
                   >
                     {skill.name}
                   </span>
@@ -94,8 +120,7 @@ function AboutMe() {
                 <div className="urban-cards-wrapper">
                   {aboutMeData.education.map((edu) => (
                     <div key={edu.id} className="urban-card education-item"
-                      onMouseEnter={() => handleSkillHover(edu)}
-                      onMouseLeave={handleSkillLeave}>
+                      {...particleTrigger(edu)}>
                       {/* Caja para el icono */}
                       <div className="card-icon-box">
                         <GraduationCap size={28} strokeWidth={1.5} />
@@ -117,9 +142,11 @@ function AboutMe() {
                 <div className="urban-cards-wrapper">
                   {aboutMeData.courses.map((course) => (
                     <div key={course.id} className="urban-card course-item"
-                      onClick={() => setActiveCertificate(course)}
-                      onMouseEnter={() => handleSkillHover(course)}
-                      onMouseLeave={handleSkillLeave}>
+                      {...particleTrigger(course)}
+                      onClick={() => {
+                        setPinnedImage(course.imageId);
+                        setActiveCertificate(course);
+                      }}>
                       {/* Caja para el icono */}
                       <div className="card-icon-box">
                         <Award size={28} strokeWidth={1.5} />
@@ -133,6 +160,7 @@ function AboutMe() {
                           className="certificate-link"
                           onClick={(e) => {
                             e.stopPropagation();
+                            setPinnedImage(course.imageId);
                             setActiveCertificate(course);
                           }}
                         >
@@ -150,8 +178,7 @@ function AboutMe() {
                 <div className="urban-cards-wrapper">
                   {aboutMeData.experience.map((exp) => (
                     <div key={exp.id} className="urban-card experience-item"
-                      onMouseEnter={() => handleSkillHover(exp)}
-                      onMouseLeave={handleSkillLeave}>
+                      {...particleTrigger(exp)}>
                       {/* Caja para el icono */}
                       <div className="card-icon-box">
                         <Briefcase size={28} strokeWidth={1.5} />
