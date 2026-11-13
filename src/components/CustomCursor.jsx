@@ -1,113 +1,214 @@
 import { useEffect, useState, useRef } from 'react';
 import '../styles/CustomCursor.css';
 
+// Factor de suavizado (0-1, a mayor valor sigue más rápido al mouse)
+const DOT_SMOOTHING = 0.45;
+const RING_SMOOTHING = 0.16;
+const MAX_PARTICLES = 60;
+const PARTICLE_SPACING = 7; // px de recorrido entre partículas
+const CLICKABLE_SELECTOR = 'a, button, [role="button"], input, textarea, select, .clickable';
+
+// Colores del trail según tema [inicio, fin]
+const TRAIL_COLORS = {
+    dark: ['255, 60, 0', '255, 150, 40'],
+    light: ['8, 145, 178', '99, 102, 241'],
+};
+
+// Interpolación independiente del framerate
+const smooth = (factor, dt) => 1 - Math.pow(1 - factor, dt / 16.67);
+
 function CustomCursor() {
-    const [particles, setParticles] = useState([]);
-    const [isHovering, setIsHovering] = useState(false);
     const [isDraggable, setIsDraggable] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
-    
-    const cursorRef = useRef(null);
+
+    const dotRef = useRef(null);
     const ringRef = useRef(null);
-    const particlesRef = useRef([]);
-    const lastParticleTime = useRef(0);
-    const MAX_PARTICLES = 30; // Limitar partículas activas
-    const PARTICLE_INTERVAL = 10; // ms entre partículas
+    const canvasRef = useRef(null);
 
     useEffect(() => {
-        // Detectar si es un dispositivo móvil o táctil
-        const checkIfMobile = () => {
-            return (
-                'ontouchstart' in window ||
-                navigator.maxTouchPoints > 0 ||
-                /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-            );
-        };
+        const mobile =
+            'ontouchstart' in window ||
+            navigator.maxTouchPoints > 0 ||
+            /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-        const mobile = checkIfMobile();
         setIsMobile(mobile);
-
-        // Si es móvil, no iniciar los eventos del cursor
         if (mobile) return;
 
-        let particleId = 0;
+        const dot = dotRef.current;
+        const ring = ringRef.current;
+        const canvas = canvasRef.current;
+        if (!dot || !ring || !canvas) return;
+        const ctx = canvas.getContext('2d');
+
+        // Posición real del mouse, y posiciones suavizadas del punto y el anillo
+        const mouse = { x: -100, y: -100 };
+        const dotPos = { x: -100, y: -100 };
+        const ringPos = { x: -100, y: -100 };
+        const lastSpawn = { x: null, y: null };
+        let particles = [];
+        let started = false;
+        let hovering = false;
+        let draggable = false;
         let animationFrameId;
+        let lastTime = performance.now();
+
+        const resizeCanvas = () => {
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = window.innerWidth * dpr;
+            canvas.height = window.innerHeight * dpr;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        };
+        resizeCanvas();
+
+        const spawnParticle = (x, y) => {
+            if (particles.length >= MAX_PARTICLES) particles.shift();
+            particles.push({
+                x,
+                y,
+                size: Math.random() * 5 + 5,
+                vx: (Math.random() - 0.5) * 0.8,
+                vy: (Math.random() - 0.5) * 0.8,
+                life: 1,
+            });
+        };
 
         const handleMouseMove = (e) => {
-            // Actualizar posición del cursor directamente en el DOM (más eficiente)
-            if (cursorRef.current) {
-                cursorRef.current.style.left = `${e.clientX}px`;
-                cursorRef.current.style.top = `${e.clientY}px`;
-            }
-            if (ringRef.current) {
-                ringRef.current.style.left = `${e.clientX}px`;
-                ringRef.current.style.top = `${e.clientY}px`;
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+
+            // La primera vez, colocar todo en la posición del mouse (evita "volar" desde la esquina)
+            if (!started) {
+                started = true;
+                dotPos.x = ringPos.x = lastSpawn.x = mouse.x;
+                dotPos.y = ringPos.y = lastSpawn.y = mouse.y;
+                dot.classList.add('visible');
+                ring.classList.add('visible');
             }
 
-            // Detectar si está sobre un elemento clickeable o si el body tiene la clase hovering-envelope
             const target = e.target;
-            const isClickable = target.closest('a, button, [role="button"], input, textarea, select, .clickable');
+            const isClickable = !!target.closest(CLICKABLE_SELECTOR);
             const isHoveringEnvelope = document.body.classList.contains('hovering-envelope');
-            
-            // Verificar si está sobre el área del slider usando las coordenadas
+
+            // Área del slider donde se puede arrastrar
             let isDraggableArea = false;
             const slider = document.querySelector('.banner .slider');
             if (slider && target.closest('.banner') && !target.closest('.pagination-controls, .pagination-btn, .pagination-info')) {
                 const rect = slider.getBoundingClientRect();
                 const paddingVertical = 30;
-                const paddingHorizontal = 135; // Área extra horizontal
-                isDraggableArea = (
+                const paddingHorizontal = 135;
+                isDraggableArea =
                     e.clientX >= rect.left - paddingHorizontal &&
                     e.clientX <= rect.right + paddingHorizontal &&
                     e.clientY >= rect.top - paddingVertical &&
-                    e.clientY <= rect.bottom + paddingVertical
-                );
+                    e.clientY <= rect.bottom + paddingVertical;
             }
-            
-            setIsHovering(!!isClickable || isHoveringEnvelope);
-            setIsDraggable(isDraggableArea && !isClickable);
 
-            // Crear nueva partícula con throttling
-            const now = Date.now();
-            if (now - lastParticleTime.current > PARTICLE_INTERVAL && particlesRef.current.length < MAX_PARTICLES) {
-                lastParticleTime.current = now;
-                
-                const newParticle = {
-                    id: particleId++,
-                    x: e.clientX,
-                    y: e.clientY,
-                    size: Math.random() * 6 + 4,
-                    vx: (Math.random() - 0.5) * 1.5,
-                    vy: (Math.random() - 0.5) * 1.5,
-                    life: 1,
-                };
+            // Solo tocar el DOM / React cuando el estado realmente cambia
+            const nextHovering = isClickable || isHoveringEnvelope;
+            if (nextHovering !== hovering) {
+                hovering = nextHovering;
+                dot.classList.toggle('hovering', hovering);
+                ring.classList.toggle('hovering', hovering);
+            }
 
-                particlesRef.current.push(newParticle);
+            const nextDraggable = isDraggableArea && !isClickable;
+            if (nextDraggable !== draggable) {
+                draggable = nextDraggable;
+                setIsDraggable(draggable);
+                dot.classList.toggle('draggable', draggable);
+                ring.classList.toggle('draggable', draggable);
             }
         };
 
-        const animate = () => {
-            // Actualizar partículas
-            particlesRef.current = particlesRef.current
-                .map(particle => ({
-                    ...particle,
-                    x: particle.x + particle.vx,
-                    y: particle.y + particle.vy,
-                    life: particle.life - 0.04,
-                }))
-                .filter(particle => particle.life > 0);
+        const handleMouseDown = () => {
+            dot.classList.add('pressed');
+            ring.classList.add('pressed');
+        };
+        const handleMouseUp = () => {
+            dot.classList.remove('pressed');
+            ring.classList.remove('pressed');
+        };
+        const handleLeave = () => {
+            dot.classList.remove('visible');
+            ring.classList.remove('visible');
+            started = false;
+            lastSpawn.x = lastSpawn.y = null;
+        };
 
-            // Solo actualizar state si hay cambios significativos
-            setParticles([...particlesRef.current]);
+        const animate = (now) => {
+            const dt = Math.min(now - lastTime, 64);
+            lastTime = now;
+
+            // Seguir al mouse con suavizado
+            const kDot = smooth(DOT_SMOOTHING, dt);
+            const kRing = smooth(RING_SMOOTHING, dt);
+            dotPos.x += (mouse.x - dotPos.x) * kDot;
+            dotPos.y += (mouse.y - dotPos.y) * kDot;
+            ringPos.x += (mouse.x - ringPos.x) * kRing;
+            ringPos.y += (mouse.y - ringPos.y) * kRing;
+
+            dot.style.transform = `translate3d(${dotPos.x}px, ${dotPos.y}px, 0) translate(-50%, -50%)`;
+            ring.style.transform = `translate3d(${ringPos.x}px, ${ringPos.y}px, 0) translate(-50%, -50%)`;
+
+            // Partículas a lo largo del recorrido del punto (trail continuo)
+            if (started && lastSpawn.x !== null) {
+                const dx = dotPos.x - lastSpawn.x;
+                const dy = dotPos.y - lastSpawn.y;
+                const dist = Math.hypot(dx, dy);
+                if (dist >= PARTICLE_SPACING) {
+                    const steps = Math.min(Math.floor(dist / PARTICLE_SPACING), 8);
+                    for (let i = 1; i <= steps; i++) {
+                        const t = i / steps;
+                        spawnParticle(lastSpawn.x + dx * t, lastSpawn.y + dy * t);
+                    }
+                    lastSpawn.x = dotPos.x;
+                    lastSpawn.y = dotPos.y;
+                }
+            }
+
+            // Dibujar trail en canvas (sin re-renders de React)
+            ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+            if (particles.length) {
+                const theme = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+                const [c1, c2] = TRAIL_COLORS[theme];
+                const decay = 0.045 * (dt / 16.67);
+                ctx.globalCompositeOperation = theme === 'dark' ? 'lighter' : 'source-over';
+
+                particles = particles.filter((p) => p.life > 0);
+                for (const p of particles) {
+                    p.x += p.vx * (dt / 16.67);
+                    p.y += p.vy * (dt / 16.67);
+                    p.life -= decay;
+                    if (p.life <= 0) continue;
+
+                    const r = p.size * (0.4 + p.life * 0.6);
+                    const color = p.life > 0.5 ? c1 : c2;
+                    const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
+                    gradient.addColorStop(0, `rgba(${color}, ${p.life * (theme === 'light' ? 0.95 : 0.9)})`);
+                    gradient.addColorStop(1, `rgba(${color}, 0)`);
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
 
             animationFrameId = requestAnimationFrame(animate);
         };
 
-        window.addEventListener('mousemove', handleMouseMove);
-        animate();
+        window.addEventListener('mousemove', handleMouseMove, { passive: true });
+        window.addEventListener('mousedown', handleMouseDown);
+        window.addEventListener('mouseup', handleMouseUp);
+        window.addEventListener('resize', resizeCanvas);
+        document.documentElement.addEventListener('mouseleave', handleLeave);
+        animationFrameId = requestAnimationFrame(animate);
 
         return () => {
             window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mousedown', handleMouseDown);
+            window.removeEventListener('mouseup', handleMouseUp);
+            window.removeEventListener('resize', resizeCanvas);
+            document.documentElement.removeEventListener('mouseleave', handleLeave);
             cancelAnimationFrame(animationFrameId);
         };
     }, []);
@@ -117,11 +218,14 @@ function CustomCursor() {
 
     return (
         <>
+            {/* Trail de partículas */}
+            <canvas ref={canvasRef} className="cursor-trail" />
+
+            {/* Anillo exterior (siempre visible, sigue con más inercia) */}
+            <div ref={ringRef} className="cursor-ring" />
+
             {/* Cursor principal */}
-            <div
-                ref={cursorRef}
-                className={`custom-cursor ${isHovering ? 'hovering' : ''} ${isDraggable ? 'draggable' : ''}`}
-            >
+            <div ref={dotRef} className="custom-cursor">
                 {isDraggable && (
                     <div className="drag-arrows">
                         <span className="drag-arrow-left">←</span>
@@ -129,29 +233,6 @@ function CustomCursor() {
                     </div>
                 )}
             </div>
-
-            {/* Anillo exterior al hacer hover */}
-            {isHovering && (
-                <div
-                    ref={ringRef}
-                    className="cursor-ring"
-                />
-            )}
-
-            {/* Partículas trail */}
-            {particles.map(particle => (
-                <div
-                    key={particle.id}
-                    className="cursor-particle"
-                    style={{
-                        left: `${particle.x}px`,
-                        top: `${particle.y}px`,
-                        width: `${particle.size}px`,
-                        height: `${particle.size}px`,
-                        opacity: particle.life,
-                    }}
-                />
-            ))}
         </>
     );
 }
