@@ -7,7 +7,8 @@ import SkillHolograms from '../components/SkillHolograms';
 import CvDossier from '../components/CvDossier';
 import { aboutMeData } from '../data/aboutMeData';
 import EducationCampus from '../components/EducationCampus';
-import { Briefcase, Award, FileText } from 'lucide-react';
+import CourseCertificates from '../components/CourseCertificates';
+import { Briefcase } from 'lucide-react';
 import '../styles/AboutMe.css';
 
 // Carga diferida: pdf.js solo se descarga al abrir un certificado
@@ -22,6 +23,11 @@ function AboutMe() {
   const [pinnedImage, setPinnedImage] = useState(null);
   const [activeCertificate, setActiveCertificate] = useState(null);
   const closeCertificate = useCallback(() => setActiveCertificate(null), []);
+  // Abrir un certificado fija también su imagen en el logo de partículas
+  const openCertificate = useCallback((course) => {
+    setPinnedImage(course.imageId);
+    setActiveCertificate(course);
+  }, []);
   // La hoja de vida se previsualiza con el mismo visor que los certificados
   const openCv = useCallback(() => {
     const { title, subtitle, file, downloadName } = aboutMeData.cv;
@@ -156,37 +162,12 @@ function AboutMe() {
               {/* Columna Cursos */}
               <div className="about-section urban-column">
                 <h4 className="section-title title-teko text-teal">COURSES</h4>
-                <div className="urban-cards-wrapper">
-                  {aboutMeData.courses.map((course) => (
-                    <div key={course.id} className="urban-card course-item"
-                      {...particleTrigger(course)}
-                      onClick={() => {
-                        setPinnedImage(course.imageId);
-                        setActiveCertificate(course);
-                      }}>
-                      {/* Caja para el icono */}
-                      <div className="card-icon-box">
-                        <Award size={28} strokeWidth={1.5} />
-                      </div>
-                      {/* Contenido de texto */}
-                      <div className="card-content">
-                        <h5 className="course-title card-title">{course.title}</h5>
-                        <p className="course-provider card-subtitle">{course.provider}</p>
-                        <span className="course-period card-period">{course.period}</span>
-                        <button
-                          className="certificate-link"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setPinnedImage(course.imageId);
-                            setActiveCertificate(course);
-                          }}
-                        >
-                          <FileText size={16} /> View certificate
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <CourseCertificates
+                  courses={aboutMeData.courses}
+                  getTriggerProps={particleTrigger}
+                  onOpen={openCertificate}
+                  activeCourse={activeCertificate}
+                />
               </div>
 
               {/* Columna Experiencia */}

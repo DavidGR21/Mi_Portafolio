@@ -1,0 +1,514 @@
+/* Cursos: diploma 3D en CSS + tarjeta tipo ticket (ver CourseCertificates.jsx) */
+
+.dark {
+  --cert-accent: #4fd1c5;
+  --cert-on-accent: #0a0a0a;
+  --cert-edge: #4fd1c5;
+  --cert-shadow: #0b4b44;
+  --cert-paper: #202020;
+  --cert-paper-side: #151515;
+  --cert-paper-top: #2c2c2c;
+  --cert-ink: rgba(79, 209, 197, 0.3);
+  --cert-ink-lit: #d4fffb;
+  --cert-glow: rgba(79, 209, 197, 0.9);
+  --cert-shine: rgba(79, 209, 197, 0.28);
+  --cert-muted: rgba(255, 255, 255, 0.7);
+}
+
+.light {
+  --cert-accent: #f32c2c;
+  --cert-on-accent: #ffffff;
+  --cert-edge: #111111;
+  --cert-shadow: #111111;
+  --cert-paper: #ffffff;
+  --cert-paper-side: #dcdcdc;
+  --cert-paper-top: #ececec;
+  --cert-ink: #c6c6c6;
+  --cert-ink-lit: #2a2a2a;
+  --cert-glow: rgba(0, 0, 0, 0);
+  --cert-shine: rgba(243, 44, 44, 0.16);
+  --cert-muted: rgba(0, 0, 0, 0.65);
+}
+
+.cert-list {
+  --cert-ease: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --cert-accent-deep: color-mix(in srgb, var(--cert-accent) 68%, #000000);
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+/* Fila: diploma + tarjeta. Las impares van al revés (diploma a la derecha,
+   girado hacia la tarjeta) */
+.cert-row {
+  --dir: 1;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.cert-row--flip {
+  --dir: -1;
+  flex-direction: row-reverse;
+}
+
+/* ---------- Diploma ---------- */
+/* Igual que la escuela: todo cuelga de .cert-model, un punto (0 × 0) en el
+   centro de la peana; cada bloque se define con --w/--h/--d */
+.cert-scene {
+  position: relative;
+  flex-shrink: 0;
+  width: 104px;
+  height: 88px;
+  perspective: 600px;
+  perspective-origin: 50% 30%;
+}
+
+.cert-model {
+  position: absolute;
+  left: 50%;
+  top: 67px;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(-18deg) rotateY(calc(var(--dir) * -30deg));
+  transition: transform 0.7s var(--cert-ease);
+}
+
+.cert-model :where(span, i) {
+  position: absolute;
+  display: block;
+  box-sizing: border-box;
+}
+
+/* Sombra dura sobre el suelo (solo se ve la parte que sobresale de la peana) */
+.cert-shadow {
+  left: -35px;
+  top: -16px;
+  width: 70px;
+  height: 32px;
+  box-shadow: 5px 5px 0 var(--cert-shadow);
+  transform: rotateX(90deg);
+}
+
+.cert-box {
+  bottom: 0;
+  left: calc(var(--w) / -2);
+  width: var(--w);
+  height: var(--h);
+  transform-style: preserve-3d;
+}
+
+.cert-face {
+  border: 1.5px solid var(--cert-edge);
+}
+
+.cert-face--front {
+  inset: 0;
+  transform: translateZ(calc(var(--d) / 2));
+  transform-style: preserve-3d;
+}
+
+.cert-face--left,
+.cert-face--right {
+  top: 0;
+  left: calc((var(--w) - var(--d)) / 2);
+  width: var(--d);
+  height: 100%;
+}
+
+.cert-face--left {
+  transform: rotateY(-90deg) translateZ(calc(var(--w) / 2));
+}
+
+.cert-face--right {
+  transform: rotateY(90deg) translateZ(calc(var(--w) / 2));
+}
+
+.cert-face--top {
+  left: 0;
+  top: calc(var(--d) / -2);
+  width: 100%;
+  height: var(--d);
+  transform: rotateX(90deg);
+}
+
+/* Peana, en el color de acento */
+.cert-plinth {
+  --w: 70px;
+  --h: 7px;
+  --d: 32px;
+}
+
+.cert-plinth .cert-face {
+  background: var(--cert-accent);
+}
+
+.cert-plinth .cert-face--left,
+.cert-plinth .cert-face--right {
+  background: var(--cert-accent-deep);
+}
+
+/* Marco con la hoja: apoyado en la peana y algo inclinado hacia atrás */
+.cert-plaque {
+  --w: 60px;
+  --h: 44px;
+  --d: 4px;
+  bottom: 7px;
+  transform-origin: 50% 100%;
+  transform: translateZ(-3px) rotateX(7deg);
+}
+
+.cert-plaque .cert-face {
+  background: var(--cert-paper-side);
+}
+
+.cert-plaque .cert-face--top {
+  background: var(--cert-paper-top);
+}
+
+.cert-plaque .cert-face--front {
+  background: var(--cert-paper);
+}
+
+.cert-paper {
+  inset: 0;
+  overflow: hidden;
+}
+
+.cert-head {
+  left: calc(50% - 12px);
+  top: 6px;
+  width: 24px;
+  height: 3.5px;
+  background: var(--cert-accent);
+}
+
+/* Renglones */
+.cert-paper i {
+  left: 9px;
+  right: 9px;
+  top: calc(14.5px + var(--n) * 5px);
+  height: 1.5px;
+  background: var(--cert-ink);
+  transition: background-color 0.25s ease-out, box-shadow 0.25s ease-out;
+  transition-delay: calc(var(--n) * 70ms);
+}
+
+.cert-paper i:nth-of-type(3) {
+  right: 24px;
+}
+
+.cert-sign {
+  left: 9px;
+  bottom: 7px;
+  width: 15px;
+  height: 1.5px;
+  background: var(--cert-ink);
+}
+
+/* Brillo que cruza la hoja al encenderse */
+.cert-shine {
+  top: -20%;
+  bottom: -20%;
+  left: -45%;
+  width: 30%;
+  background: var(--cert-shine);
+  transform: skewX(-20deg);
+  transition: transform 0.75s ease-out;
+}
+
+/* Sello: disco con su marca de verificación y dos cintas, despegado de la hoja.
+   Se queda fijo: en el hover solo gira el diploma entero */
+.cert-seal {
+  right: 5px;
+  bottom: 9px;
+  width: 16px;
+  height: 16px;
+  transform-style: preserve-3d;
+  transform: translateZ(2.5px);
+}
+
+.cert-seal::before,
+.cert-seal::after {
+  content: '';
+  position: absolute;
+  top: 9px;
+  width: 6px;
+  height: 12px;
+  background: var(--cert-accent-deep);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 72%, 0 100%);
+}
+
+.cert-seal::before {
+  left: 1.5px;
+  transform: rotate(14deg);
+}
+
+.cert-seal::after {
+  right: 1.5px;
+  transform: rotate(-14deg);
+}
+
+.cert-seal-disc {
+  inset: 0;
+  background: var(--cert-accent);
+  border: 1.5px solid var(--cert-edge);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--cert-accent), inset 0 0 0 2.5px var(--cert-on-accent);
+  transform: translateZ(1.5px);
+}
+
+.cert-seal-disc::after {
+  content: '';
+  position: absolute;
+  left: calc(50% - 1.75px);
+  top: calc(50% - 4px);
+  width: 3.5px;
+  height: 6px;
+  border: solid var(--cert-on-accent);
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+}
+
+/* ---------- Encendido: cursor sobre la fila o certificado abierto ---------- */
+.cert-row:hover .cert-model,
+.cert-row.is-active .cert-model {
+  transform: rotateX(-12deg) rotateY(calc(var(--dir) * 24deg));
+}
+
+.cert-row:hover .cert-paper i,
+.cert-row.is-active .cert-paper i {
+  background: var(--cert-ink-lit);
+  box-shadow: 0 0 4px var(--cert-glow);
+}
+
+.cert-row:hover .cert-shine,
+.cert-row.is-active .cert-shine {
+  transform: skewX(-20deg) translateX(560%);
+}
+
+/* ---------- Tarjeta: versión compacta de la tarjeta urbana, con resguardo ---------- */
+.urban-card.cert-card {
+  flex: 1;
+  min-width: 0;
+  gap: 0;
+  padding: 0;
+  align-items: stretch;
+}
+
+.cert-row--flip .cert-card {
+  flex-direction: row-reverse;
+}
+
+.cert-card-body {
+  flex: 1;
+  min-width: 0;
+  padding: 0.65rem 0.9rem 0.75rem;
+}
+
+.cert-card-title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--text-color);
+}
+
+.cert-card-provider {
+  margin: 2px 0 8px;
+  font-size: 0.88rem;
+  color: var(--cert-muted);
+}
+
+.cert-chip {
+  display: inline-block;
+  padding: 2px 8px 1px;
+  font-family: 'Chivo', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--cert-on-accent);
+  background: var(--cert-accent);
+}
+
+/* Resguardo: separado por una línea perforada, con el ojo que "ve" el certificado */
+.cert-stub {
+  flex-shrink: 0;
+  width: 58px;
+  padding: 6px 0 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  border: 0;
+  border-left: 2px dashed var(--cert-accent);
+  border-radius: 0;
+  color: var(--cert-accent);
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.25s ease-out, color 0.25s ease-out;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cert-row--flip .cert-stub {
+  border-left: 0;
+  border-right: 2px dashed var(--cert-accent);
+}
+
+.cert-stub:focus {
+  outline: none;
+}
+
+.cert-stub:focus-visible {
+  outline: 2px solid var(--cert-accent);
+  outline-offset: 3px;
+}
+
+.cert-stub-label {
+  margin-top: 3px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 2.5px;
+  text-indent: 2.5px;
+  text-transform: uppercase;
+}
+
+.cert-eye {
+  width: 28px;
+  height: 28px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  overflow: visible;
+}
+
+/* Cerrado: el párpado superior descansa volteado sobre el inferior */
+.cert-eye-lid {
+  transform-origin: 12px 12px;
+  transform: scaleY(-1);
+  transition: transform 0.35s var(--cert-ease);
+}
+
+.cert-eye-pupil {
+  fill: currentColor;
+  stroke: none;
+  transform-origin: 12px 12px;
+  transform: scale(0);
+  transition: transform 0.3s var(--cert-ease);
+}
+
+.cert-eye-lashes {
+  transition: opacity 0.2s ease-out;
+}
+
+.cert-card:hover .cert-stub,
+.cert-stub:focus-visible,
+.cert-row.is-active .cert-stub {
+  color: var(--cert-on-accent);
+  background: var(--cert-accent);
+}
+
+.cert-card:hover .cert-eye-lid,
+.cert-stub:focus-visible .cert-eye-lid,
+.cert-row.is-active .cert-eye-lid {
+  transform: scaleY(1);
+}
+
+.cert-card:hover .cert-eye-pupil,
+.cert-stub:focus-visible .cert-eye-pupil,
+.cert-row.is-active .cert-eye-pupil {
+  transform: scale(1);
+  transition-delay: 0.1s;
+}
+
+.cert-card:hover .cert-eye-lashes,
+.cert-stub:focus-visible .cert-eye-lashes,
+.cert-row.is-active .cert-eye-lashes {
+  opacity: 0;
+}
+
+/* ---------- Entrada (sincronizada con el resto del About Me) ---------- */
+/* Cada fila entra un poco después que la anterior; el retraso se topa para que
+   todo termine dentro de --enter-dur por muchos cursos que haya */
+.about-me:not(.entered) .cert-scene {
+  opacity: 0;
+}
+
+.about-me.entered .cert-scene {
+  animation: aboutFadeUp calc(var(--enter-dur) * 0.3) ease-out both;
+  animation-delay: calc(var(--col-delay, 0s) + var(--enter-dur) * min(var(--i, 0) * 0.05, 0.15));
+}
+
+/* El diploma llega girando. Sin relleno al terminar, para que después mande
+   el transform del hover */
+.about-me.entered .cert-model {
+  animation: certModelIn calc(var(--enter-dur) * 0.35) cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: calc(var(--col-delay, 0s) + var(--enter-dur) * min(var(--i, 0) * 0.05, 0.15));
+}
+
+@keyframes certModelIn {
+  from {
+    transform: rotateX(-18deg) rotateY(calc(var(--dir) * 55deg)) scale3d(0.55, 0.55, 0.55);
+  }
+}
+
+.about-me.entered .cert-list .cert-row .urban-card {
+  animation-delay: calc(var(--col-delay, 0s) + var(--enter-dur) * min(var(--i, 0) * 0.05 + 0.05, 0.2));
+}
+
+@media (max-width: 480px) {
+  .cert-row {
+    gap: 0.75rem;
+  }
+
+  .cert-scene {
+    width: 82px;
+    height: 70px;
+  }
+
+  .cert-model {
+    top: 53px;
+    scale: 0.78;
+  }
+
+  .cert-card-body {
+    padding: 0.55rem 0.7rem 0.65rem;
+  }
+
+  .cert-card-title {
+    font-size: 1.15rem;
+  }
+
+  .cert-card-provider {
+    font-size: 0.82rem;
+  }
+
+  .cert-stub {
+    width: 48px;
+  }
+
+  .cert-eye {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cert-model,
+  .cert-paper i,
+  .cert-shine,
+  .cert-stub,
+  .cert-eye-lid,
+  .cert-eye-pupil,
+  .cert-eye-lashes {
+    transition: none;
+  }
+}

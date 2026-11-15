@@ -358,39 +358,6 @@
   padding-left: 0.8rem;
 }
 
-/* Cursos: botón para ver certificado */
-.certificate-link {
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-top: 0.3rem;
-  padding: 0.3rem 0.7rem;
-  background: transparent;
-  border: 1px solid var(--urban-teal-accent, #4fd1c5);
-  color: var(--urban-teal-accent, #4fd1c5);
-  font-family: 'Chivo', sans-serif;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.certificate-link:hover {
-  background-color: var(--urban-teal-accent, #4fd1c5);
-  color: #0a0a0a;
-}
-
-.light .certificate-link {
-  border-color: var(--urban-teal-accent, #f32c2c);
-  color: var(--urban-teal-accent, #f32c2c);
-}
-
-.light .certificate-link:hover {
-  background-color: var(--urban-teal-accent, #f32c2c);
-  color: #ffffff;
-}
-
 /* Responsive Design */
 @media (max-width: 1200px) {
   .about-container {
