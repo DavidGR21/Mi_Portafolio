@@ -7,6 +7,16 @@ export const aboutMeData = {
   I strive to create intuitive, engaging, and innovative interfaces, characterized by fluid interactions, 
   purposeful animations, and robust performance.`,
 
+  // Hoja de vida: el PDF vive en public/assets/CV. Para actualizarla basta con
+  // reemplazar el archivo (o cambiar `file` si cambia el nombre)
+  cv: {
+    title: "Curriculum Vitae",
+    subtitle: "David Giler · Full Stack Developer",
+    file: "assets/CV/David_Giler_CV.pdf",
+    downloadName: "David_Giler_CV.pdf",
+    tags: ["PDF", "1 page", "Spanish"]
+  },
+
   skills: [
     {
       name: "JavaScript",

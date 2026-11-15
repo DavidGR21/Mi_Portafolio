@@ -1,12 +1,14 @@
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, ExternalLink } from 'lucide-react';
+import { X, ExternalLink, Download } from 'lucide-react';
 import PdfViewer from './PdfViewer';
 import '../styles/CertificateModal.css';
 
 /**
- * Visor de certificados en PDF.
+ * Visor de documentos en PDF (certificados y hoja de vida).
  * Se renderiza en un portal sobre el body; se cierra con Escape o clic fuera.
+ * `course`: { title, provider, certificate } y, opcionalmente, `label` (tipo de
+ * documento para lectores de pantalla) y `downloadName` (añade el botón de descarga).
  */
 function CertificateModal({ course, theme, onClose }) {
     // Ruta respetando el `base` de vite.config.js
@@ -31,7 +33,7 @@ function CertificateModal({ course, theme, onClose }) {
                 className="certificate-modal"
                 role="dialog"
                 aria-modal="true"
-                aria-label={`Certificate: ${course.title}`}
+                aria-label={`${course.label ?? 'Certificate'}: ${course.title}`}
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="certificate-header">
@@ -40,6 +42,16 @@ function CertificateModal({ course, theme, onClose }) {
                         <p className="certificate-provider">{course.provider}</p>
                     </div>
                     <div className="certificate-actions">
+                        {course.downloadName && (
+                            <a
+                                className="certificate-btn"
+                                href={certificateUrl}
+                                download={course.downloadName}
+                                title="Download"
+                            >
+                                <Download size={20} />
+                            </a>
+                        )}
                         <a
                             className="certificate-btn"
                             href={certificateUrl}

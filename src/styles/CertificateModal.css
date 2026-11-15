@@ -1,12 +1,16 @@
 /* Visor de certificados */
 .certificate-overlay {
+  /* Alto del navbar fijo (Navbar.css): el visor se centra en el espacio que
+     queda debajo de él, no en toda la ventana */
+  --navbar-height: 60px;
+  --overlay-gap: 20px;
   position: fixed;
   inset: 0;
   z-index: 2000;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: calc(var(--navbar-height) + var(--overlay-gap)) var(--overlay-gap) var(--overlay-gap);
   background-color: rgba(0, 0, 0, 0.75);
   animation: certificateFade 0.2s ease-out;
 }
@@ -14,6 +18,8 @@
 .certificate-modal {
   width: min(900px, 100%);
   height: min(85vh, 900px);
+  /* Nunca más alto que el espacio libre bajo el navbar */
+  max-height: 100%;
   display: flex;
   flex-direction: column;
   border: 2px solid;
@@ -191,7 +197,7 @@
 
 @media (max-width: 480px) {
   .certificate-overlay {
-    padding: 10px;
+    --overlay-gap: 10px;
   }
 
   .certificate-modal {

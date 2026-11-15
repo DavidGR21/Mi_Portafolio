@@ -1,0 +1,321 @@
+/* Hoja de vida como expediente: carpeta + hoja que asoma (ver CvDossier.jsx) */
+
+.dark {
+  --cv-accent: #4fd1c5;
+  --cv-on-accent: #0a0a0a;
+  --cv-edge: #4fd1c5;
+  --cv-shadow: #0b4b44;
+  --cv-back: #1a1a1a;
+  --cv-muted: rgba(255, 255, 255, 0.7);
+}
+
+.light {
+  --cv-accent: #f32c2c;
+  --cv-on-accent: #ffffff;
+  --cv-edge: #111111;
+  --cv-shadow: #111111;
+  --cv-back: #2a2a2a;
+  --cv-muted: rgba(0, 0, 0, 0.65);
+}
+
+.cv-dossier {
+  --cv-ease: cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+  /* Hueco para la hoja cuando sale de la carpeta */
+  padding-top: 6px;
+}
+
+/* ---------- Carpeta ---------- */
+.cv-folder {
+  position: relative;
+  flex-shrink: 0;
+  width: 150px;
+  height: 142px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  cursor: pointer;
+  perspective: 500px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cv-folder:focus {
+  outline: none;
+}
+
+.cv-folder:focus-visible {
+  outline: 2px solid var(--cv-accent);
+  outline-offset: 6px;
+}
+
+/* Tapa trasera con su pestaña */
+.cv-folder-back {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 96px;
+  background: var(--cv-back);
+  border: 2px solid var(--cv-edge);
+  box-shadow: 5px 5px 0 var(--cv-shadow);
+}
+
+.cv-folder-back::before {
+  content: '';
+  position: absolute;
+  left: -2px;
+  bottom: 100%;
+  width: 58px;
+  height: 13px;
+  background: var(--cv-back);
+  border: 2px solid var(--cv-edge);
+  border-bottom: 0;
+}
+
+/* Hoja: miniatura esquemática del CV */
+.cv-sheet {
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  width: 106px;
+  height: 118px;
+  padding: 9px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 5px;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #111111;
+  translate: -50% 0;
+  rotate: 0deg;
+  transition: translate 0.4s var(--cv-ease), rotate 0.4s var(--cv-ease);
+}
+
+.cv-sheet-name {
+  font-family: 'Teko', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 1px;
+  text-align: center;
+  color: #1f3864;
+}
+
+.cv-sheet-role {
+  align-self: center;
+  width: 46%;
+  height: 2px;
+  background: #9a9a9a;
+}
+
+.cv-sheet-block {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* Título de sección con su línea, como en el documento real */
+.cv-sheet-heading {
+  width: 100%;
+  height: 4px;
+  margin-top: 1px;
+  background: linear-gradient(#1f3864, #1f3864) left top / 38% 2px no-repeat,
+    linear-gradient(#1f3864, #1f3864) left bottom / 100% 1px no-repeat;
+}
+
+.cv-sheet-line {
+  height: 2px;
+  background: #c9c9c9;
+}
+
+.cv-sheet-line:last-child {
+  width: 62%;
+}
+
+/* Tapa delantera: se abre hacia el usuario */
+.cv-folder-front {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 78px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 10px 6px 12px;
+  color: var(--cv-on-accent);
+  background: var(--cv-accent);
+  border: 2px solid var(--cv-edge);
+  transform-origin: bottom center;
+  transition: transform 0.4s var(--cv-ease);
+}
+
+.cv-folder-label {
+  font-size: 2.9rem;
+  font-weight: 700;
+  line-height: 0.8;
+  letter-spacing: 1px;
+}
+
+.cv-folder-badge {
+  margin-bottom: 2px;
+  padding: 2px 6px 1px;
+  font-family: 'Chivo', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  border: 1.5px solid currentColor;
+}
+
+/* Abrir: con el cursor en cualquier parte del bloque o con el foco dentro */
+.cv-dossier:hover .cv-sheet,
+.cv-dossier:focus-within .cv-sheet {
+  translate: -50% -30px;
+  rotate: -4deg;
+}
+
+.cv-dossier:hover .cv-folder-front,
+.cv-dossier:focus-within .cv-folder-front {
+  transform: rotateX(-32deg);
+}
+
+.cv-folder:active .cv-sheet {
+  translate: -50% -22px;
+}
+
+/* ---------- Información y acciones ---------- */
+.cv-info {
+  min-width: 0;
+}
+
+.cv-title {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--text-color);
+}
+
+.cv-subtitle {
+  margin: 2px 0 10px;
+  font-size: 0.95rem;
+  color: var(--cv-muted);
+}
+
+.cv-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+}
+
+.cv-tag {
+  padding: 2px 8px 1px;
+  font-family: 'Chivo', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--cv-muted);
+  border: 1px solid currentColor;
+}
+
+.cv-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.cv-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 0;
+  font-family: 'Chivo', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  color: var(--cv-accent);
+  background: transparent;
+  border: 2px solid var(--cv-accent);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.cv-btn--primary {
+  color: var(--cv-on-accent);
+  background: var(--cv-accent);
+}
+
+.cv-btn:hover,
+.cv-btn:focus-visible {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 var(--cv-shadow);
+  color: var(--cv-on-accent);
+  background: var(--cv-accent);
+  outline: none;
+}
+
+.light .cv-btn:hover,
+.light .cv-btn:focus-visible {
+  border-color: var(--cv-edge);
+}
+
+/* ---------- Entrada (sincronizada con el resto del About Me) ---------- */
+.about-me:not(.entered) .cv-dossier {
+  opacity: 0;
+}
+
+.about-me.entered .cv-dossier {
+  animation: aboutFadeUp calc(var(--enter-dur) * 0.4) ease-out calc(var(--enter-dur) * 0.45) both;
+}
+
+@media (max-width: 480px) {
+  .cv-dossier {
+    gap: 1.1rem;
+  }
+
+  .cv-folder {
+    width: 120px;
+    height: 124px;
+  }
+
+  .cv-folder-back {
+    height: 82px;
+  }
+
+  .cv-folder-front {
+    height: 66px;
+  }
+
+  .cv-sheet {
+    width: 86px;
+    height: 104px;
+    padding: 8px;
+  }
+
+  .cv-folder-label {
+    font-size: 2.4rem;
+  }
+
+  .cv-title {
+    font-size: 1.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cv-sheet,
+  .cv-folder-front,
+  .cv-btn {
+    transition: none;
+  }
+}

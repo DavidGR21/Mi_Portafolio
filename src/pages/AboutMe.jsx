@@ -4,6 +4,7 @@ import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import ParticleLogo, { ENTRY_DURATION_S } from '../components/ParticleLogo';
 import CustomScrollbar from '../components/CustomScrollbar';
 import SkillHolograms from '../components/SkillHolograms';
+import CvDossier from '../components/CvDossier';
 import { aboutMeData } from '../data/aboutMeData';
 import { GraduationCap, Briefcase, Award, FileText } from 'lucide-react';
 import '../styles/AboutMe.css';
@@ -20,6 +21,11 @@ function AboutMe() {
   const [pinnedImage, setPinnedImage] = useState(null);
   const [activeCertificate, setActiveCertificate] = useState(null);
   const closeCertificate = useCallback(() => setActiveCertificate(null), []);
+  // La hoja de vida se previsualiza con el mismo visor que los certificados
+  const openCv = useCallback(() => {
+    const { title, subtitle, file, downloadName } = aboutMeData.cv;
+    setActiveCertificate({ title, provider: subtitle, certificate: file, downloadName, label: 'Resume' });
+  }, []);
   // El contenido anima a la vez que las partículas forman el logo y termina
   // justo cuando ellas terminan (enterDuration = duración de la entrada)
   const [entered, setEntered] = useState(false);
@@ -113,6 +119,12 @@ function AboutMe() {
             <h3 className="about-name text-rocksalt">{aboutMeData.name}</h3>
             <p className="about-role title-teko">{aboutMeData.role}</p>
             <p className="about-description text-chivo">{aboutMeData.description}</p>
+
+            {/* Hoja de vida */}
+            <div className="about-section">
+              <h4 className="section-title title-teko">RESUME</h4>
+              <CvDossier cv={aboutMeData.cv} onPreview={openCv} />
+            </div>
 
             {/* Skills */}
             <div className="about-section">
