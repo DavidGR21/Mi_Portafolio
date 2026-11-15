@@ -6,8 +6,23 @@ import logoBlanco from '/assets/images/logo/logoHorizontalBlanco.png';
 import logoNegro from '/assets/images/logo/logoHorizontalNegro.png';
 import '../styles/Navbar.css';
 
+// La animación de entrada se reproduce solo la primera vez que se monta el
+// navbar en esta carga de la página; al recargar, el módulo se evalúa de nuevo
+// y vuelve a reproducirse
+const INTRO_DURATION_MS = 1000;
+let introPlayed = false;
+
 const Navbar = ({ onNavigate }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [playIntro, setPlayIntro] = useState(() => !introPlayed);
+
+  // Al terminar la entrada se quita la clase para no interferir con los hovers
+  useEffect(() => {
+    if (!playIntro) return;
+    introPlayed = true;
+    const timer = setTimeout(() => setPlayIntro(false), INTRO_DURATION_MS + 100);
+    return () => clearTimeout(timer);
+  }, [playIntro]);
   const { theme } = useTheme();
 
   // Seleccionar el logo según el tema
@@ -55,7 +70,7 @@ const Navbar = ({ onNavigate }) => {
   ];
 
   return (
-    <nav className="navbar">
+    <nav className={`navbar${playIntro ? ' navbar--intro' : ''}`}>
       <div className="navbar-container">
         {/* Logo */}
         <div className="navbar-logo">
@@ -70,10 +85,10 @@ const Navbar = ({ onNavigate }) => {
 
         {/* Desktop Navigation */}
         <ul className="navbar-menu desktop-menu">
-          {navItems.map((item) => {
+          {navItems.map((item, index) => {
             const Icon = item.icon;
             return (
-              <li key={item.id} className="navbar-item">
+              <li key={item.id} className="navbar-item" style={{ '--i': index }}>
                 <button
                   className="navbar-link nav-button"
                   onClick={() => onNavigate(item.id)}

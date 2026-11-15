@@ -41,7 +41,7 @@
   text-transform: uppercase;
   color: currentColor;
   opacity: 0.55;
-  animation: particleHintIn 0.8s ease-out 2s backwards;
+  animation: particleHintIn 0.6s ease-out 1s backwards;
 }
 
 .particle-hint-touch {

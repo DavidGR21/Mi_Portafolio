@@ -395,6 +395,8 @@ export class ParticleEngine {
       this.colorFrom.set(target.colors);
       this.spacingFrom = target.spacing;
       this.duration = entryDuration;
+      // Avisar del inicio para sincronizar el resto de la página con la entrada
+      this.onEntryStart?.(this.reducedMotion ? 0 : entryDuration);
     } else {
       this.bakeCurrentState();
       this.uniforms.uEntry.value = 0;
@@ -494,7 +496,8 @@ export class ParticleEngine {
   }
 
   pulse(clientX, clientY) {
-    if (this.reducedMotion) return;
+    // Durante la entrada no hay interacción: rompería la formación del logo
+    if (this.reducedMotion || this.entryActive) return;
     const pulse = this.pulses[this.pulseIndex];
     this.pulseIndex = (this.pulseIndex + 1) % PULSE_COUNT;
     const local = this.toLocal(clientX, clientY, new Vector2());
@@ -540,7 +543,9 @@ export class ParticleEngine {
     u.uOpacity.value = Math.min(1, u.uOpacity.value + dt / 0.6);
 
     // Puntero suavizado (independiente del framerate)
-    const strengthTarget = this.pointerActive ? 1 : 0;
+    // Durante la entrada el puntero no afecta a las partículas
+    const strengthTarget = this.pointerActive && !this.entryActive ? 1 : 0;
+    if (u.uMouseStrength.value < 0.02) u.uMouse.value.copy(this.pointerTarget);
     u.uMouseStrength.value += (strengthTarget - u.uMouseStrength.value) * (1 - Math.exp(-dt * 7));
     u.uMouse.value.lerp(this.pointerTarget, 1 - Math.exp(-dt * 20));
 

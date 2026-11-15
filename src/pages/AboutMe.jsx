@@ -1,8 +1,9 @@
 // AboutMe.jsx
 import { useTheme } from '../context/ThemeContext';
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
-import ParticleLogo from '../components/ParticleLogo';
+import ParticleLogo, { ENTRY_DURATION_S } from '../components/ParticleLogo';
 import CustomScrollbar from '../components/CustomScrollbar';
+import SkillKeyboard from '../components/SkillKeyboard';
 import { aboutMeData } from '../data/aboutMeData';
 import { GraduationCap, Briefcase, Award, FileText } from 'lucide-react';
 import '../styles/AboutMe.css';
@@ -19,9 +20,18 @@ function AboutMe() {
   const [pinnedImage, setPinnedImage] = useState(null);
   const [activeCertificate, setActiveCertificate] = useState(null);
   const closeCertificate = useCallback(() => setActiveCertificate(null), []);
-  // El contenido espera a que las partículas terminen de formar el logo
+  // El contenido anima a la vez que las partículas forman el logo y termina
+  // justo cuando ellas terminan (enterDuration = duración de la entrada)
   const [entered, setEntered] = useState(false);
-  const handleEntered = useCallback(() => setEntered(true), []);
+  const [enterDuration, setEnterDuration] = useState(ENTRY_DURATION_S);
+  const enterStartedRef = useRef(false);
+  const handleEntryStart = useCallback((duration) => {
+    if (enterStartedRef.current) return;
+    enterStartedRef.current = true;
+    // duration 0 = sin animación de partículas (reduced motion / sin WebGL)
+    setEnterDuration(duration > 0 ? duration : ENTRY_DURATION_S);
+    setEntered(true);
+  }, []);
 
   // Barra de scroll personalizada para la página: se oculta la nativa mientras se ve esta sección
   useEffect(() => {
@@ -60,6 +70,11 @@ function AboutMe() {
     onClick: () => setPinnedImage(item.imageId),
   });
 
+  // Teclado de skills: pulsar una tecla la selecciona; pulsarla de nuevo la suelta
+  const toggleSkill = (skill) => {
+    setPinnedImage((current) => (current === skill.imageId ? null : skill.imageId));
+  };
+
   const handleSkillHover = (skill) => {
     setActiveSkillImage(skill.imageId);
   };
@@ -69,7 +84,12 @@ function AboutMe() {
   };
 
   return (
-    <section ref={sectionRef} className={`about-me ${theme}${entered ? ' entered' : ''}`} id="about">
+    <section
+      ref={sectionRef}
+      className={`about-me ${theme}${entered ? ' entered' : ''}`}
+      style={{ '--enter-dur': `${enterDuration}s` }}
+      id="about"
+    >
       <CustomScrollbar
         className="page-scrollbar"
         getMetrics={getPageScrollMetrics}
@@ -81,7 +101,7 @@ function AboutMe() {
           <ParticleLogo
             activeImageId={activeSkillImage}
             pinnedImageId={pinnedImage}
-            onEntered={handleEntered}
+            onEntryStart={handleEntryStart}
           />
         </div>
 
@@ -97,18 +117,14 @@ function AboutMe() {
             {/* Skills */}
             <div className="about-section">
               <h4 className="section-title title-teko">SKILLS</h4>
-              <div className="skills-grid graffiti-tags">
-                {aboutMeData.skills.map((skill, index) => (
-                  <span
-                    key={index}
-                    className="skill-tag graffiti-item"
-                    style={{ '--i': index }}
-                    {...particleTrigger(skill)}
-                  >
-                    {skill.name}
-                  </span>
-                ))}
-              </div>
+              <SkillKeyboard
+                skills={aboutMeData.skills}
+                getTriggerProps={particleTrigger}
+                selectedId={pinnedImage}
+                onToggle={toggleSkill}
+                entered={entered}
+                enterDuration={enterDuration}
+              />
             </div>
 
             {/* Contenedor Grid para Educación y Experiencia lado a lado */}

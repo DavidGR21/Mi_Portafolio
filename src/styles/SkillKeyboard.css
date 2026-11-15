@@ -1,0 +1,137 @@
+/* Skills como teclado de keycaps 3D: los botones del DOM definen la rejilla y
+   reciben la interacción; las teclas se dibujan en un canvas de three.js
+   superpuesto (ver skillKeyboardScene.js) */
+
+.dark {
+  --skill-accent: #44b4b8;
+  --skill-tip-text: #0a0a0a;
+  --skill-tip-edge: #ffffff;
+}
+
+.light {
+  --skill-accent: #ff3c00;
+  --skill-tip-text: #ffffff;
+  --skill-tip-edge: #111111;
+}
+
+.skill-keyboard {
+  --key-size: 58px;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, var(--key-size));
+  gap: 8px;
+  /* Hueco para la placa del teclado y su sombra, que dibuja el canvas */
+  padding: 14px 20px 22px 14px;
+  margin-top: 6px;
+}
+
+/* El canvas sobresale un poco de la rejilla y no recibe eventos */
+.skill-keyboard-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Botón invisible: la tecla se ve en el canvas */
+.skill-key {
+  position: relative;
+  width: var(--key-size);
+  height: var(--key-size);
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.skill-key:focus {
+  outline: none;
+}
+
+.skill-key:focus-visible {
+  outline: 2px solid var(--skill-accent, #44b4b8);
+  outline-offset: 2px;
+}
+
+/* Tooltip con el nombre de la tecnología, estilo etiqueta pegada */
+.skill-key-tip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  z-index: 2;
+  padding: 3px 10px 1px;
+  font-family: 'Teko', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--skill-tip-text, #0a0a0a);
+  background: var(--skill-accent, #44b4b8);
+  border: 2px solid var(--skill-tip-edge, #fff);
+  box-shadow: 3px 3px 0 var(--skill-tip-edge, #fff);
+  pointer-events: none;
+  opacity: 0;
+  translate: -50% 6px;
+  rotate: -3deg;
+  scale: 0.9;
+  transition: opacity 0.15s ease-out, translate 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    scale 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Flecha del tooltip */
+.skill-key-tip::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  translate: -50% 0;
+  border: 6px solid transparent;
+  border-top-color: var(--skill-tip-edge, #fff);
+}
+
+.skill-key:hover .skill-key-tip,
+.skill-key:focus-visible .skill-key-tip {
+  opacity: 1;
+  translate: -50% 0;
+  scale: 1;
+}
+
+/* ---------- Sin WebGL: teclas planas en CSS ---------- */
+.no-webgl .skill-key {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f4f4f4;
+  border: 2px solid #111;
+  box-shadow: 0 5px 0 #8a8a8a;
+  transition: translate 0.1s ease-out, box-shadow 0.1s ease-out;
+}
+
+.no-webgl .skill-key img {
+  max-width: 62%;
+  max-height: 62%;
+  object-fit: contain;
+}
+
+.no-webgl .skill-key:active,
+.no-webgl .skill-key.is-selected {
+  translate: 0 4px;
+  box-shadow: 0 1px 0 var(--skill-accent, #44b4b8);
+}
+
+@media (max-width: 480px) {
+  .skill-keyboard {
+    --key-size: 52px;
+    gap: 7px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skill-key-tip {
+    transition: opacity 0.15s ease-out;
+  }
+}

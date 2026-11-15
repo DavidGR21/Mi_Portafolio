@@ -360,3 +360,79 @@ body {
         padding-top: 60px;
     }
 }
+
+/* --------------------------------------------- */
+/* Animación de entrada (solo la primera carga)   */
+/* --------------------------------------------- */
+/* Mismo lenguaje que el About Me: la barra cae desde arriba, el logo y el
+   toggle se "estampan" como pegatinas y los enlaces se pintan como un trazo
+   de spray, uno tras otro. Todo termina en 1s (INTRO_DURATION_MS en
+   Navbar.jsx). Se usan translate/scale/rotate para no pisar los transform
+   de los hovers */
+.navbar--intro {
+    animation: navDrop 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.navbar--intro .navbar-logo {
+    animation: navStamp 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+}
+
+.navbar--intro .navbar-item {
+    animation: navInkWipe 0.4s cubic-bezier(0.22, 1, 0.36, 1) calc(0.35s + var(--i, 0) * 0.1s) both;
+}
+
+.navbar--intro .navbar-theme,
+.navbar--intro .hamburger-button {
+    animation: navStamp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s both;
+}
+
+@keyframes navDrop {
+    from {
+        translate: 0 -100%;
+        opacity: 0;
+    }
+
+    to {
+        translate: 0 0;
+        opacity: 1;
+    }
+}
+
+@keyframes navStamp {
+    0% {
+        opacity: 0;
+        scale: 1.5;
+        rotate: -8deg;
+    }
+
+    60% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 1;
+        scale: 1;
+        rotate: 0deg;
+    }
+}
+
+@keyframes navInkWipe {
+    from {
+        opacity: 1;
+        clip-path: inset(0 100% 0 0);
+        translate: -12px 0;
+    }
+
+    to {
+        opacity: 1;
+        clip-path: inset(0 -5% 0 0);
+        translate: 0 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .navbar--intro,
+    .navbar--intro * {
+        animation: none !important;
+    }
+}

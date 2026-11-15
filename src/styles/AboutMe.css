@@ -631,13 +631,15 @@
   }
 }
 /* ---------- Animaciones de entrada ---------- */
-/* El contenido espera a que las partículas terminen de formar el logo: la
-   clase .entered la pone AboutMe.jsx en ese momento. Se usan las propiedades
-   translate/scale/rotate (no transform) para no pisar las rotaciones y hovers
-   que ya usan transform */
+/* El contenido anima EN PARALELO a la entrada de las partículas: la clase
+   .entered la pone AboutMe.jsx cuando éstas empiezan a moverse y --enter-dur
+   es la duración de esa entrada. Todos los tiempos son fracciones de ella, de
+   modo que el último elemento termina justo cuando el logo queda formado.
+   Se usan las propiedades translate/scale/rotate (no transform) para no pisar
+   las rotaciones y hovers que ya usan transform */
 
 .about-me {
-  --enter-base: 0s;
+  --enter-dur: 1s;
   --ease-slam: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -658,65 +660,66 @@
 
 /* Títulos: se "pintan" de izquierda a derecha, como un trazo de spray */
 .about-me.entered .about-title {
-  animation: aboutInkWipe 0.7s var(--ease-out) calc(var(--enter-base) + 0.05s) both;
+  animation: aboutInkWipe calc(var(--enter-dur) * 0.45) var(--ease-out) calc(var(--enter-dur) * 0.05) both;
 }
 
 /* Foto: se estampa con un golpe, como una pegatina */
 .about-me.entered .img-profile {
-  animation: aboutStamp 0.55s var(--ease-slam) calc(var(--enter-base) + 0.2s) both;
+  animation: aboutStamp calc(var(--enter-dur) * 0.4) var(--ease-slam) calc(var(--enter-dur) * 0.35) both;
 }
 
 .about-me.entered .about-name {
-  animation: aboutFadeUp 0.55s ease-out calc(var(--enter-base) + 0.18s) both;
+  animation: aboutFadeUp calc(var(--enter-dur) * 0.4) ease-out calc(var(--enter-dur) * 0.2) both;
 }
 
 .about-me.entered .about-role {
-  animation: aboutInkWipe 0.6s var(--ease-out) calc(var(--enter-base) + 0.26s) both;
+  animation: aboutInkWipe calc(var(--enter-dur) * 0.4) var(--ease-out) calc(var(--enter-dur) * 0.25) both;
 }
 
 .about-me.entered .about-description {
-  animation: aboutFadeUp 0.6s ease-out calc(var(--enter-base) + 0.34s) both;
+  animation: aboutFadeUp calc(var(--enter-dur) * 0.4) ease-out calc(var(--enter-dur) * 0.3) both;
 }
 
 .about-me.entered .about-section .section-title {
-  animation: aboutInkWipe 0.6s var(--ease-out) calc(var(--enter-base) + 0.42s) both;
+  animation: aboutInkWipe calc(var(--enter-dur) * 0.35) var(--ease-out) calc(var(--enter-dur) * 0.4) both;
 }
 
 /* Las skills saltan una a una con una ligera inclinación y luego flotan */
 .about-me.entered .graffiti-item {
   animation:
-    aboutTagIn 0.5s var(--ease-slam) calc(var(--enter-base) + 0.5s + var(--i, 0) * 0.03s) both,
-    graffitiFloat 3s ease-in-out calc(var(--enter-base) + 1s + var(--i, 0) * 0.03s) infinite;
+    aboutTagIn calc(var(--enter-dur) * 0.3) var(--ease-slam) calc(var(--enter-dur) * (0.45 + var(--i, 0) * 0.02)) both,
+    graffitiFloat 3s ease-in-out calc(var(--enter-dur) * (0.75 + var(--i, 0) * 0.02)) infinite;
 }
 
 .about-me .urban-column:nth-child(1) {
-  --col-delay: calc(var(--enter-base) + 0.8s);
+  --col-delay: calc(var(--enter-dur) * 0.45);
 }
 
 .about-me .urban-column:nth-child(2) {
-  --col-delay: calc(var(--enter-base) + 0.92s);
+  --col-delay: calc(var(--enter-dur) * 0.5);
 }
 
 .about-me .urban-column:nth-child(3) {
-  --col-delay: calc(var(--enter-base) + 1.04s);
+  --col-delay: calc(var(--enter-dur) * 0.55);
 }
 
 .about-me.entered .urban-column .section-title {
   animation-delay: var(--col-delay);
 }
 
-/* Tarjetas: entran deslizándose y se "clavan" con su sombra dura */
+/* Tarjetas: entran deslizándose y se "clavan" con su sombra dura.
+   La última termina en 0.55 + 0.15 + 0.3 = 1 × --enter-dur */
 .about-me.entered .urban-card {
-  animation: aboutCardIn 0.6s var(--ease-slam) both;
-  animation-delay: calc(var(--col-delay, 1.3s) + 0.1s);
+  animation: aboutCardIn calc(var(--enter-dur) * 0.3) var(--ease-slam) both;
+  animation-delay: calc(var(--col-delay, 0s) + var(--enter-dur) * 0.05);
 }
 
 .about-me.entered .urban-card:nth-child(2) {
-  animation-delay: calc(var(--col-delay, 1.3s) + 0.2s);
+  animation-delay: calc(var(--col-delay, 0s) + var(--enter-dur) * 0.1);
 }
 
 .about-me.entered .urban-card:nth-child(3) {
-  animation-delay: calc(var(--col-delay, 1.3s) + 0.3s);
+  animation-delay: calc(var(--col-delay, 0s) + var(--enter-dur) * 0.15);
 }
 
 @keyframes aboutInkWipe {
@@ -775,7 +778,7 @@
     opacity: 1;
     translate: 0 0;
     scale: 1;
-    rotate: 0deg;
+    rotate: var(--rot, 0deg);
   }
 }
 

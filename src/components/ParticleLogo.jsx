@@ -15,9 +15,9 @@ const hoverImage = particleImages[HOVER_IMAGE_INDEX];
 
 const findImage = (id) => particleImages.find((img) => img.id === id);
 
-// Duración de la entrada (s). El resto de la página espera a que termine
-// (onEntered) y recién entonces aparece
-const ENTRY_DURATION_S = 1.4;
+// Duración de la entrada (s). El resto de la página anima en paralelo
+// (onEntryStart) y termina a la vez que las partículas
+export const ENTRY_DURATION_S = 1;
 // Si el navegador no logra completar la entrada, la página aparece igualmente
 const ENTRY_FALLBACK_MS = 5000;
 // Al salir de un elemento se espera un instante antes de volver al logo: si el
@@ -35,6 +35,7 @@ function resolveImage(activeImageId, pinnedImageId) {
 export default function ParticleLogo({
   activeImageId = null,
   pinnedImageId = null,
+  onEntryStart,
   onEntered,
 }) {
   const canvasHolderRef = useRef(null);
@@ -43,12 +44,17 @@ export default function ParticleLogo({
   const requestRef = useRef(0);
   const onEnteredRef = useRef(onEntered);
   onEnteredRef.current = onEntered;
+  const onEntryStartRef = useRef(onEntryStart);
+  onEntryStartRef.current = onEntryStart;
 
   const [engineReady, setEngineReady] = useState(false);
   const [failed, setFailed] = useState(false);
+  // Mientras las partículas forman el logo se ignoran los hovers/clics de la
+  // página: cambiar de imagen a mitad de la entrada la rompía
+  const [entryDone, setEntryDone] = useState(false);
 
   const { theme } = useTheme();
-  const wanted = resolveImage(activeImageId, pinnedImageId);
+  const wanted = entryDone ? resolveImage(activeImageId, pinnedImageId) : defaultImage;
   const [image, setImage] = useState(wanted);
 
   // Entrar a un elemento cambia la imagen al instante; salir de él espera un
@@ -64,14 +70,25 @@ export default function ParticleLogo({
   }, [wanted, image.id, activeImageId]);
 
   // Avisar a la página cuando las partículas terminaron de formarse
+  const finishEntry = useCallback(() => {
+    setEntryDone(true);
+    onEnteredRef.current?.();
+  }, []);
+
+  // Sin WebGL o si la entrada no llega a arrancar, la página aparece igualmente
   useEffect(() => {
+    if (entryDone) return;
     if (failed) {
-      onEnteredRef.current?.();
+      onEntryStartRef.current?.(0);
+      finishEntry();
       return;
     }
-    const timer = setTimeout(() => onEnteredRef.current?.(), ENTRY_FALLBACK_MS);
+    const timer = setTimeout(() => {
+      onEntryStartRef.current?.(0);
+      finishEntry();
+    }, ENTRY_FALLBACK_MS);
     return () => clearTimeout(timer);
-  }, [failed]);
+  }, [failed, entryDone, finishEntry]);
 
   // Partículas de una imagen, calculadas una sola vez y reutilizadas
   const getTargets = useCallback((img, count) => {
@@ -104,7 +121,8 @@ export default function ParticleLogo({
       setFailed(true);
       return;
     }
-    engine.onEntryComplete = () => onEnteredRef.current?.();
+    engine.onEntryStart = (duration) => onEntryStartRef.current?.(duration);
+    engine.onEntryComplete = finishEntry;
     engineRef.current = engine;
     setEngineReady(true);
 
@@ -126,7 +144,7 @@ export default function ParticleLogo({
       engineRef.current = null;
       setEngineReady(false);
     };
-  }, []);
+  }, [finishEntry]);
 
   useEffect(() => {
     if (engineReady) engineRef.current?.setTheme(theme);
@@ -167,7 +185,7 @@ export default function ParticleLogo({
       });
     };
     // Esperar a que termine la animación de entrada para no restarle fluidez
-    let timer = setTimeout(() => (handle = idle(next)), 2500);
+    let timer = setTimeout(() => (handle = idle(next)), ENTRY_DURATION_S * 1000 + 600);
 
     return () => {
       cancelled = true;
