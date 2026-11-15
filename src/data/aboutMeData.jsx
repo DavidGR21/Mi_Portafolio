@@ -108,6 +108,14 @@ export const aboutMeData = {
       period: "2026",
       certificate: "assets/certificates/certificadoCursoPython2.pdf",
       imageId: "logo-python"
+    },
+    {
+      id: 3,
+      title: "Fundamentals of Machine Learning and Artificial Intelligence",
+      provider: "AWS Training & Certification",
+      period: "2026",
+      certificate: "assets/certificates/certificadoAWSFundamentalsMachineLearning.pdf",
+      imageId: "logo-aws"
     }
   ]
 };
