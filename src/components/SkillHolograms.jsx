@@ -1,16 +1,17 @@
-// SkillKeyboard.jsx
-// Skills como un teclado de keycaps 3D (three.js). Cada tecla es un <button>
-// del DOM (rejilla, foco, tooltip e interacción); el canvas dibuja las teclas
-// encima. La tecla seleccionada se queda hundida.
+// SkillHolograms.jsx
+// Skills como pequeños hologramas (three.js). Cada skill es un <button> del
+// DOM (rejilla, foco, tooltip e interacción); el canvas dibuja los hologramas
+// encima. En reposo son estáticos; al pasar el cursor se encienden y giran en
+// 3D, y el seleccionado se queda encendido.
 import { useEffect, useRef, useState } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { particleImages } from '../data/particleImages';
-import { SkillKeyboardScene } from '../utils/skillKeyboardScene';
-import '../styles/SkillKeyboard.css';
+import { SkillHologramScene } from '../utils/skillHologramScene';
+import '../styles/SkillHolograms.css';
 
 const logoPaths = new Map(particleImages.map((img) => [img.id, img.path]));
 
-export default function SkillKeyboard({
+export default function SkillHolograms({
   skills,
   getTriggerProps,
   selectedId = null,
@@ -26,7 +27,7 @@ export default function SkillKeyboard({
 
   const selectedIndex = skills.findIndex((skill) => skill.imageId === selectedId);
 
-  // Escena: se crea una vez; la posición de cada tecla sale de su botón
+  // Escena: se crea una vez; la posición de cada holograma sale de su botón
   useEffect(() => {
     const wrap = wrapRef.current;
     const holder = holderRef.current;
@@ -34,20 +35,20 @@ export default function SkillKeyboard({
 
     let scene;
     try {
-      scene = new SkillKeyboardScene(
+      scene = new SkillHologramScene(
         holder,
         skills.map((skill) => logoPaths.get(skill.imageId)),
         { reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches }
       );
     } catch (err) {
-      console.error('WebGL no disponible para el teclado de skills:', err);
+      console.error('WebGL no disponible para los hologramas de skills:', err);
       setFailed(true);
       return;
     }
     sceneRef.current = scene;
 
     const layout = () => {
-      const slots = Array.from(wrap.querySelectorAll('.skill-key'), (key) => ({
+      const slots = Array.from(wrap.querySelectorAll('.skill-holo'), (key) => ({
         x: key.offsetLeft,
         y: key.offsetTop,
         width: key.offsetWidth,
@@ -58,7 +59,7 @@ export default function SkillKeyboard({
     const resizeObserver = new ResizeObserver(layout);
     resizeObserver.observe(wrap);
 
-    // No gastar GPU cuando el teclado no está en pantalla
+    // No gastar GPU cuando los hologramas no están en pantalla
     const intersectionObserver = new IntersectionObserver(([entry]) => {
       scene.setVisible(entry.isIntersecting);
     });
@@ -86,7 +87,7 @@ export default function SkillKeyboard({
   }, [selectedIndex]);
 
   return (
-    <div ref={wrapRef} className={`skill-keyboard${failed ? ' no-webgl' : ''}`}>
+    <div ref={wrapRef} className={`skill-holograms${failed ? ' no-webgl' : ''}`}>
       {skills.map((skill, index) => {
         const trigger = getTriggerProps(skill);
         const hoverIn = (e) => {
@@ -102,7 +103,7 @@ export default function SkillKeyboard({
           <button
             key={skill.imageId ?? index}
             type="button"
-            className={`skill-key${index === selectedIndex ? ' is-selected' : ''}`}
+            className={`skill-holo${index === selectedIndex ? ' is-selected' : ''}`}
             aria-label={skill.name}
             aria-pressed={index === selectedIndex}
             {...trigger}
@@ -117,11 +118,11 @@ export default function SkillKeyboard({
             {failed && logoPaths.get(skill.imageId) && (
               <img src={logoPaths.get(skill.imageId)} alt="" loading="lazy" />
             )}
-            <span className="skill-key-tip" aria-hidden="true">{skill.name}</span>
+            <span className="skill-holo-tip" aria-hidden="true">{skill.name}</span>
           </button>
         );
       })}
-      <div ref={holderRef} className="skill-keyboard-canvas" aria-hidden="true" />
+      <div ref={holderRef} className="skill-holograms-canvas" aria-hidden="true" />
     </div>
   );
 }

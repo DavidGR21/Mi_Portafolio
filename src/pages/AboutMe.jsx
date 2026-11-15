@@ -3,7 +3,7 @@ import { useTheme } from '../context/ThemeContext';
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import ParticleLogo, { ENTRY_DURATION_S } from '../components/ParticleLogo';
 import CustomScrollbar from '../components/CustomScrollbar';
-import SkillKeyboard from '../components/SkillKeyboard';
+import SkillHolograms from '../components/SkillHolograms';
 import { aboutMeData } from '../data/aboutMeData';
 import { GraduationCap, Briefcase, Award, FileText } from 'lucide-react';
 import '../styles/AboutMe.css';
@@ -70,7 +70,7 @@ function AboutMe() {
     onClick: () => setPinnedImage(item.imageId),
   });
 
-  // Teclado de skills: pulsar una tecla la selecciona; pulsarla de nuevo la suelta
+  // Hologramas de skills: un clic selecciona la skill; otro clic la suelta
   const toggleSkill = (skill) => {
     setPinnedImage((current) => (current === skill.imageId ? null : skill.imageId));
   };
@@ -117,7 +117,7 @@ function AboutMe() {
             {/* Skills */}
             <div className="about-section">
               <h4 className="section-title title-teko">SKILLS</h4>
-              <SkillKeyboard
+              <SkillHolograms
                 skills={aboutMeData.skills}
                 getTriggerProps={particleTrigger}
                 selectedId={pinnedImage}

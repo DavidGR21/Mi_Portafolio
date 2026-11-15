@@ -1,6 +1,6 @@
-/* Skills como teclado de keycaps 3D: los botones del DOM definen la rejilla y
-   reciben la interacción; las teclas se dibujan en un canvas de three.js
-   superpuesto (ver skillKeyboardScene.js) */
+/* Skills como pequeños hologramas: los botones del DOM definen la rejilla y
+   reciben la interacción; los hologramas se dibujan en un canvas de three.js
+   superpuesto (ver skillHologramScene.js) */
 
 .dark {
   --skill-accent: #44b4b8;
@@ -14,30 +14,29 @@
   --skill-tip-edge: #111111;
 }
 
-.skill-keyboard {
-  --key-size: 58px;
+.skill-holograms {
+  --holo-width: 62px;
+  --holo-height: 78px;
   position: relative;
   display: grid;
-  grid-template-columns: repeat(auto-fill, var(--key-size));
-  gap: 8px;
-  /* Hueco para la placa del teclado y su sombra, que dibuja el canvas */
-  padding: 14px 20px 22px 14px;
-  margin-top: 6px;
+  grid-template-columns: repeat(auto-fill, var(--holo-width));
+  gap: 6px 12px;
+  margin-top: 2px;
 }
 
 /* El canvas sobresale un poco de la rejilla y no recibe eventos */
-.skill-keyboard-canvas {
+.skill-holograms-canvas {
   position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
 }
 
-/* Botón invisible: la tecla se ve en el canvas */
-.skill-key {
+/* Botón invisible: el holograma se ve en el canvas */
+.skill-holo {
   position: relative;
-  width: var(--key-size);
-  height: var(--key-size);
+  width: var(--holo-width);
+  height: var(--holo-height);
   padding: 0;
   border: 0;
   border-radius: 8px;
@@ -46,20 +45,20 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.skill-key:focus {
+.skill-holo:focus {
   outline: none;
 }
 
-.skill-key:focus-visible {
+.skill-holo:focus-visible {
   outline: 2px solid var(--skill-accent, #44b4b8);
   outline-offset: 2px;
 }
 
 /* Tooltip con el nombre de la tecnología, estilo etiqueta pegada */
-.skill-key-tip {
+.skill-holo-tip {
   position: absolute;
   left: 50%;
-  bottom: calc(100% + 8px);
+  bottom: calc(100% + 2px);
   z-index: 2;
   padding: 3px 10px 1px;
   font-family: 'Teko', sans-serif;
@@ -83,7 +82,7 @@
 }
 
 /* Flecha del tooltip */
-.skill-key-tip::after {
+.skill-holo-tip::after {
   content: '';
   position: absolute;
   left: 50%;
@@ -93,45 +92,65 @@
   border-top-color: var(--skill-tip-edge, #fff);
 }
 
-.skill-key:hover .skill-key-tip,
-.skill-key:focus-visible .skill-key-tip {
+.skill-holo:hover .skill-holo-tip,
+.skill-holo:focus-visible .skill-holo-tip {
   opacity: 1;
   translate: -50% 0;
   scale: 1;
 }
 
-/* ---------- Sin WebGL: teclas planas en CSS ---------- */
-.no-webgl .skill-key {
+/* ---------- Sin WebGL: hologramas planos en CSS ---------- */
+.no-webgl .skill-holo {
   display: flex;
-  align-items: center;
   justify-content: center;
-  background: #f4f4f4;
-  border: 2px solid #111;
-  box-shadow: 0 5px 0 #8a8a8a;
-  transition: translate 0.1s ease-out, box-shadow 0.1s ease-out;
 }
 
-.no-webgl .skill-key img {
-  max-width: 62%;
-  max-height: 62%;
+.no-webgl .skill-holo img {
+  width: 60%;
+  height: 48%;
+  margin-top: 16%;
   object-fit: contain;
+  opacity: 0.8;
+  transition: opacity 0.2s ease-out, translate 0.2s ease-out, filter 0.2s ease-out;
 }
 
-.no-webgl .skill-key:active,
-.no-webgl .skill-key.is-selected {
-  translate: 0 4px;
-  box-shadow: 0 1px 0 var(--skill-accent, #44b4b8);
+/* Emisor: anillo elíptico en el suelo */
+.no-webgl .skill-holo::before {
+  content: '';
+  position: absolute;
+  left: 17%;
+  right: 17%;
+  bottom: 4%;
+  height: 14%;
+  border: 2px solid var(--skill-accent, #44b4b8);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--skill-accent, #44b4b8), transparent);
+  opacity: 0.6;
+  transition: opacity 0.2s ease-out;
+}
+
+.no-webgl .skill-holo:hover img,
+.no-webgl .skill-holo.is-selected img {
+  opacity: 1;
+  translate: 0 -3px;
+  filter: drop-shadow(0 0 6px var(--skill-accent, #44b4b8));
+}
+
+.no-webgl .skill-holo:hover::before,
+.no-webgl .skill-holo.is-selected::before {
+  opacity: 1;
 }
 
 @media (max-width: 480px) {
-  .skill-keyboard {
-    --key-size: 52px;
-    gap: 7px;
+  .skill-holograms {
+    --holo-width: 56px;
+    --holo-height: 70px;
+    gap: 4px 10px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .skill-key-tip {
+  .skill-holo-tip {
     transition: opacity 0.15s ease-out;
   }
 }
