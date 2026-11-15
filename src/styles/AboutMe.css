@@ -558,24 +558,20 @@
     font-size: 0.85rem;
   }
 
-  .experience-item,
-  .education-item {
+  .experience-item {
     padding: 12px;
     margin-bottom: 15px;
   }
 
-  .exp-title,
-  .edu-degree {
+  .exp-title {
     font-size: 1rem;
   }
 
-  .exp-company,
-  .edu-institution {
+  .exp-company {
     font-size: 0.9rem;
   }
 
-  .exp-period,
-  .edu-period {
+  .exp-period {
     font-size: 0.85rem;
   }
 

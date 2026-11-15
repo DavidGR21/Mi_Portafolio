@@ -1,0 +1,511 @@
+/* Educación: escuela 3D en CSS + entradas compactas (ver EducationCampus.jsx) */
+
+.dark {
+  --edu-accent: #4fd1c5;
+  --edu-on-accent: #0a0a0a;
+  --edu-edge: #4fd1c5;
+  --edu-shadow: #0b4b44;
+  --edu-wall: #202020;
+  --edu-wall-side: #151515;
+  --edu-wall-top: #2c2c2c;
+  --edu-ground: #161616;
+  --edu-glass: rgba(79, 209, 197, 0.16);
+  --edu-glass-lit: #d4fffb;
+  --edu-glow: rgba(79, 209, 197, 0.9);
+  --edu-muted: rgba(255, 255, 255, 0.7);
+}
+
+.light {
+  --edu-accent: #f32c2c;
+  --edu-on-accent: #ffffff;
+  --edu-edge: #111111;
+  --edu-shadow: #111111;
+  --edu-wall: #ffffff;
+  --edu-wall-side: #dcdcdc;
+  --edu-wall-top: #ececec;
+  --edu-ground: #2a2a2a;
+  --edu-glass: #2a2a2a;
+  --edu-glass-lit: #ffc93c;
+  --edu-glow: rgba(255, 201, 60, 0);
+  --edu-muted: rgba(0, 0, 0, 0.65);
+}
+
+.edu-campus {
+  --edu-ease: cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+}
+
+/* ---------- Escuela ---------- */
+/* Todo cuelga de .school, un punto (0 × 0) en el centro de la parcela: x hacia
+   la derecha, z hacia el usuario. Cada bloque se define con --w/--h/--d */
+.school-scene {
+  position: relative;
+  flex-shrink: 0;
+  width: 150px;
+  height: 124px;
+  perspective: 640px;
+  perspective-origin: 50% 30%;
+}
+
+.school {
+  position: absolute;
+  left: 50%;
+  top: 80px;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(-22deg) rotateY(-34deg);
+  transition: transform 0.7s var(--edu-ease);
+}
+
+.school :where(span, i) {
+  position: absolute;
+  display: block;
+  box-sizing: border-box;
+}
+
+/* Parcela: plano tumbado con la sombra dura del portafolio */
+.school-ground {
+  left: -60px;
+  top: -36px;
+  width: 120px;
+  height: 72px;
+  background: var(--edu-ground);
+  border: 2px solid var(--edu-edge);
+  box-shadow: 5px 5px 0 var(--edu-shadow);
+  transform: rotateX(90deg);
+}
+
+.school-path {
+  left: calc(50% - 8px);
+  bottom: 0;
+  width: 16px;
+  height: 15px;
+  background: var(--edu-accent);
+  opacity: 0.28;
+  transition: opacity 0.35s ease-out;
+}
+
+/* Bloque: sus caras se colocan a partir de --w (ancho), --h (alto) y --d (fondo) */
+.school-box {
+  bottom: 0;
+  left: calc(var(--w) / -2);
+  width: var(--w);
+  height: var(--h);
+  transform: translateZ(var(--z, 0px));
+  transform-style: preserve-3d;
+}
+
+.school-main {
+  --w: 92px;
+  --h: 34px;
+  --d: 36px;
+  --z: -4px;
+}
+
+.school-tower {
+  --w: 30px;
+  --h: 52px;
+  --d: 40px;
+}
+
+.school-face {
+  background: var(--edu-wall);
+  border: 1.5px solid var(--edu-edge);
+}
+
+.school-face--front {
+  inset: 0;
+  transform: translateZ(calc(var(--d) / 2));
+  transform-style: preserve-3d;
+}
+
+.school-face--left,
+.school-face--right {
+  top: 0;
+  left: calc((var(--w) - var(--d)) / 2);
+  width: var(--d);
+  height: 100%;
+  background: var(--edu-wall-side);
+}
+
+.school-face--left {
+  transform: rotateY(-90deg) translateZ(calc(var(--w) / 2));
+}
+
+.school-face--right {
+  transform: rotateY(90deg) translateZ(calc(var(--w) / 2));
+}
+
+.school-face--top {
+  left: 0;
+  top: calc(var(--d) / -2);
+  width: 100%;
+  height: var(--d);
+  background: var(--edu-wall-top);
+  transform: rotateX(90deg);
+}
+
+/* Ventanas */
+.school-face i {
+  position: static;
+  flex-shrink: 0;
+  width: 6px;
+  height: 15px;
+  background: var(--edu-glass);
+  border: 1px solid var(--edu-edge);
+  transition: background-color 0.25s ease-out, box-shadow 0.25s ease-out;
+  transition-delay: calc(var(--n, 0) * 45ms);
+}
+
+.school-wing {
+  top: 0;
+  bottom: 0;
+  width: 31px;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  padding-top: 2px;
+}
+
+.school-wing:first-child {
+  left: 0;
+}
+
+.school-wing:last-child {
+  right: 0;
+}
+
+.school-face--left,
+.school-face--right {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.school-main .school-face--left,
+.school-main .school-face--right {
+  padding-top: 2px;
+}
+
+.school-main .school-face--left i,
+.school-main .school-face--right i {
+  width: 7px;
+}
+
+/* La ventana lateral de la torre asoma por encima del edificio principal */
+.school-tower .school-face--left,
+.school-tower .school-face--right {
+  align-items: flex-start;
+  padding-top: 5px;
+}
+
+.school-tower .school-face--left i,
+.school-tower .school-face--right i {
+  width: 8px;
+  height: 9px;
+}
+
+/* Tejado a dos aguas: dos planos que suben desde el alero hasta la cumbrera
+   (medio ancho 15, altura 13 → faldón de 19.85px a 40.91°) */
+.school-roof {
+  top: -22px;
+  width: 20.6px;
+  height: 44px;
+  background: var(--edu-accent);
+  border: 1.5px solid var(--edu-edge);
+}
+
+.school-roof--left {
+  left: -0.5px;
+  transform-origin: 0 50%;
+  transform: rotateZ(-40.91deg) rotateX(90deg);
+}
+
+.school-roof--right {
+  right: -0.5px;
+  transform-origin: 100% 50%;
+  transform: rotateZ(40.91deg) rotateX(90deg);
+}
+
+/* Frontón: triángulo con su filo (dos recortes, el de dentro más pequeño) */
+.school-gable {
+  left: -1.5px;
+  right: -1.5px;
+  bottom: calc(100% + 1.5px);
+  height: 13px;
+  background: var(--edu-edge);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.school-gable::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--edu-wall);
+  clip-path: polygon(50% 2.6px, calc(100% - 3px) 100%, 3px 100%);
+}
+
+/* Asta en la cumbrera y bandera */
+.school-pole {
+  left: calc(50% - 0.75px);
+  bottom: calc(100% + 12px);
+  width: 1.5px;
+  height: 18px;
+  background: var(--edu-edge);
+}
+
+.school-flag {
+  left: 100%;
+  top: 0;
+  width: 12px;
+  height: 8px;
+  background: var(--edu-accent);
+  border: 1px solid var(--edu-edge);
+  border-left: 0;
+  transform-origin: 0 50%;
+  transform: skewY(-7deg);
+}
+
+/* Reloj */
+.school-clock {
+  left: calc(50% - 5.5px);
+  top: 5px;
+  width: 11px;
+  height: 11px;
+  background: var(--edu-wall-top);
+  border: 1.5px solid var(--edu-edge);
+  border-radius: 50%;
+}
+
+.school-clock::before,
+.school-clock::after {
+  content: '';
+  position: absolute;
+  left: calc(50% - 0.5px);
+  bottom: 50%;
+  width: 1px;
+  background: var(--edu-edge);
+  transform-origin: 50% 100%;
+}
+
+/* Minutero y horario */
+.school-clock::before {
+  height: 3.5px;
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.school-clock::after {
+  height: 2.5px;
+  transform: rotate(115deg);
+}
+
+/* Puerta de dos hojas: se abren hacia fuera y dejan ver el interior iluminado */
+.school-door {
+  left: calc(50% - 7.5px);
+  bottom: -1.5px;
+  width: 15px;
+  height: 19px;
+  background: var(--edu-ground);
+  border: 1.5px solid var(--edu-edge);
+  transform-style: preserve-3d;
+  transition: background-color 0.35s ease-out;
+}
+
+.school-door i {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: var(--edu-accent);
+  border: 0;
+  border-right: 0.75px solid var(--edu-edge);
+  transform-origin: 0 50%;
+  transform: translateZ(0.4px);
+  transition: transform 0.5s var(--edu-ease);
+  transition-delay: 0s;
+}
+
+.school-door i:last-child {
+  left: 50%;
+  border-right: 0;
+  border-left: 0.75px solid var(--edu-edge);
+  transform-origin: 100% 50%;
+}
+
+/* ---------- Encendido: cursor sobre el bloque o entrada fijada ---------- */
+.edu-campus:hover .school,
+.edu-campus.is-active .school {
+  transform: rotateX(-15deg) rotateY(30deg);
+}
+
+.edu-campus:hover .school-face > i,
+.edu-campus:hover .school-wing > i,
+.edu-campus.is-active .school-face > i,
+.edu-campus.is-active .school-wing > i {
+  background: var(--edu-glass-lit);
+  box-shadow: 0 0 5px var(--edu-glow);
+}
+
+.edu-campus:hover .school-door,
+.edu-campus.is-active .school-door {
+  background: var(--edu-glass-lit);
+}
+
+.edu-campus:hover .school-door i:first-child,
+.edu-campus.is-active .school-door i:first-child {
+  transform: translateZ(0.4px) rotateY(-78deg);
+}
+
+.edu-campus:hover .school-door i:last-child,
+.edu-campus.is-active .school-door i:last-child {
+  transform: translateZ(0.4px) rotateY(78deg);
+}
+
+.edu-campus:hover .school-path,
+.edu-campus.is-active .school-path {
+  opacity: 0.75;
+}
+
+.edu-campus:hover .school-clock::before,
+.edu-campus.is-active .school-clock::before {
+  transform: rotate(360deg);
+}
+
+.edu-campus:hover .school-flag,
+.edu-campus.is-active .school-flag {
+  animation: eduFlagWave 0.7s ease-in-out infinite alternate;
+}
+
+@keyframes eduFlagWave {
+  from {
+    transform: skewY(-9deg) scaleX(1);
+  }
+
+  to {
+    transform: skewY(9deg) scaleX(0.88);
+  }
+}
+
+/* ---------- Entradas: tarjeta urbana en versión compacta ---------- */
+.edu-list {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.urban-card.edu-entry {
+  flex-direction: column;
+  gap: 0;
+  padding: 0.7rem 0.95rem 0.8rem;
+}
+
+.edu-entry-degree {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--text-color);
+}
+
+.edu-entry-school {
+  margin: 1px 0 9px;
+  font-size: 0.9rem;
+  color: var(--edu-muted);
+}
+
+.edu-entry-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.edu-chip {
+  padding: 2px 8px 1px;
+  font-family: 'Chivo', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--edu-muted);
+  border: 1px solid currentColor;
+}
+
+.edu-chip--accent {
+  color: var(--edu-on-accent);
+  background: var(--edu-accent);
+  border-color: var(--edu-accent);
+}
+
+/* ---------- Entrada (sincronizada con el resto del About Me) ---------- */
+.about-me:not(.entered) .school-scene {
+  opacity: 0;
+}
+
+.about-me.entered .school-scene {
+  animation: aboutFadeUp calc(var(--enter-dur) * 0.35) ease-out var(--col-delay, 0s) both;
+}
+
+/* La escuela llega girando hasta su posición (sin enseñar la parte trasera,
+   que no tiene caras). Sin relleno al terminar, para que después mande el
+   transform del hover */
+.about-me.entered .school {
+  animation: eduSchoolIn calc(var(--enter-dur) * 0.5) cubic-bezier(0.22, 1, 0.36, 1) var(--col-delay, 0s) backwards;
+}
+
+@keyframes eduSchoolIn {
+  from {
+    transform: rotateX(-22deg) rotateY(55deg) scale3d(0.55, 0.55, 0.55);
+  }
+}
+
+@media (max-width: 480px) {
+  .edu-campus {
+    gap: 1rem;
+  }
+
+  .school-scene {
+    width: 116px;
+    height: 98px;
+  }
+
+  .school {
+    top: 63px;
+    scale: 0.78;
+  }
+
+  .urban-card.edu-entry {
+    padding: 0.6rem 0.75rem 0.7rem;
+  }
+
+  .edu-entry-degree {
+    font-size: 1.25rem;
+  }
+
+  .edu-entry-school {
+    font-size: 0.85rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .school,
+  .school-face i,
+  .school-door,
+  .school-door i,
+  .school-path,
+  .school-clock::before {
+    transition: none;
+  }
+
+  .edu-campus:hover .school-flag,
+  .edu-campus.is-active .school-flag {
+    animation: none;
+  }
+}

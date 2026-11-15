@@ -6,7 +6,8 @@ import CustomScrollbar from '../components/CustomScrollbar';
 import SkillHolograms from '../components/SkillHolograms';
 import CvDossier from '../components/CvDossier';
 import { aboutMeData } from '../data/aboutMeData';
-import { GraduationCap, Briefcase, Award, FileText } from 'lucide-react';
+import EducationCampus from '../components/EducationCampus';
+import { Briefcase, Award, FileText } from 'lucide-react';
 import '../styles/AboutMe.css';
 
 // Carga diferida: pdf.js solo se descarga al abrir un certificado
@@ -145,23 +146,11 @@ function AboutMe() {
               {/* Columna Educación */}
               <div className="about-section urban-column">
                 <h4 className="section-title title-teko text-teal">EDUCATION</h4>
-                <div className="urban-cards-wrapper">
-                  {aboutMeData.education.map((edu) => (
-                    <div key={edu.id} className="urban-card education-item"
-                      {...particleTrigger(edu)}>
-                      {/* Caja para el icono */}
-                      <div className="card-icon-box">
-                        <GraduationCap size={28} strokeWidth={1.5} />
-                      </div>
-                      {/* Contenido de texto */}
-                      <div className="card-content">
-                        <h5 className="edu-degree card-title">{edu.degree}</h5>
-                        <p className="edu-institution card-subtitle">{edu.institution}</p>
-                        <span className="edu-period card-period">{edu.period}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <EducationCampus
+                  items={aboutMeData.education}
+                  getTriggerProps={particleTrigger}
+                  activeId={pinnedImage}
+                />
               </div>
 
               {/* Columna Cursos */}

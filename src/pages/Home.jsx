@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
-import IntroVideo from "../components/IntroVideo.jsx";
+// El intro está desactivado y sus videos ya no están en public/assets/videos:
+// importarlo rompe la carga de la app
+// import IntroVideo from "../components/IntroVideo.jsx";
 import AudioVisualizer from "../components/AudioVisualizer.jsx";
 import Navbar from "../components/Navbar.jsx";
 import CustomCursor from "../components/CustomCursor.jsx";
