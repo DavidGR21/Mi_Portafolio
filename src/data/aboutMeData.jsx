@@ -105,7 +105,7 @@ export const aboutMeData = {
   courses: [
     {
       id: 1,
-      title: "Fundamentos de Python 1",
+      title: "Python Essentials 1",
       provider: "Networking Academy",
       period: "2026",
       certificate: "assets/certificates/certificadoCursoPython.pdf",
@@ -113,7 +113,7 @@ export const aboutMeData = {
     },
     {
       id: 2,
-      title: "Fundamentos de Python 2",
+      title: "Python Essentials 2",
       provider: "Networking Academy",
       period: "2026",
       certificate: "assets/certificates/certificadoCursoPython2.pdf",

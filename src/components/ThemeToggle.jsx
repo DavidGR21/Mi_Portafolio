@@ -8,7 +8,10 @@ const ThemeToggle = () => {
   return (
     <button 
       className="theme-toggle" 
-      onClick={toggleTheme}
+      onClick={(e) => {
+        e.stopPropagation();
+        toggleTheme();
+      }}
       aria-label={theme === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro'}
       title={theme === 'light' ? 'Modo oscuro' : 'Modo claro'}
     >

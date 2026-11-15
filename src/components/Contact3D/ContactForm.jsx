@@ -2,6 +2,12 @@ import { useState } from 'react';
 import emailjs from '@emailjs/browser';
 import '../../styles/ContactForm.css';
 
+const FIELD_LIMITS = {
+    name: 80,
+    email: 120,
+    message: 500,
+};
+
 function ContactForm({ onCancel, onSubmit }) {
     const [formData, setFormData] = useState({
         name: '',
@@ -13,9 +19,10 @@ function ContactForm({ onCancel, onSubmit }) {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+        const limit = FIELD_LIMITS[name];
         setFormData((prev) => ({
             ...prev,
-            [name]: value,
+            [name]: limit ? value.slice(0, limit) : value,
         }));
     };
 
@@ -90,6 +97,7 @@ function ContactForm({ onCancel, onSubmit }) {
                             value={formData.name}
                             onChange={handleChange}
                             required
+                            maxLength={FIELD_LIMITS.name}
                             placeholder="Your name"
                         />
                     </div>
@@ -103,18 +111,25 @@ function ContactForm({ onCancel, onSubmit }) {
                             value={formData.email}
                             onChange={handleChange}
                             required
+                            maxLength={FIELD_LIMITS.email}
                             placeholder="your@email.com"
                         />
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="message">Message</label>
+                        <div className="form-label-row">
+                            <label htmlFor="message">Message</label>
+                            <span className={`form-char-count${formData.message.length >= FIELD_LIMITS.message ? ' is-limit' : ''}`}>
+                                {formData.message.length} / {FIELD_LIMITS.message}
+                            </span>
+                        </div>
                         <textarea
                             id="message"
                             name="message"
                             value={formData.message}
                             onChange={handleChange}
                             required
+                            maxLength={FIELD_LIMITS.message}
                             placeholder="Write your message here..."
                             rows={5}
                         />

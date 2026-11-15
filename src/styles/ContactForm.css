@@ -56,6 +56,26 @@
     color: var(--text-secondary);
 }
 
+.form-label-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.form-char-count {
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    opacity: 0.8;
+    white-space: nowrap;
+}
+
+.form-char-count.is-limit {
+    color: #e74c3c;
+    opacity: 1;
+}
+
 .form-group input,
 .form-group textarea {
     padding: 0.5rem;

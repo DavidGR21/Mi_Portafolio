@@ -86,6 +86,17 @@ export default function SkillHolograms({
     sceneRef.current?.setSelected(selectedIndex);
   }, [selectedIndex]);
 
+  useEffect(() => {
+    const onThemePointerOut = (e) => {
+      if (!e.target.closest?.('.theme-toggle')) return;
+      if (e.relatedTarget?.closest?.('.theme-toggle, .skill-holo')) return;
+      sceneRef.current?.setHover(-1);
+      sceneRef.current?.setDown(-1);
+    };
+    document.addEventListener('pointerout', onThemePointerOut);
+    return () => document.removeEventListener('pointerout', onThemePointerOut);
+  }, []);
+
   return (
     <div ref={wrapRef} className={`skill-holograms${failed ? ' no-webgl' : ''}`}>
       {skills.map((skill, index) => {
@@ -95,6 +106,8 @@ export default function SkillHolograms({
           sceneRef.current?.setHover(index);
         };
         const hoverOut = (e) => {
+          // Cambiar claro/oscuro no debe contar como salir del holograma
+          if (e.relatedTarget?.closest?.('.theme-toggle')) return;
           trigger.onMouseLeave?.(e);
           sceneRef.current?.setHover(-1);
           sceneRef.current?.setDown(-1);

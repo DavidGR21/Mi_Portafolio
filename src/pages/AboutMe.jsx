@@ -65,10 +65,11 @@ function AboutMe() {
   const scrollPageTo = (value) => window.scrollTo(0, value);
 
   // Un clic en cualquier elemento con efecto hover (o en el propio logo) fija su
-  // imagen; un clic en cualquier otro sitio vuelve al logo inicial
+  // imagen; un clic en cualquier otro sitio vuelve al logo inicial.
+  // El botón de tema no cuenta: no debe soltar el hover ni volver a la imagen principal
   useEffect(() => {
     const unpinOnOutsideClick = (e) => {
-      if (e.target.closest('[data-particle-trigger], .certificate-modal')) return;
+      if (e.target.closest('[data-particle-trigger], .certificate-modal, .theme-toggle')) return;
       setPinnedImage(null);
     };
     document.addEventListener('click', unpinOnOutsideClick);
@@ -92,9 +93,21 @@ function AboutMe() {
     setActiveSkillImage(skill.imageId);
   };
 
-  const handleSkillLeave = () => {
+  const handleSkillLeave = (e) => {
+    if (e?.relatedTarget?.closest?.('.theme-toggle')) return;
     setActiveSkillImage(null);
   };
+
+  // Al salir del botón de tema hacia un hueco vacío, ahí sí se suelta el hover
+  useEffect(() => {
+    const onThemePointerOut = (e) => {
+      if (!e.target.closest?.('.theme-toggle')) return;
+      if (e.relatedTarget?.closest?.('.theme-toggle, [data-particle-trigger], .certificate-modal')) return;
+      setActiveSkillImage(null);
+    };
+    document.addEventListener('pointerout', onThemePointerOut);
+    return () => document.removeEventListener('pointerout', onThemePointerOut);
+  }, []);
 
   return (
     <section
