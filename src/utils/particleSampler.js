@@ -11,7 +11,7 @@
 
 const FIT = 0.84; // fracción del canvas que ocupa la imagen (deja margen para el movimiento)
 const PROBE_SIZE = 256; // resolución de la pasada rápida para recortar márgenes vacíos
-const MAX_SOURCE_SIZE = 1280; // las imágenes mayores se reducen antes de analizarlas
+export const MAX_SOURCE_SIZE = 1280; // las imágenes mayores se reducen antes de analizarlas
 const EDGE_BOOST = 1.5; // partículas extra en los contornos (más nitidez)
 const MIN_ALPHA = 0.2;
 const MIN_INK = 0.04; // por debajo de esto un tono neutro se considera "papel"
@@ -95,13 +95,13 @@ function analyzePixels(data, cells) {
 }
 
 // Caja que contiene el dibujo real (muchas imágenes traen márgenes transparentes enormes)
-function findContentBox(img) {
+function findContentBox(img, makeContext) {
   const width = sourceWidth(img);
   const height = sourceHeight(img);
   const scale = Math.min(1, PROBE_SIZE / Math.max(width, height));
   const w = Math.max(1, Math.round(width * scale));
   const h = Math.max(1, Math.round(height * scale));
-  const ctx = createContext(w, h);
+  const ctx = makeContext(w, h);
   ctx.drawImage(img, 0, 0, w, h);
   const { weight } = analyzePixels(ctx.getImageData(0, 0, w, h).data, w * h);
 
@@ -130,16 +130,18 @@ function findContentBox(img) {
 }
 
 /**
- * Genera `count` partículas a partir de una imagen.
+ * Genera `count` partículas a partir de una imagen ya cargada (<img> o
+ * ImageBitmap). Es síncrona y pesada: se ejecuta en un Web Worker siempre que
+ * se puede (ver sampleImage). `makeContext` crea el canvas 2D de trabajo
+ * (OffscreenCanvas dentro del worker).
  * Devuelve null si la imagen no tiene contenido utilizable.
  *
  * positions: Int16Array normalizado (x, y) en [-1, 1]
  * colors:    Uint8Array (r, g, b, colorido)
  * spacing:   separación media entre partículas en zonas llenas (unidades normalizadas)
  */
-export async function sampleImage(src, count) {
-  const img = await loadImage(src);
-  const box = findContentBox(img);
+export function sampleSource(img, count, makeContext = createContext) {
+  const box = findContentBox(img, makeContext);
   if (!box) return null;
 
   // Rejilla de análisis proporcional al número de partículas
@@ -149,7 +151,7 @@ export async function sampleImage(src, count) {
   const gh = Math.max(2, Math.round(box.sh * gridScale));
   const cells = gw * gh;
 
-  const ctx = createContext(gw, gh);
+  const ctx = makeContext(gw, gh);
   ctx.drawImage(img, box.sx, box.sy, box.sw, box.sh, 0, 0, gw, gh);
   const data = ctx.getImageData(0, 0, gw, gh).data;
   const { weight, colorful, lum } = analyzePixels(data, cells);
@@ -255,4 +257,61 @@ export async function sampleImage(src, count) {
     colors,
     spacing: Math.sqrt(total / count) * scale,
   };
+}
+
+// ---------- Web Worker ----------
+// El análisis se hace en un worker para no bloquear la página. Si el navegador
+// no lo permite (sin Worker u OffscreenCanvas) o el worker falla, se usa el
+// hilo principal como antes.
+
+let worker = null;
+let workerBroken = false;
+let requestId = 0;
+const pending = new Map();
+
+function failPending(error) {
+  for (const { reject } of pending.values()) reject(error);
+  pending.clear();
+}
+
+function getWorker() {
+  if (worker) return worker;
+  worker = new Worker(new URL("./particleSampler.worker.js", import.meta.url), { type: "module" });
+  worker.onmessage = ({ data: { id, result, error } }) => {
+    const request = pending.get(id);
+    if (!request) return;
+    pending.delete(id);
+    if (error) request.reject(new Error(error));
+    else request.resolve(result);
+  };
+  worker.onerror = () => {
+    workerBroken = true;
+    failPending(new Error("El worker de partículas no está disponible"));
+  };
+  return worker;
+}
+
+function sampleInWorker(src, count) {
+  return new Promise((resolve, reject) => {
+    const id = ++requestId;
+    pending.set(id, { resolve, reject });
+    // En el worker las rutas relativas no se resuelven igual que en la página
+    getWorker().postMessage({ id, url: new URL(src, document.baseURI).href, count });
+  });
+}
+
+const canUseWorker = () =>
+  !workerBroken && typeof Worker !== "undefined" && typeof OffscreenCanvas !== "undefined";
+
+/** Genera `count` partículas a partir de la imagen `src` (ver sampleSource) */
+export async function sampleImage(src, count) {
+  if (canUseWorker()) {
+    try {
+      return await sampleInWorker(src, count);
+    } catch {
+      // Se reintenta en el hilo principal
+    }
+  }
+  const img = await loadImage(src);
+  return sampleSource(img, count);
 }

@@ -22,6 +22,7 @@
     --p-text: #ffffff;
     --p-muted: rgba(255, 255, 255, 0.55);
     --p-border: rgba(255, 255, 255, 0.12);
+    --p-line: rgba(255, 255, 255, 0.24);
     --p-scan: rgba(255, 255, 255, 0.05);
     --p-accent: #44b4b8;
     --p-shadow: rgba(0, 0, 0, 0.6);
@@ -30,8 +31,9 @@
 #projects.light {
     --p-bg: #f5f5f5;
     --p-text: #1a1a1a;
-    --p-muted: rgba(0, 0, 0, 0.55);
-    --p-border: rgba(0, 0, 0, 0.12);
+    --p-muted: rgba(0, 0, 0, 0.62);
+    --p-border: rgba(0, 0, 0, 0.14);
+    --p-line: rgba(0, 0, 0, 0.3);
     --p-scan: rgba(0, 0, 0, 0.05);
     --p-accent: #ff3c00;
     --p-shadow: rgba(0, 0, 0, 0.25);
@@ -166,6 +168,7 @@
     aspect-ratio: 16 / 10;
     overflow: hidden;
     border: 1px solid var(--p-border);
+    transition: border-color 0.3s var(--p-ease), box-shadow 0.35s var(--p-ease), transform 0.35s var(--p-ease);
 }
 
 .project-thumb img {
@@ -176,17 +179,6 @@
     filter: grayscale(1) contrast(1.05);
     transform: scale(1.08);
     transition: filter 0.5s var(--p-ease), transform 0.9s var(--p-ease);
-}
-
-/* Capa de color al pasar el mouse */
-.project-thumb::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-color: var(--p-accent);
-    mix-blend-mode: overlay;
-    opacity: 0;
-    transition: opacity 0.25s var(--p-ease);
 }
 
 /* Línea de escaneo al seleccionar */
@@ -213,14 +205,48 @@
     transition: color 0.25s var(--p-ease), transform 0.5s var(--p-ease);
 }
 
+/* Hover igual en claro y oscuro: la miniatura se levanta con una sombra dura del
+   color de acento (sin capas de mezcla que cambian de aspecto según el tema) y el
+   título se subraya con un trazo que entra desde la derecha */
+.project-item-title {
+    position: relative;
+    display: block;
+    width: fit-content;
+    margin-left: auto;
+}
+
+.project-item-title::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    height: 2px;
+    background: var(--p-accent);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.4s var(--p-ease);
+}
+
 @media (hover: hover) {
     .project-item-trigger:hover .project-index,
     .project-item-trigger:hover .project-item-title {
         color: var(--p-accent);
     }
 
-    .project-item-trigger:hover .project-thumb::after {
-        opacity: 1;
+    .project-item-trigger:hover .project-thumb {
+        border-color: var(--p-accent);
+        box-shadow: 5px 5px 0 var(--p-accent);
+        transform: translate(-3px, -3px);
+    }
+
+    .project-item-trigger:hover .project-thumb img {
+        filter: grayscale(0.35) contrast(1.02);
+        transform: scale(1.03);
+    }
+
+    .project-item-trigger:hover .project-item-title::after {
+        transform: scaleX(1);
     }
 }
 
@@ -231,6 +257,16 @@
 
 .project-item.is-selected .project-item-title {
     transform: translateX(-8px);
+}
+
+.project-item.is-selected .project-item-title::after {
+    transform: scaleX(1);
+}
+
+.project-item.is-selected .project-thumb {
+    border-color: var(--p-accent);
+    box-shadow: 5px 5px 0 var(--p-accent);
+    transform: translate(-3px, -3px);
 }
 
 .project-item.is-selected .project-thumb img {
@@ -257,12 +293,16 @@
 }
 
 .project-detail {
+    /* Alto del hueco de los paneles; el resto de piezas tienen alto fijo, así
+       que el título queda siempre en el mismo sitio */
+    --pane-h: clamp(205px, 35vh, 270px);
     position: absolute;
     left: 5%;
-    top: 50%;
+    /* Se centra en el espacio que deja libre el reproductor de música (abajo) */
+    top: calc(50% - 34px);
     z-index: 2;
-    width: min(34%, 420px);
-    transform: translateY(-50%) rotateY(14deg);
+    width: min(38%, 460px);
+    transform: translateY(-50%) rotateY(10deg);
     transform-origin: left center;
 }
 
@@ -279,12 +319,12 @@
 
 .detail-title {
     position: relative;
-    margin: 0.4rem 0 1rem;
-    font-size: clamp(2.6rem, 4.2vw, 4.6rem);
+    margin: 0.3rem 0 0.8rem;
+    font-size: clamp(2.2rem, 3.3vw, 3.6rem);
     font-weight: 600;
-    line-height: 0.9;
+    line-height: 1;
     text-transform: uppercase;
-    overflow-wrap: anywhere;
+    white-space: nowrap;
 }
 
 /* Copia desenfocada detrás del título */
@@ -298,6 +338,12 @@
     opacity: 0.6;
 }
 
+/* En claro el resplandor del título se suaviza para que no ensucie el texto */
+#projects.light .detail-title::before {
+    filter: blur(10px);
+    opacity: 0.22;
+}
+
 .detail-title.animating {
     color: var(--p-accent);
 }
@@ -308,63 +354,469 @@
     line-height: 1.6;
     color: var(--p-muted);
     display: -webkit-box;
-    -webkit-line-clamp: 6;
+    -webkit-line-clamp: 5;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    animation: fadeUp 0.7s 0.15s var(--p-ease) both;
 }
 
-.detail-tags {
+/* ---------- Descripción recortada: "… more" + modal ---------- */
+
+.detail-desc-wrap {
+    position: relative;
+}
+
+/* Tapa el final de la última línea (y los puntos suspensivos nativos) */
+#projects .detail-more {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    padding: 0 0 0 2.2rem;
+    border: 0;
+    border-radius: 0;
+    background: linear-gradient(to right, transparent, var(--p-bg) 1.6rem);
+    font-family: var(--p-mono);
+    font-size: 0.72rem;
+    line-height: calc(0.92rem * 1.6);
+    letter-spacing: 0.04em;
+    color: var(--p-accent);
+    cursor: pointer;
+}
+
+#projects .detail-more:hover,
+#projects .detail-more:focus-visible {
+    outline: none;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.desc-modal {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: grid;
+    place-items: center;
+    /* Abajo se deja libre el sitio del reproductor de música */
+    padding: 1.5rem 1.5rem 96px;
+    background: color-mix(in srgb, var(--p-bg) 80%, transparent);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    animation: modalFade 0.25s ease-out both;
+}
+
+.desc-modal-card {
+    position: relative;
+    width: min(520px, 100%);
+    max-height: 100%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 1.5rem 1.6rem 1.6rem;
+    border: 1px solid var(--p-line);
+    background: var(--p-bg);
+    box-shadow: 6px 6px 0 var(--p-accent);
+    animation: fadeUp 0.35s var(--p-ease) both;
+}
+
+.desc-modal-kicker {
+    font-family: var(--p-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--p-accent);
+}
+
+.desc-modal-title {
+    margin: 0.2rem 2rem 0.8rem 0;
+    font-size: 2.2rem;
+    font-weight: 600;
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--p-text);
+}
+
+.desc-modal-text {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: var(--p-muted);
+}
+
+#projects .desc-modal-close {
+    position: absolute;
+    top: 0.8rem;
+    right: 0.8rem;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid var(--p-line);
+    border-radius: 0;
+    background: transparent;
+    color: var(--p-text);
+    cursor: pointer;
+    transition: color 0.25s var(--p-ease), border-color 0.25s var(--p-ease);
+}
+
+#projects .desc-modal-close:hover,
+#projects .desc-modal-close:focus-visible {
+    outline: none;
+    border-color: var(--p-accent);
+    color: var(--p-accent);
+}
+
+@keyframes modalFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ---------- Secciones: About / Stack / Notes ---------- */
+/* Solo se usan los colores del tema: texto, texto atenuado, líneas y acento */
+
+.detail-tabs {
+    display: flex;
+    gap: 0.25rem;
+    margin: 0 0 0.9rem;
+    border-bottom: 1px solid var(--p-border);
+    animation: fadeUp 0.6s 0.1s var(--p-ease) both;
+}
+
+.detail-tab {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.8rem;
+    border: 0;
+    background: none;
+    font-family: var(--p-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--p-muted);
+    cursor: pointer;
+    transition: color 0.25s var(--p-ease);
+}
+
+.detail-tab::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 2px;
+    background: var(--p-accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s var(--p-ease);
+}
+
+.detail-tab:hover {
+    color: var(--p-text);
+}
+
+.detail-tab.is-active {
+    color: var(--p-accent);
+}
+
+.detail-tab.is-active::after {
+    transform: scaleX(1);
+}
+
+/* Sin marco al seleccionar (index.css pone un outline a todo button:focus):
+   la única señal es la línea inferior. Con teclado, el foco aclara el texto */
+.detail-tab:focus,
+.detail-tab:focus-visible {
+    outline: none;
+}
+
+.detail-tab:focus-visible:not(.is-active) {
+    color: var(--p-text);
+}
+
+.detail-tab:focus-visible::after {
+    transform: scaleX(1);
+}
+
+/* Punto de aviso: hay una nota importante (p. ej. arranque lento) */
+.detail-tab-alert {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--p-accent);
+    animation: livePulse 1.8s ease-out infinite;
+}
+
+@keyframes livePulse {
+    0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--p-accent) 70%, transparent); }
+    100% { box-shadow: 0 0 0 6px transparent; }
+}
+
+/* Hueco de altura fija: los tres paneles se superponen dentro, de modo que lo
+   que hay debajo (los enlaces) no se mueve nunca */
+.detail-panels {
+    position: relative;
+    height: var(--pane-h);
+    margin-bottom: 0.9rem;
+}
+
+.detail-pane {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--p-line) transparent;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s var(--p-ease), visibility 0s 0.2s;
+}
+
+.detail-pane.is-active {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.3s var(--p-ease);
+}
+
+.detail-pane.is-active > * {
+    animation: fadeUp 0.45s var(--p-ease) both;
+}
+
+.detail-pane > * {
+    flex-shrink: 0;
+}
+
+/* ---------- Autoría: solo / equipo ---------- */
+
+.role-card {
+    display: flex;
+    gap: 0.7rem;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--p-border);
+    border-left: 2px solid var(--p-accent);
+}
+
+.role-icon {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p-accent);
+    border: 1px solid var(--p-line);
+    border-radius: 50%;
+}
+
+.role-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+.role-label {
+    font-family: var(--p-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--p-accent);
+}
+
+.role-summary {
+    font-size: 0.8rem;
+    line-height: 1.45;
+    color: var(--p-muted);
+}
+
+.role-collab {
+    font-family: var(--p-mono);
+    font-size: 0.7rem;
+    line-height: 1.6;
+    color: var(--p-muted);
+}
+
+.role-collab a {
+    color: var(--p-text);
+    text-decoration: underline;
+    text-decoration-color: var(--p-accent);
+    text-underline-offset: 3px;
+    transition: color 0.25s var(--p-ease);
+}
+
+.role-collab a:hover,
+.role-collab a:focus-visible {
+    color: var(--p-accent);
+}
+
+/* ---------- Stack por categorías ---------- */
+
+.stack-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.stack-group-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--p-mono);
+    font-size: 0.64rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--p-muted);
+}
+
+.stack-group-label::before {
+    content: "";
+    width: 5px;
+    height: 5px;
+    background: var(--p-accent);
+}
+
+.stack-group-label::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--p-border);
+}
+
+.stack-chips {
     list-style: none;
     display: flex;
     flex-wrap: wrap;
-    gap: 0.4rem;
-    margin: 1.2rem 0;
+    gap: 0.35rem;
+    margin: 0;
     padding: 0;
 }
 
-.detail-tag {
-    padding: 0.3rem 0.65rem;
-    border: 1px solid var(--p-border);
-    border-radius: 999px;
+.stack-chip {
+    padding: 0.22rem 0.6rem;
+    border: 1px solid var(--p-line);
     font-family: var(--p-mono);
     font-size: 0.7rem;
-    animation: tagIn 0.5s var(--p-ease) both;
-    animation-delay: calc(var(--i) * 45ms + 0.25s);
+    line-height: 1.5;
+    transition: color 0.25s var(--p-ease), border-color 0.25s var(--p-ease), transform 0.25s var(--p-ease);
 }
+
+.stack-chip:hover {
+    color: var(--p-accent);
+    border-color: var(--p-accent);
+    transform: translateY(-2px);
+}
+
+/* ---------- Notas ---------- */
+
+.detail-notes {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+}
+
+.detail-note {
+    display: flex;
+    gap: 0.5rem;
+    padding-left: 0.6rem;
+    border-left: 2px solid var(--p-line);
+    font-size: 0.8rem;
+    line-height: 1.45;
+    color: var(--p-muted);
+}
+
+.detail-note svg {
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+}
+
+.detail-note.is-warning {
+    border-left-color: var(--p-accent);
+    color: var(--p-text);
+}
+
+.detail-note.is-warning svg {
+    color: var(--p-accent);
+}
+
+/* ---------- Enlaces (demo / código): botones pequeños ---------- */
 
 .detail-links {
     display: flex;
     flex-wrap: wrap;
-    gap: 1.4rem;
-    animation: fadeUp 0.6s 0.4s var(--p-ease) both;
+    gap: 0.45rem;
+    min-height: 1.9rem;
+    animation: fadeUp 0.6s 0.35s var(--p-ease) both;
 }
 
-.detail-links a {
+.detail-link {
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
-    padding-bottom: 0.2rem;
-    border-bottom: 1px solid var(--p-accent);
+    gap: 0.4rem;
+    padding: 0.35rem 0.65rem;
+    border: 1px solid var(--p-line);
     font-family: var(--p-mono);
-    font-size: 0.8rem;
-    letter-spacing: 0.06em;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    line-height: 1.4;
     text-transform: uppercase;
-    color: var(--p-text);
     text-decoration: none;
-    transition: color 0.25s var(--p-ease);
+    white-space: nowrap;
+    color: var(--p-text);
+    transition: color 0.25s var(--p-ease), border-color 0.25s var(--p-ease), background-color 0.25s var(--p-ease);
 }
 
-.detail-links a svg {
-    transition: transform 0.35s var(--p-ease);
+.detail-link svg {
+    flex-shrink: 0;
 }
 
-.detail-links a:hover {
+.detail-link svg:last-child {
+    transition: transform 0.3s var(--p-ease);
+}
+
+.detail-link--demo {
+    border-color: var(--p-accent);
     color: var(--p-accent);
 }
 
-.detail-links a:hover svg {
-    transform: translate(3px, -3px);
+.detail-link-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--p-accent);
+    animation: livePulse 1.8s ease-out infinite;
+}
+
+.detail-link:hover,
+.detail-link:focus-visible {
+    border-color: var(--p-accent);
+    color: var(--p-accent);
+}
+
+.detail-link--demo:hover,
+.detail-link--demo:focus-visible {
+    background: var(--p-accent);
+    color: var(--p-bg);
+}
+
+.detail-link--demo:hover .detail-link-dot,
+.detail-link--demo:focus-visible .detail-link-dot {
+    background: var(--p-bg);
+}
+
+.detail-link:hover svg:last-child,
+.detail-link:focus-visible svg:last-child {
+    transform: translate(2px, -2px);
+}
+
+.detail-link:focus-visible {
+    outline: 1px dashed var(--p-accent);
+    outline-offset: 3px;
 }
 
 /* ---------- Vista previa ---------- */
@@ -536,6 +988,80 @@
 
     .project-item-details .detail-desc {
         -webkit-line-clamp: unset;
+    }
+
+    .project-thumb,
+    .project-item.is-selected .project-thumb {
+        transform: none;
+        box-shadow: none;
+    }
+
+    .project-item.is-selected .project-thumb {
+        border-color: var(--p-accent);
+    }
+
+    .project-item-title {
+        margin-left: 0;
+    }
+
+    /* En móvil solo ocupa sitio el panel activo: sin huecos en blanco */
+    .detail-panels {
+        height: auto;
+    }
+
+    .detail-pane {
+        position: static;
+        display: none;
+        overflow: visible;
+    }
+
+    .detail-pane.is-active {
+        display: flex;
+    }
+
+    .detail-tab {
+        flex: 1;
+        justify-content: center;
+        padding: 0.6rem 0.5rem;
+    }
+
+    .detail-link {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.72rem;
+    }
+}
+
+/* Escritorio con poca altura: se compacta para que nada quede bajo el reproductor */
+@media (min-width: 960px) and (max-height: 700px) {
+    .project-detail {
+        --pane-h: clamp(170px, 33vh, 230px);
+    }
+
+    .detail-title {
+        margin-bottom: 0.5rem;
+        font-size: clamp(2rem, 2.9vw, 3rem);
+    }
+
+    .detail-tabs {
+        margin-bottom: 0.7rem;
+    }
+
+    .detail-desc {
+        -webkit-line-clamp: 4;
+        font-size: 0.85rem;
+        line-height: 1.5;
+    }
+
+    #projects .detail-more {
+        line-height: calc(0.85rem * 1.5);
+    }
+
+    .detail-pane {
+        gap: 0.6rem;
+    }
+
+    .role-card {
+        padding: 0.45rem 0.65rem;
     }
 }
 

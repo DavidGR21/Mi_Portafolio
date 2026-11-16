@@ -24,6 +24,14 @@ const ENTRY_FALLBACK_MS = 5000;
 // puntero pasa directo a otro elemento, no hay un viaje intermedio al logo
 const RELEASE_DELAY_MS = 70;
 
+// Partículas ya calculadas de cada imagen. Vive fuera del componente para que
+// sobreviva a la navegación: al volver a About Me no se recalcula nada
+const targetsCache = new Map();
+
+// Motor WebGL compartido: se crea la primera vez y se reutiliza en cada visita
+// a la sección (ver ParticleEngine.attach / detach)
+let sharedEngine = null;
+
 // Imagen a mostrar, por prioridad: elemento bajo el puntero (skill, curso,
 // foto...), la imagen fijada con clic y, por último, el logo por defecto
 function resolveImage(activeImageId, pinnedImageId) {
@@ -40,7 +48,6 @@ export default function ParticleLogo({
 }) {
   const canvasHolderRef = useRef(null);
   const engineRef = useRef(null);
-  const targetsCache = useRef(new Map());
   const requestRef = useRef(0);
   const onEnteredRef = useRef(onEntered);
   onEnteredRef.current = onEntered;
@@ -93,7 +100,7 @@ export default function ParticleLogo({
   // Partículas de una imagen, calculadas una sola vez y reutilizadas
   const getTargets = useCallback((img, count) => {
     const key = `${img.id}:${count}`;
-    const cache = targetsCache.current;
+    const cache = targetsCache;
     if (!cache.has(key)) {
       cache.set(
         key,
@@ -107,15 +114,16 @@ export default function ParticleLogo({
     return cache.get(key);
   }, []);
 
-  // Motor WebGL: se crea una sola vez; tamaño, tema e imagen se actualizan
-  // sin reconstruir la escena
+  // Motor WebGL: se crea una sola vez (y se conserva entre visitas); tamaño,
+  // tema e imagen se actualizan sin reconstruir la escena
   useEffect(() => {
     const holder = canvasHolderRef.current;
     if (!holder) return;
 
-    let engine;
+    let engine = sharedEngine;
     try {
-      engine = new ParticleEngine(holder, detectQuality());
+      if (engine) engine.attach(holder);
+      else engine = sharedEngine = new ParticleEngine(holder, detectQuality());
     } catch (err) {
       console.error("WebGL no disponible para el logo de partículas:", err);
       setFailed(true);
@@ -140,7 +148,7 @@ export default function ParticleLogo({
     return () => {
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
-      engine.dispose();
+      engine.detach();
       engineRef.current = null;
       setEngineReady(false);
     };

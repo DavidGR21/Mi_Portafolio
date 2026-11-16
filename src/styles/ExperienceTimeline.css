@@ -1,0 +1,524 @@
+/* Experiencia: estación de trabajo 3D en CSS + riel de carrera (ver ExperienceTimeline.jsx) */
+
+.dark {
+  --exp-accent: #4fd1c5;
+  --exp-on-accent: #0a0a0a;
+  --exp-edge: #4fd1c5;
+  --exp-shadow: #0b4b44;
+  --exp-body: #202020;
+  --exp-body-side: #151515;
+  --exp-body-top: #2c2c2c;
+  --exp-screen: #0d1514;
+  --exp-ink: rgba(79, 209, 197, 0.55);
+  --exp-ink-lit: #d4fffb;
+  --exp-glow: rgba(79, 209, 197, 0.9);
+  --exp-muted: rgba(255, 255, 255, 0.7);
+  --exp-rail: rgba(79, 209, 197, 0.28);
+}
+
+.light {
+  --exp-accent: #f32c2c;
+  --exp-on-accent: #ffffff;
+  --exp-edge: #111111;
+  --exp-shadow: #111111;
+  --exp-body: #ffffff;
+  --exp-body-side: #dcdcdc;
+  --exp-body-top: #ececec;
+  --exp-screen: #1b1b1b;
+  --exp-ink: rgba(255, 255, 255, 0.55);
+  --exp-ink-lit: #ffffff;
+  --exp-glow: rgba(243, 44, 44, 0.8);
+  --exp-muted: rgba(0, 0, 0, 0.65);
+  --exp-rail: rgba(0, 0, 0, 0.22);
+}
+
+.exp3d-list {
+  --exp-ease: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --exp-accent-deep: color-mix(in srgb, var(--exp-accent) 68%, #000000);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+/* ---------- Riel de carrera ---------- */
+.exp3d-rail {
+  position: absolute;
+  left: 52px;
+  top: 8px;
+  bottom: 8px;
+  width: 0;
+  border-left: 2px dashed var(--exp-rail);
+  overflow: visible;
+}
+
+/* El pulso viaja con transform (lo mueve el compositor, sin recalcular el
+   layout en cada frame): la pista mide lo mismo que el riel y se desplaza el
+   100% de su propia altura */
+.exp3d-pulse-track {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 100%;
+  animation: expPulseTravel 3.6s ease-in-out infinite;
+}
+
+.exp3d-pulse {
+  position: absolute;
+  left: -5px;
+  top: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--exp-accent);
+  box-shadow: 0 0 10px 2px var(--exp-glow);
+}
+
+@keyframes expPulseTravel {
+  0% { transform: translateY(0); opacity: 0; }
+  12% { opacity: 1; }
+  88% { opacity: 1; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+
+.exp3d-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+/* ---------- Estación de trabajo ---------- */
+.exp3d-scene {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  width: 104px;
+  height: 108px;
+  perspective: 600px;
+  perspective-origin: 50% 30%;
+}
+
+.exp3d-model {
+  position: absolute;
+  left: 50%;
+  top: 88px;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(-18deg) rotateY(-32deg);
+  transition: transform 0.7s var(--exp-ease);
+}
+
+.exp3d-model :where(span, i, b) {
+  position: absolute;
+  display: block;
+  box-sizing: border-box;
+}
+
+.exp3d-shadow {
+  left: -37px;
+  top: -16px;
+  width: 74px;
+  height: 32px;
+  box-shadow: 5px 5px 0 var(--exp-shadow);
+  transform: rotateX(90deg);
+}
+
+.exp3d-box {
+  bottom: 0;
+  left: calc(var(--w) / -2);
+  width: var(--w);
+  height: var(--h);
+  transform-style: preserve-3d;
+}
+
+.exp3d-face {
+  border: 1.5px solid var(--exp-edge);
+}
+
+.exp3d-face--front {
+  inset: 0;
+  transform: translateZ(calc(var(--d) / 2));
+  transform-style: preserve-3d;
+}
+
+.exp3d-face--left,
+.exp3d-face--right {
+  top: 0;
+  left: calc((var(--w) - var(--d)) / 2);
+  width: var(--d);
+  height: 100%;
+}
+
+.exp3d-face--left {
+  transform: rotateY(-90deg) translateZ(calc(var(--w) / 2));
+}
+
+.exp3d-face--right {
+  transform: rotateY(90deg) translateZ(calc(var(--w) / 2));
+}
+
+.exp3d-face--top {
+  left: 0;
+  top: calc(var(--d) / -2);
+  width: 100%;
+  height: var(--d);
+  transform: rotateX(90deg);
+}
+
+/* Peana en el color de acento */
+.exp3d-plinth {
+  --w: 74px;
+  --h: 7px;
+  --d: 32px;
+}
+
+.exp3d-plinth .exp3d-face {
+  background: var(--exp-accent);
+}
+
+.exp3d-plinth .exp3d-face--left,
+.exp3d-plinth .exp3d-face--right {
+  background: var(--exp-accent-deep);
+}
+
+.exp3d-neck {
+  --w: 12px;
+  --h: 10px;
+  --d: 8px;
+  bottom: 7px;
+}
+
+.exp3d-neck .exp3d-face {
+  background: var(--exp-body-side);
+}
+
+.exp3d-neck .exp3d-face--top {
+  background: var(--exp-body-top);
+}
+
+/* Monitor */
+.exp3d-screen {
+  --w: 62px;
+  --h: 40px;
+  --d: 6px;
+  bottom: 17px;
+}
+
+.exp3d-screen .exp3d-face {
+  background: var(--exp-body-side);
+}
+
+.exp3d-screen .exp3d-face--top {
+  background: var(--exp-body-top);
+}
+
+.exp3d-screen .exp3d-face--front {
+  background: var(--exp-screen);
+  overflow: hidden;
+}
+
+/* Líneas de código que se "escriben" una tras otra y vuelven a empezar */
+.exp3d-code {
+  inset: 0;
+}
+
+.exp3d-code i {
+  left: 7px;
+  top: calc(7px + var(--n) * 7px);
+  height: 2px;
+  width: calc(60% - var(--n) * 4%);
+  background: var(--exp-ink);
+  transform-origin: 0 50%;
+  animation: expType 3.2s steps(8, end) infinite;
+  animation-delay: calc(var(--n) * 0.45s);
+}
+
+.exp3d-code i:nth-of-type(2) {
+  left: 13px;
+}
+
+.exp3d-code i:nth-of-type(3) {
+  left: 13px;
+  width: 42%;
+}
+
+@keyframes expType {
+  0% { transform: scaleX(0); }
+  45%, 85% { transform: scaleX(1); }
+  100% { transform: scaleX(0); }
+}
+
+.exp3d-cursor {
+  left: 7px;
+  top: 35px;
+  width: 4px;
+  height: 3px;
+  background: var(--exp-ink-lit);
+  box-shadow: 0 0 5px var(--exp-glow);
+  animation: expBlink 1s steps(2, start) infinite;
+}
+
+@keyframes expBlink {
+  to { visibility: hidden; }
+}
+
+/* Barrido de luz sobre la pantalla */
+.exp3d-scan {
+  left: 0;
+  right: 0;
+  top: -12px;
+  height: 10px;
+  background: linear-gradient(to bottom, transparent, var(--exp-glow), transparent);
+  opacity: 0.22;
+  animation: expScan 2.6s linear infinite;
+}
+
+@keyframes expScan {
+  from { transform: translateY(0); }
+  to { transform: translateY(54px); }
+}
+
+/* ---------- Cubo flotante ---------- */
+.exp3d-float {
+  --s: 14px;
+  left: -7px;
+  bottom: 62px;
+  width: 14px;
+  height: 14px;
+  transform-style: preserve-3d;
+  animation: expBob 2.8s ease-in-out infinite;
+}
+
+.exp3d-cube {
+  inset: 0;
+  transform-style: preserve-3d;
+  animation: expSpin 7s linear infinite;
+}
+
+.exp3d-cube-face {
+  inset: 0;
+  border: 1.5px solid var(--exp-edge);
+  background: color-mix(in srgb, var(--exp-accent) 78%, transparent);
+}
+
+.exp3d-cube-face--f { transform: translateZ(7px); }
+.exp3d-cube-face--b { transform: rotateY(180deg) translateZ(7px); }
+.exp3d-cube-face--l { transform: rotateY(-90deg) translateZ(7px); background: var(--exp-accent-deep); }
+.exp3d-cube-face--r { transform: rotateY(90deg) translateZ(7px); background: var(--exp-accent-deep); }
+.exp3d-cube-face--t { transform: rotateX(90deg) translateZ(7px); }
+.exp3d-cube-face--d { transform: rotateX(-90deg) translateZ(7px); }
+
+@keyframes expBob {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -6px; }
+}
+
+@keyframes expSpin {
+  from { transform: rotateX(20deg) rotateY(0deg); }
+  to { transform: rotateX(20deg) rotateY(360deg); }
+}
+
+/* Baliza del puesto actual: anillo que se expande desde la peana */
+.exp3d-ring {
+  left: -30px;
+  top: -14px;
+  width: 60px;
+  height: 28px;
+  border: 2px solid var(--exp-accent);
+  border-radius: 50%;
+  transform: rotateX(90deg);
+  opacity: 0;
+  animation: expRing 2.4s ease-out infinite;
+}
+
+@keyframes expRing {
+  0% { transform: rotateX(90deg) scale(0.5); opacity: 0.9; }
+  100% { transform: rotateX(90deg) scale(1.7); opacity: 0; }
+}
+
+/* Fuera de pantalla las animaciones en bucle se detienen */
+.exp3d-list.is-paused :is(
+  .exp3d-pulse-track,
+  .exp3d-code i,
+  .exp3d-cursor,
+  .exp3d-scan,
+  .exp3d-float,
+  .exp3d-cube,
+  .exp3d-ring,
+  .exp3d-live-dot span
+) {
+  animation-play-state: paused;
+}
+
+.exp3d-row:hover .exp3d-model {
+  transform: rotateX(-12deg) rotateY(26deg);
+}
+
+.exp3d-row:hover .exp3d-code i {
+  animation-duration: 1.6s;
+}
+
+/* ---------- Tarjeta ---------- */
+.urban-card.exp3d-card {
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0;
+  padding: 0.7rem 0.95rem 0.85rem;
+  cursor: default;
+}
+
+.exp3d-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 6px;
+}
+
+.exp3d-chip {
+  display: inline-block;
+  padding: 2px 8px 1px;
+  font-family: 'Chivo', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--exp-on-accent);
+  background: var(--exp-accent);
+}
+
+.exp3d-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--exp-accent);
+}
+
+.exp3d-live-dot {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--exp-accent);
+}
+
+.exp3d-live-dot span {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--exp-accent);
+  animation: expLiveDot 1.6s ease-out infinite;
+}
+
+@keyframes expLiveDot {
+  0% { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(3); opacity: 0; }
+}
+
+.exp3d-title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--text-color);
+}
+
+.exp3d-company {
+  margin: 2px 0 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--exp-accent);
+}
+
+.exp3d-desc {
+  margin: 0.55rem 0 0;
+  padding-left: 0.7rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--exp-muted);
+  border-left: 2px solid var(--exp-rail);
+}
+
+/* ---------- Entrada (sincronizada con el resto del About Me) ---------- */
+.about-me:not(.entered) .exp3d-scene,
+.about-me:not(.entered) .exp3d-rail {
+  opacity: 0;
+}
+
+.about-me.entered .exp3d-scene {
+  animation: aboutFadeUp calc(var(--enter-dur) * 0.3) ease-out both;
+  animation-delay: calc(var(--col-delay, 0s) + var(--enter-dur) * min(var(--i, 0) * 0.05, 0.15));
+}
+
+.about-me.entered .exp3d-rail {
+  animation: aboutFadeUp calc(var(--enter-dur) * 0.4) ease-out both;
+  animation-delay: var(--col-delay, 0s);
+}
+
+.about-me.entered .exp3d-model {
+  animation: expModelIn calc(var(--enter-dur) * 0.35) cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: calc(var(--col-delay, 0s) + var(--enter-dur) * min(var(--i, 0) * 0.05, 0.15));
+}
+
+@keyframes expModelIn {
+  from {
+    transform: rotateX(-18deg) rotateY(-55deg) scale3d(0.55, 0.55, 0.55);
+  }
+}
+
+.about-me.entered .exp3d-row .urban-card {
+  animation-delay: calc(var(--col-delay, 0s) + var(--enter-dur) * min(var(--i, 0) * 0.05 + 0.05, 0.2));
+}
+
+@media (max-width: 480px) {
+  .exp3d-row {
+    gap: 0.75rem;
+  }
+
+  .exp3d-rail {
+    left: 41px;
+  }
+
+  .exp3d-scene {
+    width: 82px;
+    height: 88px;
+  }
+
+  .exp3d-model {
+    top: 70px;
+    scale: 0.78;
+  }
+
+  .exp3d-title {
+    font-size: 1.15rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .exp3d-model,
+  .exp3d-code i,
+  .exp3d-cursor,
+  .exp3d-scan,
+  .exp3d-float,
+  .exp3d-cube,
+  .exp3d-ring,
+  .exp3d-pulse-track,
+  .exp3d-live-dot span {
+    animation: none;
+    transition: none;
+  }
+
+  .exp3d-code i {
+    transform: scaleX(1);
+  }
+}

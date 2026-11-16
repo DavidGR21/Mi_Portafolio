@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowUpRight } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { ArrowUpRight, Code, Info, TriangleAlert, User, Users, X } from 'lucide-react';
 import '../styles/Projects.css';
 import { useTheme } from '../context/ThemeContext';
 import { projectsData } from '../data/projectsData';
@@ -11,18 +12,20 @@ import CustomScrollbar from '../components/CustomScrollbar';
 const projects = projectsData.map((project) => ({
     ...project,
     imageSrc: `${import.meta.env.BASE_URL}${project.image}`,
+    // Lista plana de tecnologías (para el pie de la vista previa)
+    tech: Object.values(project.stack).flat(),
 }));
 const previewImages = projects.map((project) => project.imageSrc);
 
 const pad = (n) => String(n).padStart(2, '0');
 
-// Un solo repositorio -> "Source Code"; frontend y backend separados -> un enlace por cada uno
+// Un solo repositorio -> "Source code"; frontend y backend separados -> un enlace por cada uno
 const getSourceLinks = (source) => {
     if (!source) return [];
-    if (typeof source === 'string') return [{ label: 'Source Code', url: source }];
+    if (typeof source === 'string') return [{ label: 'Source code', url: source }];
     return [
-        source.frontend && { label: 'Source Code Frontend', url: source.frontend },
-        source.backend && { label: 'Source Code Backend', url: source.backend },
+        source.frontend && { label: 'Frontend', url: source.frontend },
+        source.backend && { label: 'Backend', url: source.backend },
     ].filter(Boolean);
 };
 
@@ -30,24 +33,214 @@ const getSourceLinks = (source) => {
 const DESKTOP_QUERY = '(min-width: 960px)';
 const SMOOTH_SCROLL_QUERY = `${DESKTOP_QUERY} and (hover: hover)`;
 
+const TABS = [
+    { id: 'about', label: 'About' },
+    { id: 'stack', label: 'Stack' },
+    { id: 'notes', label: 'Notes' },
+];
+
+// Autoría: proyecto en solitario o en equipo (con enlace a cada colaborador)
+function RoleCard({ role }) {
+    const solo = role.type === 'solo';
+    const Icon = solo ? User : Users;
+    const collaborators = role.collaborators ?? [];
+    return (
+        <div className="role-card">
+            <span className="role-icon"><Icon size={16} strokeWidth={1.8} /></span>
+            <div className="role-text">
+                <span className="role-label">{solo ? 'Solo project' : 'Team project'}</span>
+                <span className="role-summary text-chivo">{role.summary}</span>
+                {collaborators.length > 0 && (
+                    <span className="role-collab">
+                        With{' '}
+                        {collaborators.map(({ name, url }, i) => (
+                            <span key={name}>
+                                {i > 0 && (i === collaborators.length - 1 ? ' & ' : ', ')}
+                                <a href={url} target="_blank" rel="noopener noreferrer">{name}</a>
+                            </span>
+                        ))}
+                    </span>
+                )}
+            </div>
+        </div>
+    );
+}
+
+// Descripción. Si no cabe en el hueco (pantallas pequeñas) se recorta y los puntos
+// suspensivos pasan a ser un botón "… more" que abre el texto completo en un modal
+function Description({ project }) {
+    const textRef = useRef(null);
+    const [clamped, setClamped] = useState(false);
+    const [open, setOpen] = useState(false);
+
+    useEffect(() => {
+        const el = textRef.current;
+        const check = () => setClamped(el.scrollHeight > el.clientHeight + 1);
+        check();
+        const observer = new ResizeObserver(check);
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, [project.description]);
+
+    useEffect(() => {
+        if (!open) return undefined;
+        const handleKey = (e) => e.key === 'Escape' && setOpen(false);
+        window.addEventListener('keydown', handleKey);
+        return () => window.removeEventListener('keydown', handleKey);
+    }, [open]);
+
+    return (
+        <div className="detail-desc-wrap">
+            <p ref={textRef} className="detail-desc text-chivo">{project.description}</p>
+            {clamped && (
+                <button
+                    type="button"
+                    className="detail-more"
+                    onClick={() => setOpen(true)}
+                    aria-label={`Read the full description of ${project.title}`}
+                >
+                    … more
+                </button>
+            )}
+            {/* Se monta dentro de #projects para heredar los colores del tema */}
+            {open && createPortal(
+                <div
+                    className="desc-modal"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label={`${project.title} description`}
+                    onClick={() => setOpen(false)}
+                >
+                    <div className="desc-modal-card" onClick={(e) => e.stopPropagation()}>
+                        <button
+                            type="button"
+                            className="desc-modal-close"
+                            onClick={() => setOpen(false)}
+                            aria-label="Close"
+                            autoFocus
+                        >
+                            <X size={16} />
+                        </button>
+                        <span className="desc-modal-kicker">About</span>
+                        <h3 className="desc-modal-title title-teko">{project.title}</h3>
+                        <p className="desc-modal-text text-chivo">{project.description}</p>
+                    </div>
+                </div>,
+                document.getElementById('projects'),
+            )}
+        </div>
+    );
+}
+
+// Información del proyecto en tres secciones (About / Stack / Notes).
+// Los tres paneles ocupan siempre el mismo hueco, así que ni las pestañas ni los
+// enlaces cambian de sitio al cambiar de sección o de proyecto.
 function ProjectInfo({ project }) {
+    const [tab, setTab] = useState('about');
+    const { practices = [], notes = [] } = project;
+    const groups = Object.entries(project.stack);
+    const sourceLinks = getSourceLinks(project.source);
+    const hasWarning = notes.some((note) => note.type === 'warning');
+
+    const paneProps = (id) => ({
+        className: `detail-pane${tab === id ? ' is-active' : ''}`,
+        role: 'tabpanel',
+        'aria-hidden': tab !== id,
+        inert: tab !== id ? '' : undefined,
+    });
+
     return (
         <>
-            <p className="detail-desc text-chivo">{project.description}</p>
-            <ul className="detail-tags">
-                {project.tech.map((tech, i) => (
-                    <li key={tech} className="detail-tag" style={{ '--i': i }}>{tech}</li>
+            <div className="detail-tabs" role="tablist">
+                {TABS.map(({ id, label }) => (
+                    <button
+                        key={id}
+                        type="button"
+                        role="tab"
+                        aria-selected={tab === id}
+                        className={`detail-tab${tab === id ? ' is-active' : ''}`}
+                        onClick={() => setTab(id)}
+                    >
+                        {label}
+                        {id === 'notes' && hasWarning && (
+                            <span className="detail-tab-alert" aria-label="Has important notes" />
+                        )}
+                    </button>
                 ))}
-            </ul>
+            </div>
+
+            <div className="detail-panels">
+                <div {...paneProps('about')}>
+                    <Description project={project} />
+                    <RoleCard role={project.role} />
+                </div>
+
+                <div {...paneProps('stack')}>
+                    {groups.map(([group, items]) => (
+                        <div key={group} className="stack-group">
+                            <span className="stack-group-label">{group}</span>
+                            <ul className="stack-chips">
+                                {items.map((tech) => (
+                                    <li key={tech} className="stack-chip">{tech}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
+                </div>
+
+                <div {...paneProps('notes')}>
+                    {practices.length > 0 && (
+                        <div className="stack-group">
+                            <span className="stack-group-label">Methodologies &amp; patterns</span>
+                            <ul className="stack-chips">
+                                {practices.map((practice) => (
+                                    <li key={practice} className="stack-chip">{practice}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                    {notes.length > 0 && (
+                        <ul className="detail-notes">
+                            {notes.map((note) => (
+                                <li key={note.text} className={`detail-note is-${note.type}`}>
+                                    {note.type === 'warning'
+                                        ? <TriangleAlert size={14} strokeWidth={2} />
+                                        : <Info size={14} strokeWidth={2} />}
+                                    <span className="text-chivo">{note.text}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                    {practices.length === 0 && notes.length === 0 && (
+                        <p className="detail-desc text-chivo">No extra notes for this project.</p>
+                    )}
+                </div>
+            </div>
+
             <div className="detail-links">
                 {project.demo && (
-                    <a href={project.demo} target="_blank" rel="noopener noreferrer">
-                        Live Demo <ArrowUpRight size={16} />
+                    <a
+                        className="detail-link detail-link--demo"
+                        href={project.demo}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <span className="detail-link-dot" />
+                        Live demo
+                        <ArrowUpRight size={13} />
                     </a>
                 )}
-                {getSourceLinks(project.source).map(({ label, url }) => (
-                    <a key={url} href={url} target="_blank" rel="noopener noreferrer">
-                        {label} <ArrowUpRight size={16} />
+                {sourceLinks.map(({ label, url }) => (
+                    <a
+                        key={url}
+                        className="detail-link"
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <Code size={13} strokeWidth={2} />
+                        {label}
+                        <ArrowUpRight size={13} />
                     </a>
                 ))}
             </div>
@@ -111,6 +304,8 @@ function Projects() {
         // La rueda del mouse mueve la lista desde cualquier parte de la pantalla
         const handleWheel = (e) => {
             if (!smoothQuery.matches || e.ctrlKey) return;
+            const pane = e.target.closest?.('.detail-pane, .desc-modal-card');
+            if (pane && pane.scrollHeight > pane.clientHeight + 1) return;
             e.preventDefault();
             scroll.target = clampTarget(scroll.target + e.deltaY);
         };

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { PerspectiveCamera } from '@react-three/drei';
 import Envelope from './Envelope';
+import { deferContextLoss } from '../../utils/deferContextLoss';
 import ContactForm from './ContactForm';
 import '../../styles/EnvelopeScene.css';
 
@@ -57,7 +58,7 @@ function EnvelopeScene() {
     return (
         <div className="envelope-scene-container">
             <h1 className='contact-title'>CONTACT</h1>
-            <Canvas className="envelope-canvas" dpr={[1, 2]}>
+            <Canvas className="envelope-canvas" dpr={[1, 2]} onCreated={deferContextLoss}>
                 {/* Cámara */}
                 <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={50} />
 

@@ -2,6 +2,7 @@ import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
+import { deferContextLoss } from '../utils/deferContextLoss';
 
 // Duraciones de las transiciones (segundos)
 const ENTER_DURATION = 1.6;
@@ -180,6 +181,7 @@ function ProjectPreview({ images, activeIndex, velocityRef }) {
             dpr={[1, 2]}
             gl={{ alpha: true, antialias: false }}
             camera={{ position: [0, 0, 5], fov: 50 }}
+            onCreated={deferContextLoss}
         >
             <Suspense fallback={null}>
                 <ImagePlanes images={images} activeIndex={activeIndex} velocityRef={velocityRef} />

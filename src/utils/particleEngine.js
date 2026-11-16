@@ -288,6 +288,48 @@ export class ParticleEngine {
     this.canvas.addEventListener("webglcontextlost", this.onContextLost);
 
     this.setTheme("dark");
+
+    // Compilar el shader en segundo plano: en Windows (ANGLE) tarda 100-250 ms
+    // y, hecho en el primer frame, congelaba la página al empezar la entrada
+    this.renderer.compileAsync?.(this.scene, this.camera)?.catch(() => {});
+  }
+
+  // ---------- Reutilización ----------
+  // El motor (contexto WebGL, buffers y shader ya compilado) se conserva al
+  // salir de la sección y se vuelve a montar al regresar: crearlo de nuevo en
+  // cada visita provocaba un tirón justo al empezar la animación de entrada
+
+  attach(container) {
+    this.container = container;
+    container.appendChild(this.canvas);
+  }
+
+  // Suelta el contenedor y deja el motor listo para una nueva entrada
+  detach() {
+    this.stop();
+    if (this.canvas.parentNode) this.canvas.parentNode.removeChild(this.canvas);
+    this.onEntryStart = null;
+    this.onEntryComplete = null;
+    this.pendingTarget = null;
+    this.hasTarget = false;
+    this.entryNotified = false;
+    this.entryActive = false;
+    this.width = 0;
+    this.height = 0;
+    this.progress = 1;
+    this.visible = true;
+    this.pointerActive = false;
+    this.uniforms.uEntry.value = 0;
+    this.uniforms.uOpacity.value = 0;
+    this.uniforms.uMouseStrength.value = 0;
+    for (const pulse of this.pulses) pulse.set(0, 0, -1000, 0);
+    this.geometry.setDrawRange(0, 0);
+    // Borrar el último frame: si no, al volver a montar el canvas se vería un
+    // instante la imagen anterior antes de empezar la entrada. Además el canvas
+    // queda oculto hasta que se dibuja el primer frame de la nueva entrada
+    this.renderer.clear();
+    this.canvas.style.visibility = "hidden";
+    this.canvasHidden = true;
   }
 
   // ---------- Configuración ----------
@@ -297,6 +339,13 @@ export class ParticleEngine {
     this.width = width;
     this.height = height;
     this.applyLayout();
+    // Imagen que llegó antes de conocer el tamaño (ver setTarget)
+    if (this.pendingTarget) {
+      const [target, entryDuration] = this.pendingTarget;
+      this.pendingTarget = null;
+      this.setTarget(target, entryDuration);
+      return;
+    }
     // Redibujar ya: cambiar el tamaño limpia el canvas y se vería un parpadeo
     if (this.hasTarget) this.draw();
   }
@@ -373,6 +422,14 @@ export class ParticleEngine {
   // entryDuration: segundos que debe durar la animación de entrada (solo la 1.ª vez)
   setTarget(target, entryDuration = ENTRY_DURATION) {
     if (!target || target.count !== this.count) return;
+
+    // Con las partículas en caché la imagen puede llegar antes que el primer
+    // setSize: sin tamaño no hay layout desde el que lanzar la entrada, así que
+    // se guarda y se aplica en cuanto se conozca
+    if (!this.width) {
+      this.pendingTarget = [target, entryDuration];
+      return;
+    }
 
     if (!this.hasTarget) {
       // Entrada: las partículas nacen repartidas por toda la pantalla y viajan
@@ -583,6 +640,12 @@ export class ParticleEngine {
     );
 
     this.renderer.render(this.scene, this.camera);
+
+    // Primer frame tras volver a montar el motor: ya se puede mostrar el canvas
+    if (this.canvasHidden) {
+      this.canvasHidden = false;
+      this.canvas.style.visibility = "";
+    }
   }
 
   // Redibuja un frame aunque el bucle esté en pausa (p. ej. cambio de tema)

@@ -8,7 +8,7 @@ import CvDossier from '../components/CvDossier';
 import { aboutMeData } from '../data/aboutMeData';
 import EducationCampus from '../components/EducationCampus';
 import CourseCertificates from '../components/CourseCertificates';
-import { Briefcase } from 'lucide-react';
+import ExperienceTimeline from '../components/ExperienceTimeline';
 import '../styles/AboutMe.css';
 
 // Carga diferida: pdf.js solo se descarga al abrir un certificado
@@ -186,24 +186,10 @@ function AboutMe() {
               {/* Columna Experiencia */}
               <div className="about-section urban-column">
                 <h4 className="section-title title-teko text-teal">EXPERIENCE</h4>
-                <div className="urban-cards-wrapper">
-                  {aboutMeData.experience.map((exp) => (
-                    <div key={exp.id} className="urban-card experience-item"
-                      {...particleTrigger(exp)}>
-                      {/* Caja para el icono */}
-                      <div className="card-icon-box">
-                        <Briefcase size={28} strokeWidth={1.5} />
-                      </div>
-                      {/* Contenido de texto */}
-                      <div className="card-content">
-                        <h5 className="exp-title card-title">{exp.title}</h5>
-                        <p className="exp-company card-subtitle">{exp.company}</p>
-                        <span className="exp-period card-period">{exp.period}</span>
-                        <p className="exp-description card-description">{exp.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <ExperienceTimeline
+                  items={aboutMeData.experience}
+                  getTriggerProps={particleTrigger}
+                />
               </div>
             </div>
           </div>
