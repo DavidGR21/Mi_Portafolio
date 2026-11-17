@@ -11,13 +11,47 @@
 // practices: metodologías, arquitecturas y patrones aplicados
 // notes:     cosas a tener en cuenta (despliegue, tiempos de arranque, alcance...)
 //            type: "info" | "warning"
+// media:     (opcional) galería de capturas y videos. Se genera optimizada con
+//              npm run media -- <slug>        (originales en media-src/<slug>/)
+//            y el comando imprime el bloque projectMedia(...) listo para pegar aquí.
+//            Cada elemento: [tipo "image" | "video", nombre de archivo sin extensión, pie de foto]
+
+// Construye las rutas de la galería a partir de la carpeta del proyecto:
+//   imagen -> <carpeta>/<nombre>.webp           miniatura -> <carpeta>/thumbs/<nombre>.webp
+//   video  -> <carpeta>/<nombre>.mp4 + póster   miniatura -> <carpeta>/thumbs/<nombre>.webp
+const projectMedia = (folder, items) =>
+    items.map(([type, name, caption]) => ({
+        type,
+        caption,
+        thumb: `${folder}/thumbs/${name}.webp`,
+        ...(type === "video"
+            ? { src: `${folder}/${name}.mp4`, poster: `${folder}/${name}-poster.webp` }
+            : { src: `${folder}/${name}.webp` }),
+    }));
+
 export const projectsData = [
     {
         id: 1,
         title: "iBlogTwo",
         description:
             "A blog-style social network where users publish posts with images, react, comment, add friends and chat. Posts, reactions and messages arrive live over WebSockets on top of a REST API.",
-        image: "assets/images/projects/iBlogTwo.png",
+        image: "assets/images/projects/iBlogTwo.webp",
+        media: projectMedia("assets/projects/iBlogTwo", [
+            ["video", "promo", "Promo trailer"],
+            ["image", "01-login", "Login"],
+            ["image", "02-registro", "Sign up"],
+            ["image", "03-inicio", "Home feed — create a post"],
+            ["image", "04-busqueda", "People search"],
+            ["image", "05-reacciones", "Reactions"],
+            ["image", "06-comentarios", "Comments & replies"],
+            ["image", "07-amigos", "Friends & requests"],
+            ["image", "08-chat", "Real-time chat"],
+            ["image", "09-stickers", "Stickers"],
+            ["image", "10-perfil", "Profile"],
+            ["image", "11-ajustes", "Profile settings"],
+            ["image", "12-admin", "Admin dashboard"],
+            ["image", "13-admin-usuarios", "User management"],
+        ]),
         role: {
             type: "solo",
             summary: "Designed and built the whole project: frontend, backend, database and deployment.",
@@ -50,7 +84,21 @@ export const projectsData = [
         title: "Virtual Pet",
         description:
             "A Java program that simulates caring for a virtual pet: feed it and play with it while its hunger, happiness and energy change with every action. Neglect it and it can get sick or even leave.",
-        image: "assets/images/projects/virtualPet.png",
+        image: "assets/images/projects/virtualPet.webp",
+        media: projectMedia("assets/projects/virtualPet", [
+            ["video", "gameplay", "Gameplay trailer"],
+            ["image", "01-menu-principal", "Main menu"],
+            ["image", "02-selector-partidas", "Save slots"],
+            ["image", "03-sala", "Living room"],
+            ["image", "04-cocina", "Kitchen — feeding"],
+            ["image", "05-bano", "Bathroom — hygiene"],
+            ["image", "06-cuarto", "Bedroom — rest"],
+            ["image", "07-tienda", "Shop"],
+            ["image", "08-juego-memoria", "Memory mini-game"],
+            ["image", "09-subir-nivel", "Level up"],
+            ["image", "10-logros", "Achievements"],
+            ["image", "11-mascota-muerta", "Game over"],
+        ]),
         role: {
             type: "solo",
             summary: "Developed entirely on my own.",
@@ -68,7 +116,7 @@ export const projectsData = [
         title: "Control NFC",
         description:
             "A web app that records student check-ins and check-outs with NFC. Scanning a student's tag reads their data and automatically logs the time and the event, replacing manual sign-in at schools.",
-        image: "assets/images/projects/NFC.png",
+        image: "assets/images/projects/NFC.webp",
         role: {
             type: "team",
             summary: "Built together with a teammate, sharing the work across the app.",
@@ -94,7 +142,7 @@ export const projectsData = [
         title: "Gestor de Notas",
         description:
             "A note-taking application to create, edit and organize notes. A React interface talks to a Node.js REST API that stores every note in a SQL database, so they stay available between sessions.",
-        image: "assets/images/projects/gestorNotas.png",
+        image: "assets/images/projects/gestorNotas.webp",
         role: {
             type: "team",
             summary: "Built together with a teammate, sharing the work across the app.",
@@ -115,7 +163,7 @@ export const projectsData = [
         title: "Ventas POO",
         description:
             "A desktop sales management application built in Java that helps track and manage sales, with all the data stored in a SQL database. Developed as an object-oriented programming project.",
-        image: "assets/images/projects/Ventas.png",
+        image: "assets/images/projects/Ventas.webp",
         role: {
             type: "solo",
             summary: "Developed entirely on my own.",
@@ -134,7 +182,7 @@ export const projectsData = [
         title: "App Combustible",
         description:
             "A fuel, vehicle, driver and route management system built on microservices, with an API Gateway, gRPC communication, JWT authentication and one database per service, all containerized with Docker.",
-        image: "assets/images/projects/Combustible.jpg",
+        image: "assets/images/projects/Combustible.webp",
         role: {
             type: "team",
             summary: "Group project for the Distributed Applications course, built with classmates.",
@@ -167,7 +215,7 @@ export const projectsData = [
         title: "App Hospital",
         description:
             "A distributed hospital management platform built on microservices: secure authentication, doctors, patients and specialties, consultation records, statistical reports and support for multiple branches.",
-        image: "assets/images/projects/Hospital.jpg",
+        image: "assets/images/projects/Hospital.webp",
         role: {
             type: "team",
             summary: "Group project for the Distributed Applications course, built with classmates.",
@@ -200,7 +248,7 @@ export const projectsData = [
         title: "Pixel Odyssey",
         description:
             "A 2D pixel-art platformer made in Unity 6 with a clean architecture: state-based movement, modular enemy AI, a multi-phase boss battle, a profile-based save system and centralized audio.",
-        image: "assets/images/projects/PixelOdysey.jpeg",
+        image: "assets/images/projects/PixelOdysey.webp",
         role: {
             type: "team",
             summary: "Developed as a team: game design, architecture and programming shared with my teammates.",

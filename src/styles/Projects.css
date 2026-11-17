@@ -929,7 +929,8 @@
 /* Móvil y tablet: lista con la info desplegada, sin vista previa WebGL */
 @media (max-width: 959px) {
     #projects {
-        grid-template-columns: 1fr;
+        /* minmax(0, …): la tira de miniaturas del carrusel no ensancha la columna */
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .projects-sidebar {
@@ -998,6 +999,11 @@
 
     .project-item.is-selected .project-thumb {
         border-color: var(--p-accent);
+    }
+
+    /* Con capturas o video, el carrusel (dentro de la info) reemplaza a la miniatura */
+    .project-item.is-selected.has-media .project-thumb {
+        display: none;
     }
 
     .project-item-title {

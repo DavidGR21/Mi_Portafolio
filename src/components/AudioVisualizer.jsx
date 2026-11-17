@@ -2,6 +2,7 @@ import { useRef, useEffect, useState, useMemo, useCallback } from 'react';
 import { SkipBack, Play, Pause, SkipForward } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import playlist from '../data/playlist';
+import { MEDIA_PLAY_EVENT } from '../utils/mediaGallery';
 import '../styles/AudioVisualizer.css';
 
 const AudioVisualizer = () => {
@@ -194,7 +195,16 @@ const AudioVisualizer = () => {
         const preloader = new Audio();
         preloader.preload = 'auto';
 
-        const handlePlay = () => setIsPlaying(true);
+        // Avisa al resto de medios (video de la galería) para que se pausen
+        const handlePlay = () => {
+            setIsPlaying(true);
+            window.dispatchEvent(new CustomEvent(MEDIA_PLAY_EVENT, { detail: { source: 'music' } }));
+        };
+        // Si empieza a sonar un video, la música se pausa
+        const handleOtherMedia = (e) => {
+            if (e.detail?.source !== 'music') audio.pause();
+        };
+        window.addEventListener(MEDIA_PLAY_EVENT, handleOtherMedia);
         const handlePause = () => {
             // Ignorar la pausa momentánea al saltar de pista
             if (!wasPlayingRef.current) setIsPlaying(false);
@@ -230,6 +240,7 @@ const AudioVisualizer = () => {
 
         return () => {
             Object.entries(listeners).forEach(([event, handler]) => audio.removeEventListener(event, handler));
+            window.removeEventListener(MEDIA_PLAY_EVENT, handleOtherMedia);
 
             preloader.removeAttribute('src');
             preloader.load();

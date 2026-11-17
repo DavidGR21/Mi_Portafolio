@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowUpRight, Code, Info, TriangleAlert, User, Users, X } from 'lucide-react';
 import '../styles/Projects.css';
@@ -7,11 +7,21 @@ import { projectsData } from '../data/projectsData';
 import AnimatedTitle from '../components/AnimatedTitle';
 import ProjectPreview from '../components/ProjectPreview';
 import CustomScrollbar from '../components/CustomScrollbar';
+import MediaGallery from '../components/MediaGallery';
+import MediaCarousel from '../components/MediaCarousel';
 
 // Rutas de imágenes respetando el `base` de vite.config.js
+const withBase = (path) => path && `${import.meta.env.BASE_URL}${path}`;
 const projects = projectsData.map((project) => ({
     ...project,
-    imageSrc: `${import.meta.env.BASE_URL}${project.image}`,
+    imageSrc: withBase(project.image),
+    // Galería (capturas y videos): rutas completas
+    media: (project.media ?? []).map((item) => ({
+        ...item,
+        src: withBase(item.src),
+        thumb: withBase(item.thumb),
+        poster: withBase(item.poster),
+    })),
     // Lista plana de tecnologías (para el pie de la vista previa)
     tech: Object.values(project.stack).flat(),
 }));
@@ -253,6 +263,22 @@ function Projects() {
     const [activeIndex, setActiveIndex] = useState(0);
     const activeProject = projects[activeIndex];
 
+    // Galería ampliada abierta: { project, index } (null = cerrada).
+    // Al cerrar, el foco vuelve a quien la abrió
+    const [gallery, setGallery] = useState(null);
+    const galleryOpenerRef = useRef(null);
+    const openGallery = (project, index = 0) => {
+        galleryOpenerRef.current = document.activeElement;
+        setGallery({ project, index });
+    };
+    const closeGallery = useCallback(() => {
+        setGallery(null);
+        galleryOpenerRef.current?.focus?.({ preventScroll: true });
+    }, []);
+
+    // Los proyectos con capturas o video muestran el carrusel en lugar de la imagen WebGL
+    const hasMedia = activeProject.media.length > 0;
+
     // La vista previa WebGL solo se monta en pantallas anchas (en móvil está oculta)
     const [isDesktop, setIsDesktop] = useState(() => window.matchMedia(DESKTOP_QUERY).matches);
     useEffect(() => {
@@ -304,6 +330,8 @@ function Projects() {
         // La rueda del mouse mueve la lista desde cualquier parte de la pantalla
         const handleWheel = (e) => {
             if (!smoothQuery.matches || e.ctrlKey) return;
+            // Dentro de la galería la rueda no mueve la lista de detrás
+            if (e.target.closest?.('.gallery-modal')) return;
             const pane = e.target.closest?.('.detail-pane, .desc-modal-card');
             if (pane && pane.scrollHeight > pane.clientHeight + 1) return;
             e.preventDefault();
@@ -388,7 +416,7 @@ function Projects() {
                                 return (
                                     <li
                                         key={project.id}
-                                        className={`project-item ${isSelected ? 'is-selected' : ''}`}
+                                        className={`project-item ${isSelected ? 'is-selected' : ''} ${project.media.length ? 'has-media' : ''}`}
                                         style={{ '--i': index }}
                                     >
                                         <button
@@ -411,6 +439,15 @@ function Projects() {
                                         {/* En móvil la información se despliega dentro de la lista */}
                                         {isSelected && (
                                             <div className="project-item-details">
+                                                {/* En móvil el carrusel ocupa el lugar de la miniatura */}
+                                                {!isDesktop && project.media.length > 0 && (
+                                                    <MediaCarousel
+                                                        media={project.media}
+                                                        paused={!!gallery}
+                                                        onOpen={(i) => openGallery(project, i)}
+                                                        className="is-inline"
+                                                    />
+                                                )}
                                                 <ProjectInfo project={project} />
                                             </div>
                                         )}
@@ -444,8 +481,17 @@ function Projects() {
                             {isDesktop && (
                                 <ProjectPreview
                                     images={previewImages}
-                                    activeIndex={activeIndex}
+                                    activeIndex={hasMedia ? -1 : activeIndex}
                                     velocityRef={velocityRef}
+                                />
+                            )}
+                            {isDesktop && hasMedia && (
+                                <MediaCarousel
+                                    key={activeProject.id}
+                                    media={activeProject.media}
+                                    paused={!!gallery}
+                                    onOpen={(i) => openGallery(activeProject, i)}
+                                    className="is-framed"
                                 />
                             )}
                             <span className="preview-dot dot1" />
@@ -460,6 +506,10 @@ function Projects() {
                     </div>
                 </div>
             </div>
+
+            {gallery && (
+                <MediaGallery project={gallery.project} startIndex={gallery.index} onClose={closeGallery} />
+            )}
         </section>
     );
 }

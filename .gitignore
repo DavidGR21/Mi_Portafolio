@@ -24,3 +24,6 @@ dist
 *.njsproj
 *.sln
 *.sw?
+
+# Originales de capturas y videos (solo para `npm run media`; lo publicado está en public/)
+media-src

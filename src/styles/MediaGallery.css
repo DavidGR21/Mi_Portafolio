@@ -1,0 +1,274 @@
+/* ==========================================================
+   Galería de capturas y videos de un proyecto
+   Solo usa los colores del tema de #projects (texto, atenuado, líneas y acento)
+   ========================================================== */
+
+#projects .gallery-modal {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: grid;
+    /* Una sola columna del ancho disponible: la tira de miniaturas no la ensancha */
+    grid-template-columns: minmax(0, 1fr);
+    place-items: center;
+    /* Abajo se deja libre el sitio del reproductor de música */
+    padding: 1.25rem 1.5rem 96px;
+    background: color-mix(in srgb, var(--p-bg) 85%, transparent);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    animation: modalFade 0.25s ease-out both;
+    /* La tarjeta se dimensiona con el alto disponible (unidades cqh) */
+    container-type: size;
+}
+
+#projects .gallery-card {
+    /* Ancho limitado por el alto: el visor 16:9 + cabecera, pie y miniaturas (~210px)
+       caben siempre sin scroll */
+    width: min(980px, 100%, calc((100cqh - 210px) * 16 / 9 + 42px));
+    padding: 1rem 1.25rem 1.05rem;
+    border: 1px solid var(--p-line);
+    background: var(--p-bg);
+    box-shadow: 6px 6px 0 var(--p-accent);
+    animation: fadeUp 0.35s var(--p-ease) both;
+}
+
+/* ---------- Cabecera ---------- */
+
+#projects .gallery-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
+}
+
+#projects .gallery-kicker {
+    font-family: var(--p-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--p-accent);
+}
+
+#projects .gallery-title {
+    margin: 0.15rem 0 0;
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--p-text);
+}
+
+/* ---------- Botones cuadrados (cerrar / anterior / siguiente) ---------- */
+
+#projects .gallery-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid var(--p-line);
+    border-radius: 0;
+    background: transparent;
+    color: var(--p-text);
+    cursor: pointer;
+    transition: color 0.25s var(--p-ease), border-color 0.25s var(--p-ease), background-color 0.25s var(--p-ease);
+}
+
+#projects .gallery-btn:hover,
+#projects .gallery-btn:focus-visible {
+    border-color: var(--p-accent);
+    color: var(--p-accent);
+}
+
+#projects .gallery-btn:focus {
+    outline: none;
+}
+
+#projects .gallery-btn:focus-visible,
+#projects .gallery-play:focus-visible {
+    outline: 1px dashed var(--p-accent);
+    outline-offset: 3px;
+}
+
+#projects .gallery-close {
+    flex-shrink: 0;
+}
+
+/* ---------- Visor ---------- */
+
+#projects .gallery-stage {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    border: 1px solid var(--p-border);
+    background-image: repeating-linear-gradient(0deg, var(--p-scan) 0 1px, transparent 1px 4px);
+    touch-action: pan-y;
+}
+
+#projects .gallery-media {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    animation: galleryIn 0.45s var(--p-ease) both;
+}
+
+/* La captura o el video encajan completos en el visor 16:9 */
+#projects .gallery-media-el {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    user-select: none;
+}
+
+#projects .gallery-nav {
+    position: absolute;
+    top: 50%;
+    z-index: 2;
+    background: color-mix(in srgb, var(--p-bg) 75%, transparent);
+    transform: translateY(-50%);
+}
+
+#projects .gallery-nav.is-prev { left: 0.6rem; }
+#projects .gallery-nav.is-next { right: 0.6rem; }
+
+/* En escritorio las flechas se atenúan hasta pasar el mouse por el visor */
+@media (hover: hover) {
+    #projects .gallery-nav {
+        opacity: 0.55;
+        transition: opacity 0.25s var(--p-ease), color 0.25s var(--p-ease), border-color 0.25s var(--p-ease);
+    }
+
+    #projects .gallery-stage:hover .gallery-nav,
+    #projects .gallery-nav:focus-visible {
+        opacity: 1;
+    }
+}
+
+/* Esquinas en el color de acento, como en la vista previa */
+#projects .gallery-corner {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border: 0 solid var(--p-accent);
+    pointer-events: none;
+}
+
+#projects .gallery-corner.c1 { left: -1px; top: -1px; border-left-width: 1px; border-top-width: 1px; }
+#projects .gallery-corner.c2 { right: -1px; top: -1px; border-right-width: 1px; border-top-width: 1px; }
+#projects .gallery-corner.c3 { right: -1px; bottom: -1px; border-right-width: 1px; border-bottom-width: 1px; }
+#projects .gallery-corner.c4 { left: -1px; bottom: -1px; border-left-width: 1px; border-bottom-width: 1px; }
+
+/* Botón de reproducir sobre el póster del video */
+#projects .gallery-play {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 58px;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0 0 3px;
+    border: 1px solid var(--p-accent);
+    border-radius: 0;
+    background: color-mix(in srgb, var(--p-bg) 80%, transparent);
+    color: var(--p-accent);
+    box-shadow: 4px 4px 0 var(--p-accent);
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    transition: background-color 0.25s var(--p-ease), color 0.25s var(--p-ease),
+        transform 0.25s var(--p-ease), box-shadow 0.25s var(--p-ease);
+}
+
+#projects .gallery-play:hover,
+#projects .gallery-play:focus-visible {
+    background: var(--p-accent);
+    color: var(--p-bg);
+    box-shadow: 6px 6px 0 var(--p-accent);
+    transform: translate(calc(-50% - 2px), calc(-50% - 2px));
+}
+
+#projects .gallery-play:focus {
+    outline: none;
+}
+
+/* ---------- Pie: título de la captura + contador ---------- */
+
+#projects .gallery-meta {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.7rem;
+}
+
+#projects .gallery-caption {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.88rem;
+    color: var(--p-text);
+    animation: fadeUp 0.4s var(--p-ease) both;
+}
+
+#projects .gallery-count {
+    flex-shrink: 0;
+    font-family: var(--p-mono);
+    font-size: 0.75rem;
+    color: var(--p-accent);
+}
+
+#projects .gallery-count span {
+    color: var(--p-muted);
+}
+
+/* ---------- Tira de miniaturas (estilos en ThumbStrip.css) ---------- */
+
+#projects .gallery-strip {
+    margin-top: 0.5rem;
+}
+
+@keyframes galleryIn {
+    from { opacity: 0; transform: translateX(calc(var(--dir, 1) * 18px)); }
+    to { opacity: 1; transform: none; }
+}
+
+/* ---------- Móvil ---------- */
+
+@media (max-width: 959px) {
+    #projects .gallery-modal {
+        padding: 1rem 0.75rem 92px;
+    }
+
+    #projects .gallery-card {
+        width: 100%;
+        padding: 0.85rem 0.85rem 0.9rem;
+        box-shadow: 4px 4px 0 var(--p-accent);
+    }
+
+    #projects .gallery-title {
+        font-size: 1.7rem;
+    }
+
+    #projects .gallery-nav {
+        width: 30px;
+        height: 30px;
+    }
+
+    #projects .gallery-nav.is-prev { left: 0.4rem; }
+    #projects .gallery-nav.is-next { right: 0.4rem; }
+
+    #projects .gallery-play {
+        width: 50px;
+        height: 50px;
+    }
+
+    #projects .gallery-strip {
+        --thumb-h: 40px;
+    }
+}
