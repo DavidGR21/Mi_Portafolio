@@ -3,6 +3,25 @@
     * {
         cursor: none !important;
     }
+
+    /* Los controles nativos del <video> viven en un shadow DOM que el selector *
+       no alcanza y el navegador les pone cursor: pointer (la mano). */
+    video::-webkit-media-controls,
+    video::-webkit-media-controls-enclosure,
+    video::-webkit-media-controls-panel,
+    video::-webkit-media-controls-overlay-play-button,
+    video::-webkit-media-controls-play-button,
+    video::-webkit-media-controls-mute-button,
+    video::-webkit-media-controls-volume-slider,
+    video::-webkit-media-controls-volume-control-container,
+    video::-webkit-media-controls-timeline,
+    video::-webkit-media-controls-current-time-display,
+    video::-webkit-media-controls-time-remaining-display,
+    video::-webkit-media-controls-fullscreen-button,
+    video::-webkit-media-controls-toggle-closed-captions-button,
+    video::-webkit-media-controls-overflow-button {
+        cursor: none !important;
+    }
 }
 
 /* La posición la controla JS con transform (compositor, sin layout) */

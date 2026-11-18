@@ -101,6 +101,11 @@ export const particleImages = [
     id: "logo-python",
     path: "assets/images/logo/logoPython.png",
     name: "Python"
+  },
+  {
+    id: "logo-cybersecurity",
+    path: "assets/images/logo/Cybersecurity.png",
+    name: "Cybersecurity"
   }
 ];
 

@@ -112,58 +112,32 @@ export const projectsData = [
         source: "https://github.com/DavidGR21/MascotaVirtualJAVA.git",
     },
     {
-        id: 3,
-        title: "Control NFC",
-        description:
-            "A web app that records student check-ins and check-outs with NFC. Scanning a student's tag reads their data and automatically logs the time and the event, replacing manual sign-in at schools.",
-        image: "assets/images/projects/NFC.webp",
-        role: {
-            type: "team",
-            summary: "Built together with a teammate, sharing the work across the app.",
-            collaborators: [{ name: "Michael", url: "https://xxxmichael.github.io/Portafolio/" }],
-        },
-        stack: {
-            Frontend: ["React"],
-            Backend: ["Python"],
-            Database: ["SQL"],
-        },
-        practices: ["Collaborative development with Git"],
-        notes: [
-            {
-                type: "info",
-                text: "Mobile browsers restrict access to the NFC reader, so the app was exposed through Ngrok to make scanning work from a phone.",
-            },
-        ],
-        demo: "",
-        source: "https://github.com/xxxMichael/Nfc-detector.git",
-    },
-    {
-        id: 4,
-        title: "Gestor de Notas",
-        description:
-            "A note-taking application to create, edit and organize notes. A React interface talks to a Node.js REST API that stores every note in a SQL database, so they stay available between sessions.",
-        image: "assets/images/projects/gestorNotas.webp",
-        role: {
-            type: "team",
-            summary: "Built together with a teammate, sharing the work across the app.",
-            collaborators: [{ name: "Michael", url: "https://xxxmichael.github.io/Portafolio/" }],
-        },
-        stack: {
-            Frontend: ["React"],
-            Backend: ["Node.js"],
-            Database: ["SQL"],
-        },
-        practices: ["Collaborative development with Git", "REST API"],
-        notes: [],
-        demo: "",
-        source: "https://github.com/xxxMichael/Plataforma-Educativa.git",
-    },
-    {
         id: 5,
         title: "Ventas POO",
         description:
             "A desktop sales management application built in Java that helps track and manage sales, with all the data stored in a SQL database. Developed as an object-oriented programming project.",
         image: "assets/images/projects/Ventas.webp",
+        media: projectMedia("assets/projects/VentasPO", [
+            ["video", "App_de_Ventas_Trailer", "Trailer"],
+            ["image", "01_inicio_de_sesion", "Login"],
+            ["image", "02_menu_principal", "Main menu"],
+            ["image", "03_productos_con_codigo_qr", "Products with QR codes"],
+            ["image", "04_productos_nuevo_registro", "New product"],
+            ["image", "05_clientes", "Customers"],
+            ["image", "06_clientes_formulario", "Customer form"],
+            ["image", "07_proveedores", "Suppliers"],
+            ["image", "08_provincias", "Provinces"],
+            ["image", "09_ciudades", "Cities"],
+            ["image", "10_compra_validacion_proveedor", "Purchase — supplier validation"],
+            ["image", "11_compra_detalle", "Purchase details"],
+            ["image", "12_factura_validacion_cliente", "Invoice — customer validation"],
+            ["image", "13_factura_detalle", "Invoice details"],
+            ["image", "14_lista_ventas_qr", "Sales list with QR"],
+            ["image", "15_lista_compras_qr", "Purchases list with QR"],
+            ["image", "16_kardex_general", "General kardex"],
+            ["image", "17_kardex_por_producto", "Kardex by product"],
+            ["image", "18_gestion_de_usuarios", "User management"],
+        ]),
         role: {
             type: "solo",
             summary: "Developed entirely on my own.",
@@ -173,7 +147,12 @@ export const projectsData = [
             Database: ["SQL"],
         },
         practices: ["Object-Oriented Programming"],
-        notes: [],
+        notes: [
+            {
+                type: "info",
+                text: "One of my first projects, built at the beginning of my university studies.",
+            },
+        ],
         demo: "",
         source: "https://github.com/DavidGR21/App-de-Ventas.git",
     },

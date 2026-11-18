@@ -126,6 +126,22 @@ export const aboutMeData = {
       period: "2026",
       certificate: "assets/certificates/certificadoAWSFundamentalsMachineLearning.pdf",
       imageId: "logo-aws"
+    },
+    {
+      id: 4,
+      title: "Introduction to Cybersecurity",
+      provider: "Networking Academy",
+      period: "2024",
+      certificate: "assets/certificates/IntroduccionCiberseguridad.pdf",
+      imageId: "logo-cybersecurity"
+    },
+    {
+      id: 5,
+      title: "Network Support and Security",
+      provider: "Networking Academy",
+      period: "2024",
+      certificate: "assets/certificates/SoporteSeguridad.pdf",
+      imageId: "logo-cybersecurity"
     }
   ]
 };

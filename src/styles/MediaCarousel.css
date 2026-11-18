@@ -31,8 +31,9 @@
     position: relative;
     display: block;
     width: 100%;
-    /* Casi la proporción de las capturas: se recortan lo mínimo */
-    aspect-ratio: 3 / 2;
+    /* 16:9, el formato más ancho (los trailers); las capturas, algo más
+       estrechas, se muestran completas con franjas laterales mínimas */
+    aspect-ratio: 16 / 9;
     padding: 0;
     border: 1px solid var(--p-border);
     border-radius: 0;
@@ -76,6 +77,8 @@
 #projects .mc-slide {
     position: absolute;
     inset: 0;
+    /* Tapa la diapositiva anterior en las franjas que deja una captura más estrecha */
+    background: var(--p-bg);
 }
 
 /* La nueva diapositiva barre sobre la anterior con un trazo de acento en el borde */
@@ -101,7 +104,8 @@
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    /* Nunca se recorta: la imagen o el video se ve completo dentro del visor */
+    object-fit: contain;
     user-select: none;
 }
 
@@ -291,7 +295,7 @@
 
 @keyframes mcDrift {
     from { transform: scale(1); }
-    to { transform: scale(1.04); }
+    to { transform: scale(1.02); }
 }
 
 @keyframes mcProgress {
