@@ -17,59 +17,35 @@ export const aboutMeData = {
     tags: ["PDF", "1 page", "Spanish"]
   },
 
+  // imageId: referencia a particleImages (src/data/particleImages.jsx)
   skills: [
-    {
-      name: "JavaScript",
-      imageId: "logo-javascript" // Referencia a particleImages
-    },
-    {
-      name: "React",
-      imageId: "logo-react" // Referencia a particleImages
-    },
-    {
-      name: "Node.js",
-      imageId: "logo-nodejs" // Referencia a particleImages
-    },
-    {
-      name: "HTML",
-      imageId: "logo-html" // Referencia a particleImages
-    },
-    {
-      name: "CSS",
-      imageId: "logo-css" // Referencia a particleImages
-    },
-    {
-      name: "Spring Boot",
-      imageId: "logo-springboot" // Referencia a particleImages
-    },
-    {
-      name: "MySQL",
-      imageId: "logo-mysql" // Referencia a particleImages
-    },
-    {
-      name: "PostgreSQL",
-      imageId: "logo-postgresql" // Referencia a particleImages
-    },
-    {
-      name: "Git-Hub",
-      imageId: "logo-github" // Referencia a particleImages
-    },
-    {
-      name: "AWS",
-      imageId: "logo-aws" // Referencia a particleImages
-    },
-    {
-      name: "Azure",
-      imageId: "logo-azure" // Referencia a particleImages
-    },
-    {
-      name: "Docker",
-      imageId: "logo-docker" // Referencia a particleImages
-    },
-    {
-      name: "Python",
-      imageId: "logo-python" // Referencia a particleImages
-    }
+    // Lenguajes
+    { name: "JavaScript", imageId: "logo-javascript" },
+    { name: "Java", imageId: "logo-java" },
+    { name: "C#", imageId: "logo-csharp" },
+    { name: "Python", imageId: "logo-python" },
+    // Frontend
+    { name: "React", imageId: "logo-react" },
+    { name: "Vite", imageId: "logo-vite" },
+    { name: "HTML", imageId: "logo-html" },
+    { name: "CSS", imageId: "logo-css" },
+    // Backend
+    { name: "Node.js", imageId: "logo-nodejs" },
+    { name: "Socket.io", imageId: "logo-socketio" },
+    { name: "Spring Boot", imageId: "logo-springboot" },
+    { name: ".NET", imageId: "logo-dotnet" },
+    { name: "gRPC", imageId: "logo-grpc" },
+    { name: "Swagger", imageId: "logo-swagger" },
+    // Bases de datos
+    { name: "MySQL", imageId: "logo-mysql" },
+    { name: "PostgreSQL", imageId: "logo-postgresql" },
+    // DevOps y nube
+    { name: "Docker", imageId: "logo-docker" },
+    { name: "GitHub", imageId: "logo-github" },
+    { name: "AWS", imageId: "logo-aws" },
+    { name: "Azure", imageId: "logo-azure" },
+    // Videojuegos
+    { name: "Unity", imageId: "logo-unity" }
   ],
 
   experience: [

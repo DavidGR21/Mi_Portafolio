@@ -106,7 +106,16 @@ export const particleImages = [
     id: "logo-cybersecurity",
     path: "assets/images/logo/Cybersecurity.png",
     name: "Cybersecurity"
-  }
+  },
+  // Íconos de tecnologías usadas en los proyectos (Devicon / Simple Icons)
+  { id: "logo-java", path: "assets/images/logo/Java.png", name: "Java" },
+  { id: "logo-csharp", path: "assets/images/logo/CSharp.png", name: "C#" },
+  { id: "logo-dotnet", path: "assets/images/logo/DotNet.png", name: ".NET" },
+  { id: "logo-socketio", path: "assets/images/logo/SocketIO.png", name: "Socket.io" },
+  { id: "logo-grpc", path: "assets/images/logo/gRPC.png", name: "gRPC" },
+  { id: "logo-swagger", path: "assets/images/logo/Swagger.png", name: "Swagger" },
+  { id: "logo-vite", path: "assets/images/logo/Vite.png", name: "Vite" },
+  { id: "logo-unity", path: "assets/images/logo/Unity.png", name: "Unity" }
 ];
 
 // Índice de la imagen por defecto (se muestra al cargar)
