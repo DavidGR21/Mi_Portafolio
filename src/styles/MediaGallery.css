@@ -196,6 +196,145 @@
     outline: none;
 }
 
+/* ---------- Controles propios del video ---------- */
+
+#projects .gv {
+    position: absolute;
+    inset: 0;
+}
+
+#projects .gv-controls {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 1.4rem 0.7rem 0.55rem;
+    background: linear-gradient(to top, color-mix(in srgb, var(--p-bg) 88%, transparent), transparent);
+    transition: opacity 0.25s var(--p-ease);
+}
+
+/* En escritorio se ocultan mientras se reproduce y aparecen al pasar el mouse */
+@media (hover: hover) {
+    #projects .gv:not(.is-paused) .gv-controls {
+        opacity: 0;
+    }
+
+    #projects .gv:hover .gv-controls,
+    #projects .gv-controls:focus-within {
+        opacity: 1;
+    }
+}
+
+#projects .gv-btn {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid var(--p-line);
+    border-radius: 0;
+    background: color-mix(in srgb, var(--p-bg) 70%, transparent);
+    color: var(--p-text);
+    transition: color 0.25s var(--p-ease), border-color 0.25s var(--p-ease);
+}
+
+#projects .gv-btn:hover,
+#projects .gv-btn:focus-visible {
+    border-color: var(--p-accent);
+    color: var(--p-accent);
+    outline: none;
+}
+
+#projects .gv-time {
+    flex-shrink: 0;
+    font-family: var(--p-mono);
+    font-size: 0.7rem;
+    color: var(--p-text);
+    white-space: nowrap;
+}
+
+#projects .gv-time span {
+    color: var(--p-muted);
+}
+
+/* Barras de progreso y volumen: el input mide lo mismo que la línea visible,
+   así el hover del cursor solo se activa dentro de la línea */
+#projects .gv-range {
+    --fill: 0%;
+    height: 4px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    -webkit-appearance: none;
+    appearance: none;
+    background: linear-gradient(to right, var(--p-accent) var(--fill), var(--p-line) var(--fill));
+}
+
+#projects .gv-progress {
+    flex: 1;
+    min-width: 0;
+}
+
+#projects .gv-volume {
+    flex-shrink: 0;
+    width: 64px;
+}
+
+#projects .gv-range:focus {
+    outline: none;
+}
+
+#projects .gv-range:focus-visible {
+    outline: 1px dashed var(--p-accent);
+    outline-offset: 4px;
+}
+
+#projects .gv-range::-webkit-slider-runnable-track {
+    height: 4px;
+    background: transparent;
+}
+
+#projects .gv-range::-webkit-slider-thumb {
+    width: 10px;
+    height: 10px;
+    margin-top: -3px;
+    border: 0;
+    border-radius: 0;
+    background: var(--p-accent);
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+#projects .gv-range::-moz-range-track {
+    height: 4px;
+    background: transparent;
+}
+
+#projects .gv-range::-moz-range-thumb {
+    width: 10px;
+    height: 10px;
+    border: 0;
+    border-radius: 0;
+    background: var(--p-accent);
+}
+
+/* Pantalla completa: el cursor personalizado queda fuera de este elemento,
+   así que aquí vuelve la flecha normal del sistema (sin la mano) */
+#projects .gv.is-fullscreen {
+    background: var(--p-bg);
+}
+
+#projects .gv.is-fullscreen,
+#projects .gv.is-fullscreen * {
+    cursor: default !important;
+}
+
 /* ---------- Pie: título de la captura + contador ---------- */
 
 #projects .gallery-meta {
@@ -270,5 +409,14 @@
 
     #projects .gallery-strip {
         --thumb-h: 40px;
+    }
+
+    #projects .gv-controls {
+        gap: 0.4rem;
+        padding: 1rem 0.45rem 0.4rem;
+    }
+
+    #projects .gv-volume {
+        display: none;
     }
 }

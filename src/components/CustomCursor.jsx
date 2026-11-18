@@ -7,7 +7,6 @@ const RING_SMOOTHING = 0.16;
 const MAX_PARTICLES = 60;
 const PARTICLE_SPACING = 7; // px de recorrido entre partículas
 const CLICKABLE_SELECTOR = 'a, button, [role="button"], input, textarea, select, .clickable';
-
 // Colores del trail según tema [inicio, fin]
 const TRAIL_COLORS = {
     dark: ['255, 60, 0', '255, 150, 40'],

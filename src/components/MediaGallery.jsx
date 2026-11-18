@@ -1,14 +1,37 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, Play, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Maximize, Minimize, Pause, Play, Volume2, VolumeX, X } from 'lucide-react';
 import { MEDIA_PLAY_EVENT, preloadGallery } from '../utils/mediaGallery';
 import ThumbStrip from './ThumbStrip';
 import '../styles/MediaGallery.css';
 
 const pad = (n) => String(n).padStart(2, '0');
 
+// m:ss
+const formatTime = (s) => {
+    if (!Number.isFinite(s)) return '0:00';
+    const total = Math.floor(s);
+    return `${Math.floor(total / 60)}:${pad(total % 60)}`;
+};
+
+// Controles propios en lugar de los nativos: los del navegador viven en un shadow DOM
+// donde el cursor personalizado no sabe qué botón hay debajo. Con botones e inputs
+// reales el efecto de hover se aplica solo sobre cada control.
 function GalleryVideo({ item }) {
+    const wrapRef = useRef(null);
     const videoRef = useRef(null);
     const [started, setStarted] = useState(false);
+    const [paused, setPaused] = useState(true);
+    const [current, setCurrent] = useState(0);
+    const [duration, setDuration] = useState(0);
+    const [muted, setMuted] = useState(false);
+    const [volume, setVolume] = useState(1);
+    const [fullscreen, setFullscreen] = useState(false);
+
+    useEffect(() => {
+        const handleChange = () => setFullscreen(document.fullscreenElement === wrapRef.current);
+        document.addEventListener('fullscreenchange', handleChange);
+        return () => document.removeEventListener('fullscreenchange', handleChange);
+    }, []);
 
     // Si empieza a sonar la música, se pausa el video
     useEffect(() => {
@@ -31,8 +54,46 @@ function GalleryVideo({ item }) {
         videoRef.current.play().catch(() => {});
     };
 
+    const togglePlay = () => {
+        const video = videoRef.current;
+        if (video.paused || video.ended) video.play().catch(() => {});
+        else video.pause();
+    };
+
+    const seek = (e) => {
+        const time = Number(e.target.value);
+        videoRef.current.currentTime = time;
+        setCurrent(time);
+    };
+
+    const toggleMute = () => {
+        const video = videoRef.current;
+        video.muted = !video.muted;
+        if (!video.muted && video.volume === 0) video.volume = 1;
+    };
+
+    const changeVolume = (e) => {
+        const video = videoRef.current;
+        video.volume = Number(e.target.value);
+        video.muted = video.volume === 0;
+    };
+
+    const toggleFullscreen = () => {
+        if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+        else wrapRef.current.requestFullscreen?.().catch(() => {});
+    };
+
+    const syncVolume = () => {
+        setMuted(videoRef.current.muted);
+        setVolume(videoRef.current.volume);
+        announce();
+    };
+
+    const progress = duration ? (current / duration) * 100 : 0;
+    const volumeLevel = muted ? 0 : volume;
+
     return (
-        <>
+        <div ref={wrapRef} className={`gv${paused ? ' is-paused' : ''}${fullscreen ? ' is-fullscreen' : ''}`}>
             {/* "faststart" + preload=metadata: el póster aparece al instante y el video
                 empieza a reproducirse mientras se sigue descargando */}
             <video
@@ -42,16 +103,58 @@ function GalleryVideo({ item }) {
                 poster={item.poster}
                 preload="metadata"
                 playsInline
-                controls={started}
-                onPlay={announce}
-                onVolumeChange={announce}
+                onClick={started ? togglePlay : start}
+                onPlay={() => { setPaused(false); announce(); }}
+                onPause={() => setPaused(true)}
+                onTimeUpdate={(e) => setCurrent(e.target.currentTime)}
+                onLoadedMetadata={(e) => setDuration(e.target.duration)}
+                onDurationChange={(e) => setDuration(e.target.duration)}
+                onVolumeChange={syncVolume}
             />
             {!started && (
                 <button type="button" className="gallery-play" onClick={start} aria-label={`Play: ${item.caption}`}>
                     <Play size={22} strokeWidth={1.8} />
                 </button>
             )}
-        </>
+            {started && (
+                <div className="gv-controls">
+                    <button type="button" className="gv-btn" onClick={togglePlay} aria-label={paused ? 'Play' : 'Pause'}>
+                        {paused ? <Play size={15} /> : <Pause size={15} />}
+                    </button>
+                    <span className="gv-time">
+                        {formatTime(current)} <span>/ {formatTime(duration)}</span>
+                    </span>
+                    <input
+                        type="range"
+                        className="gv-range gv-progress"
+                        min="0"
+                        max={duration || 0}
+                        step="0.1"
+                        value={current}
+                        onChange={seek}
+                        style={{ '--fill': `${progress}%` }}
+                        aria-label="Seek"
+                    />
+                    <button type="button" className="gv-btn" onClick={toggleMute} aria-label={volumeLevel ? 'Mute' : 'Unmute'}>
+                        {volumeLevel ? <Volume2 size={15} /> : <VolumeX size={15} />}
+                    </button>
+                    <input
+                        type="range"
+                        className="gv-range gv-volume"
+                        min="0"
+                        max="1"
+                        step="0.05"
+                        value={volumeLevel}
+                        onChange={changeVolume}
+                        style={{ '--fill': `${volumeLevel * 100}%` }}
+                        aria-label="Volume"
+                    />
+                    <button type="button" className="gv-btn" onClick={toggleFullscreen} aria-label={fullscreen ? 'Exit full screen' : 'Full screen'}>
+                        {fullscreen ? <Minimize size={15} /> : <Maximize size={15} />}
+                    </button>
+                </div>
+            )}
+        </div>
     );
 }
 
@@ -83,8 +186,9 @@ function MediaGallery({ project, startIndex = 0, onClose }) {
     useEffect(() => {
         const handleKey = (e) => {
             if (e.key === 'Escape') onClose();
-            // Con el foco en el video, las flechas adelantan/retroceden el video
-            if (e.target.tagName === 'VIDEO') return;
+            // Con el foco en los controles del video, las flechas son del video
+            // (adelantar, volumen) y no cambian de captura
+            if (e.target.closest?.('.gv-controls')) return;
             if (e.key === 'ArrowRight') go(1);
             if (e.key === 'ArrowLeft') go(-1);
         };
@@ -94,7 +198,7 @@ function MediaGallery({ project, startIndex = 0, onClose }) {
 
     // Deslizar con el dedo en pantallas táctiles
     const handlePointerDown = (e) => {
-        if (e.pointerType !== 'touch' || e.target.tagName === 'VIDEO') return;
+        if (e.pointerType !== 'touch' || e.target.closest('.gv-controls')) return;
         swipeRef.current = e.clientX;
     };
     const handlePointerUp = (e) => {
